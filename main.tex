@@ -1,0 +1,42 @@
+% Documento principal: estructura e inclusión de capítulos.
+\documentclass[12pt,oneside]{report}
+\input{configuracion/preambulo}
+\begin{document}
+\input{preliminares/portada}
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+\input{preliminares/resumen}
+\input{preliminares/abstract}
+\clearpage
+\tableofcontents
+\clearpage
+\glsaddall[types=\acronymtype]
+\printglossary[type=\acronymtype,title=Acrónimos]
+\clearpage
+\input{preliminares/notacion}
+\pagenumbering{arabic}
+\input{capitulos/01_introduccion}
+\part{Fundamentos y modelo físico}
+\input{capitulos/02_fundamentos_canal}
+\part{Gemelos digitales y representaciones físico--latentes}
+\input{capitulos/03_gemelos_digitales}
+\input{capitulos/04_representaciones_entorno}
+\part{De la escena a la observación y la inferencia}
+\input{capitulos/05_aprendizaje_optimizacion}
+\input{capitulos/06_observacion_wifi_lora}
+\input{capitulos/07_dinamica_humana}
+\input{capitulos/08_observabilidad}
+\input{capitulos/09_transferencia}
+\part{Programa doctoral y estrategia de validación}
+\input{capitulos/10_problema_objetivos}
+\input{capitulos/11_metodologia}
+\input{capitulos/12_diseno_experimental}
+\input{capitulos/13_avances_experimentales}
+\input{capitulos/14_contribuciones}
+\input{capitulos/15_proyecto_ciencia}
+\input{capitulos/16_plan_trabajo}
+\input{capitulos/17_conclusiones}
+\clearpage
+\bibliographystyle{ieeetr}
+\bibliography{references}
+\end{document}

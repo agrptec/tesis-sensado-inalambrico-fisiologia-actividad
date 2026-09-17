@@ -1,0 +1,453 @@
+\chapter{Metodología general}
+\label{ch:methodology}
+
+\section{Principio metodológico: incorporación gradual de complejidad}
+
+La metodología incorpora una sola fuente principal de complejidad en cada fase. Los elementos validados se conservan, se documentan sus supuestos y se añade el componente siguiente. El avance no depende de alcanzar de manera aislada un valor de exactitud, sino de demostrar que el nuevo componente explica un fenómeno que el modelo anterior no podía representar. Esta lógica enlaza el modelo físico con la adquisición experimental y, posteriormente, con el problema inverso.
+
+\begin{table}[ht]
+\centering
+\caption{Líneas metodológicas de la investigación doctoral.}
+\label{tab:lineas_metodologicas}
+\begin{tabularx}{\textwidth}{p{1.3cm}L L}
+\toprule
+\textbf{Línea} & \textbf{Pregunta científica} & \textbf{Resultado principal}\\
+\midrule
+L1 & ¿Puede el gemelo reproducir el canal real y conservar su fase? & Gemelo estático nominal y calibrado.\\
+L2 & ¿Cómo debe representarse el entorno? & Comparación de $Z_E$ y análisis de eficiencia de datos.\\
+L3 & ¿Cómo preservar la dinámica y las variaciones pequeñas de fase? & Gemelo dinámico para movimiento y respiración.\\
+L4 & ¿Cómo transforma cada tecnología de radio la información física? & Modelos de observación para Wi-Fi y LoRa.\\
+L5 & ¿Qué variables pueden recuperarse y con qué incertidumbre? & Solución del problema inverso y análisis de observabilidad.\\
+L6 & ¿Cómo configurar una red para maximizar la información útil? & Diseño optimizado de la red distribuida.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Cadena de evidencia y ejecución concurrente}
+\label{sec:updated_method_chain}
+
+La secuencia científica actualizada es geometría métrica, calibración macroscópica,
+factorización de fase, representación robusta/coherente, fidelidad diferencial y,
+finalmente, sensado e inversión. Cada enlace requiere evidencia propia. El resultado
+de DICHASUS motiva separar retardo transferible, referencia de fase y residual;
+no autoriza a atribuir toda discrepancia a un defecto geométrico o instrumental.
+
+Se desarrollarán dos frentes concurrentes. El computacional completará S4.7a con
+$\mathsf V_0$--$\mathsf V_7$, controles de invariancia y particiones espaciales;
+S4.7b se justificará por el residual y S5 comparará representaciones. El experimental
+construirá referencia y metrología, caracterizará Esc. E0 y contrastará Esc. E1--E2
+antes de adquirir datos humanos. La preparación de S6 no esperará a implementar todas
+las arquitecturas de S5. Los operadores Wi-Fi y LoRa se instrumentarán desde el inicio,
+aunque su comparación de sensado exija una perturbación común ya validada.
+
+\subsection{Pruebas de esfuerzo de la representación}
+\label{sec:representation_stress_tests}
+
+Antes de entrenar un predictor, cada $\mathsf V_i$ se someterá a transformaciones
+sintéticas sobre el mismo canal. Para $H_{a,k,t}$ se definen:
+\begin{align}
+\mathsf T_1(H)&=e^{j\phi_t}H,
+&\phi_t&\sim\mathcal U(-\pi,\pi),\nonumber\\
+\mathsf T_2(H)_{a,k,t}&=e^{j\phi_{g(a),t}}H_{a,k,t},
+&&\text{fase por arreglo},\nonumber\\
+\mathsf T_3(H)_{a,k,t}&=e^{-j2\pi\nu_k\delta\tau_t}H_{a,k,t},
+&&\text{retardo de referencia},\nonumber\\
+\mathsf T_4(H)&=g_tH,
+&&\text{ganancia},\label{eq:s47_stress_transforms}\\
+\mathsf T_5(H)_{a,k,t}&=e^{j\theta_a}H_{a,k,t},
+&&\text{desfase por cadena},\nonumber\\
+\mathsf T_6(H)_{a,k,t}&=e^{j2\pi\Delta f\,t}H_{a,k,t},
+&&\text{CFO temporal},\nonumber\\
+\mathsf T_7(H)&=\mathcal Q\!\left(\mathcal I_{\rm IQ}(H)+n\right),
+&&\text{IQ, cuantización y ruido}.\nonumber
+\end{align}
+$g_t$, $\delta\tau_t$, $\Delta f$ y el nivel de ruido se obtendrán de rangos
+observados o de una condición experimental declarada. RadioRange orientará la
+inyección controlada de perturbaciones, sin importar automáticamente su modelo de
+ranging a la tarea de sensado \citep{Lyu2026RadioRange}.
+
+Las identidades algebraicas se verificarán con tolerancia numérica relativa fijada
+antes de la ejecución; los efectos de ruido, regularización y máscaras se resumirán
+mediante distribuciones e intervalos agrupados. La matriz final indicará, para cada
+par $(\mathsf V_i,\mathsf T_j)$, error relativo de invariancia y pérdida de sensibilidad.
+No se asignará de antemano una etiqueta binaria de ``robusto'': por ejemplo, una matriz
+de Gram por frecuencia rechaza fase común y retardo común, pero cambia ante fases de
+cadena y puede ocultar movimiento compartido. La selección seguirá un frente de Pareto
+entre rechazo de perturbaciones y retención de respuesta física.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Relación entre escenarios físicos nuevos y nomenclatura previa. Todos los escenarios E0--E5 son propuestos.}
+\label{tab:scenario_program_map}
+\begin{tabularx}{\textwidth}{P{1.6cm}L P{3.4cm}}
+\toprule
+Escenario & Pregunta y transición & Correspondencia\\
+\midrule
+Esc. E0 & Estabilidad con escena y terminales fijos; referencia instrumental. & L1/L4; soporte de S6/S7.\\
+Esc. E1 & Desplazamiento conocido de reflector; respuesta diferencial. & E3.1; S6; experimento D.\\
+Esc. E2 & Fantoma periódico y perturbaciones combinadas. & L3; S6/S7; D y F.\\
+Esc. E3 & Una persona: movimiento, postura y respiración diferenciados. & E3.2--E3.5; F y G.\\
+Esc. E4 & Dos personas: separabilidad antes de reconocimiento. & E3.6; experimento H.\\
+Esc. E5 & Día, dispositivo, objetos, habitación y banda reservados. & S5/S7; C y G; soporte de I.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los identificadores Esc. E0--E5 nombran condiciones físicas y no reemplazan los
+subexperimentos E1.1--E3.6 ni los experimentos temáticos A--I. Las condiciones G0--G4
+comparan geometría; $\mathsf V_i$ compara observables; L1--L6 nombra líneas científicas
+y LT1--LT6, tareas administrativas. La \cref{sec:physical_scenarios} fija controles,
+referencias y criterios de paso para evitar que estas dimensiones se confundan.
+
+\section{Primera etapa: modelado de canal en escenarios controlados}
+\label{sec:first_method_stage}
+
+La primera etapa establece la relación entre escenario, representación electromagnética
+y respuesta compleja antes de introducir una tarea humana. Se organiza en cinco niveles:
+validación analítica; reconstrucción del entorno dc01; descomposición y estadística de fase;
+predicción y transferencia espacial; y caracterización de los componentes todavía no
+predichos. El \cref{ch:marco_canal} fundamenta propagación, interferencia y referencia
+espectral; el \cref{ch:learning_foundations} establece los estimadores y la evaluación.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Escenarios de la primera etapa y alcance de su evidencia.}
+\begin{tabularx}{\textwidth}{P{2.8cm}L L}
+\toprule
+Escenario & Propiedad que se contrasta & Estado y relación experimental\\
+\midrule
+Espacio libre y una reflexión & Escala, fase, retardo y Fresnel & Verificación analítica del simulador; protocolo de E1.1.\\
+Multitrayectoria controlada & Interferencia y sensibilidad a fase por camino & S4.1: reproducción PEOC/UPEC/PEAC y estabilidad de estimación.\\
+Escena nominal dc01 & Ganancia, magnitud y dispersión temporal & S1/B0--B2: ejecutados con partición original.\\
+Frecuencias y antenas reservadas & Transferencia de fase afín y estructura residual & S4.2--S4.3: ejecutados; distintos accesos a CPO.\\
+Regiones reservadas de dc01 & Predicción de retardo y utilidad en el canal & S4.4--S4.5: ejecutados con cinco bloques y exclusión de 0.5 m.\\
+Capturas con tiempo recuperado & Concentración y continuidad de la fase común & S4.6a--d.2: ejecutados sobre B0; sin ventaja clara de los vecinos ensayados.\\
+Otra configuración de objetos o escena & Editabilidad y transferencia del entorno & S5: propuesto; no demostrado por los bloques de dc01.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Esta organización distingue variación de condiciones dentro de una escena de transferencia
+entre escenas. La calibración de materiales B0--B2 y el predictor de retardo se evalúan
+con protocolos diferentes; el resultado espacial del segundo no acredita automáticamente
+el del primero. S4.6 caracteriza el desfase residual y documenta controles
+espaciales y temporales. S4.7a evaluará fidelidad relativa mediante invariantes;
+S4.7b contrastará incertidumbre por trayectoria. Los criterios concretos y sus condiciones de acceso a datos se presentan en
+la \cref{sec:future_route}.
+
+Las comparaciones externas tienen una función específica: Hoydis fundamenta la reproducción
+material; Ruah, la incertidumbre de fase; NeRF$^2$, la predicción espacial de campos;
+Learnable WDT y RadTwin, la representación del entorno editable; WaveVerse, la coherencia
+dinámica; y RayLoc, la inversión diferenciable \citep{Hoydis2024DiffRT,Ruah2024Phase,
+Zhao2023NeRF2,Jiang2025LearnableWDT,Zhang2026RadTwin,Zheng2026WaveVerse,Han2026RayLoc}.
+Su incorporación depende de una consulta y un observable comparables, no de una lista
+indiferenciada de arquitecturas.
+
+\subsection{Decisión metodológica después de S4.6}
+
+La decisión siguiente parte de un resultado positivo: el retardo predicho ya
+mejora la concordancia angular y la coherencia, tanto en interpolación densa
+como en regiones reservadas. S4.7a aborda la fase común que todavía se estima
+con la medición, y S4.7b la discrepancia relativa restante. Así, cada bloque
+responde a una limitación específica de una corrección que ha demostrado
+utilidad parcial, conforme al balance de la \cref{sec:synthesis}.
+
+
+El diagnóstico comprende 10\,000 capturas, 640\,000 fases por enlace y un
+manifiesto temporal cuya correspondencia de coordenadas es exacta en ese
+subconjunto. La fase común se estima con las propias antenas de cada captura,
+por lo que su eliminación es descriptiva. Las reglas de vecindad no acreditan
+predictibilidad local; tampoco excluyen estructura condicionada a variables
+no examinadas. La distinción entre fase efectiva residual y CPO físico evita
+atribuir al entorno o al receptor un error cuya causa no ha sido identificada.
+
+S4.7a comprobará productos espaciales y entre frecuencias, junto con una
+métrica del canal definida respecto de una fase común por arreglo. Los productos
+espaciales eliminan también retardo común, por lo que la contribución del
+retardo predicho se medirá con productos entre frecuencias o con el canal
+apilado. El protocolo completo se fija en la \cref{sec:s47a_protocol}.
+S4.7b estudiará el residual restante y S5 comparará representaciones bajo el
+mismo acceso a mediciones y el mismo grupo de invariancia. La validación
+diferencial S6 determinará si esa invariancia conserva la señal de movimiento.
+
+\section{Línea 1: gemelo físico estático}
+
+El estado de avance de esta línea se presenta en el \cref{ch:avances}. S1/B0--B2 y S4.1--S4.6d.2 cuentan con ejecuciones documentadas. El avance incluye análisis residual, predicción de retardo, evaluación por bloques espaciales y estudio de la fase común; S4.6 completa el diagnóstico circular y temporal; S4.7a--b permanecen propuestos. Las actividades que siguen fijan el protocolo completo y sus verificaciones pendientes; su enumeración no presupone que todas se hayan ejecutado.
+
+\subsection{E1.1: validación analítica mínima}
+
+Antes de interpretar resultados de escenas complejas se validarán:
+\begin{enumerate}
+\item espacio libre: Friis, fase y delay;
+\item una reflexión: coeficientes de Fresnel y dos rayos;
+\item difracción en configuración controlada;
+\item movimiento de reflector de $0.5$ a $50$ mm;
+\item consistencia entre derivada numérica y derivada diferenciable.
+\end{enumerate}
+El criterio de validación exige que la salida compleja del simulador reproduzca las soluciones analíticas dentro de tolerancias numéricas definidas antes del experimento.
+
+\subsection{E1.2: configuración nominal de DICHASUS dc01}
+
+Se utilizaron posiciones reales y la escena INUE para construir un banco reportado de $10000$ posiciones con
+\begin{equation}
+\left(\vect p_i,H_i^{\rm real},\calP_i,H_i^{\rm RT}\right).
+\end{equation}
+La referencia B0 utiliza materiales nominales y una escala global congelada. La comparación adicional sin ajuste de escala constituye una ablación propuesta; no debe confundirse con B0. Se conservan los caminos trazados, su activación, el orden de frecuencias y la partición original 5000/100/4900.
+
+\subsection{E1.3: particiones espaciales}
+
+La partición original se conserva como referencia de interpolación densa. S4.4d documenta su proximidad espacial, y S4.4e--f añade cinco bloques con exclusión de 0.5 m. Para cada protocolo se distinguen:
+\begin{align}
+\Omega_{\rm ent}&,\\
+\Omega_{\rm val}&,\\
+\Omega_{\rm prueba}&,
+\end{align}
+con regiones separadas. Se estudiarán tres regímenes: interpolación, extrapolación dentro de una escena y transferencia entre escenas cuando existan conjuntos de datos compatibles.
+
+\subsection{E1.4: calibración acumulativa}
+
+Comparaciones:
+\begin{enumerate}
+\item RT nominal con materiales de catálogo;
+\item RT + escala global;
+\item materiales aprendidos;
+\item materiales neuronales dependientes de la posición;
+\item materiales + scattering/antena cuando sea identificable;
+\item diagnóstico de CPO y retardo efectivo, con referencias oráculo y transferencia;
+\item calibración sensible a la fase y modelado del error local de fase.
+\end{enumerate}
+Cada versión utilizará la misma partición de datos. B0, B1 y B2 designan respectivamente materiales nominales, globales aprendidos y neuronales espaciales; las identificaciones no deben confundirse con los identificadores de experimentos A--I. Los resultados y las particiones documentadas se detallan en el \cref{ch:avances}.
+
+\subsection{Métricas}
+
+\paragraph{NMSE complejo}
+\begin{equation}
+\operatorname{NMSE}_H=
+\frac{\sum_i\|\widehat H_i-H_i\|_2^2}
+{\sum_i\|H_i\|_2^2}.
+\end{equation}
+
+\paragraph{Error de magnitud}
+\begin{equation}
+E_A=\frac{1}{N}\sum_i
+\big\||\widehat H_i|-|H_i|\big\|_1.
+\end{equation}
+
+\paragraph{Pérdida circular de fase}
+\begin{equation}
+\calL_{\phi,\rm circ}=\frac{1}{NK}
+\sum_{i,k}\left[1-
+\cos(\angle\widehat H_{ik}-\angle H_{ik})\right].
+\end{equation}
+Esta pérdida es adimensional. Para reportar errores angulares en grados se utiliza la distancia circular absoluta $E_{\phi,\rm deg}$ de la \cref{eq:error_angular_avances}; ambas métricas deben distinguirse. Se añade la coherencia compleja normalizada de la \cref{eq:coherencia_avances}, con declaración de los ejes de agregación. Los valores brutos, alineados sobre la propia observación y transferidos se informarán por separado.
+
+\paragraph{Dispersión de retardos.}
+A partir de $h=\operatorname{IFFT}(H)$ se compararán el perfil de potencia en función del retardo y su dispersión cuadrática media.
+
+\paragraph{Eficiencia de datos}
+Se repetirá calibración con $N\in\{25,50,100,250,500,1000,\ldots\}$ para obtener $E(N)$.
+
+\section{Línea 2: comparación de representaciones del entorno}
+
+\subsection{Familias}
+
+La comparación inicial realizada comprende RT nominal B0, materiales globales B1 y materiales neuronales espaciales B2. S4.4--S4.5 comparan predictores auxiliares del retardo sobre B0; no constituyen todavía el banco de campos neuronales S5. Se mantiene como ampliación propuesta la comparación con un campo neuronal implícito tipo NeRF$^2$, un gemelo centrado en objetos, una representación informada por la geometría tipo RadTwin y una formulación híbrida propia basada en descriptores de trayectorias y objetos \citep{Zhao2023NeRF2,Jiang2025LearnableWDT,Zhang2026RadTwin}. B2 no se identifica con esas arquitecturas ni acredita por sí solo transferencia entre escenas.
+
+\subsection{Comparación por capacidades y acceso a información}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Función de las familias de gemelo en la comparación propuesta S5.}
+\label{tab:twin_capability_comparison}
+\begin{tabularx}{\textwidth}{P{2.8cm}L L}
+\toprule
+Familia & Capacidad que se contrastará & Condición de comparación\\
+\midrule
+RT B0/B1/B2 & Propagación explícita y calibración material global/espacial. & Geometría, mecanismos y datos de ajuste declarados.\\
+NeRF$^2$ & Predicción espacial mediante campo aprendido de mediciones. & Densidad de muestras, consulta y regiones reservadas iguales.\\
+Learnable WDT & Transporte y representación del entorno centrada en objetos. & Acceso a objetos y coste de adaptación explícitos.\\
+RFScape & Representación neuronal de objetos integrada en trazado RF. & Objetos trasladados con identidad conservada y prueba independiente.\\
+RadTwin & Uso de información geométrica en escenas variables. & Igual disponibilidad de geometría y observables de evaluación.\\
+Híbrido propuesto & Trayectorias, coordenadas locales y dos ramas de fase. & Ablaciones de geometría, referencia, latente y supervisión.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Estas familias se apoyan en los trabajos de referencia \citep{Zhao2023NeRF2,Jiang2025LearnableWDT,
+Chen2025RFScape,Zhang2026RadTwin}. La tabla define preguntas experimentales, no
+un orden de superioridad publicado. Cuando un método requiera información adicional,
+se comparará dentro del régimen correspondiente y se cuantificará el beneficio de
+esa información. Sionna RT constituye el antecedente canónico del simulador diferenciable
+\citep{Hoydis2023SionnaRT}; sus desarrollos posteriores no cambian retrospectivamente
+la versión con la que se obtuvieron los resultados documentados.
+
+\subsection{Tareas}
+
+\begin{enumerate}
+\item reconstrucción de canal en posiciones conocidas;
+\item interpolación espacial;
+\item extrapolación espacial;
+\item adaptación con pocas mediciones y coste de calibración declarado;
+\item cambio de objetos/materiales;
+\item transferencia de escena;
+\item inversión de parámetros físicos.
+\end{enumerate}
+
+\subsection{Métricas adicionales}
+
+Además del error de canal se reportarán memoria, tiempo de inferencia, número de mediciones de calibración, error bajo edición y calidad del Jacobiano respecto de cambios físicos.
+
+\section{Línea 3: gemelo dinámico}
+
+\subsection{E3.1: reflector mecánico}
+
+Se utilizará una superficie de geometría conocida y desplazamiento medido con
+transmisor y receptor fijos. La rejilla inicial será
+\begin{equation}
+\delta x\in\{0,0.25,0.5,1,2,5,10\}\;\mathrm{mm},
+\end{equation}
+restringida por la incertidumbre efectiva de la etapa. Se compararán $H(t)$,
+$\Delta H$, fase, Doppler y $\partial\mathcal V/\partial x$; pasos mayores podrán
+introducirse como extensión macroscópica. Esc. E1 de la \cref{sec:scenario_e1}
+fija repeticiones, referencias y controles de histéresis.
+
+\subsection{E3.2: primitivas humanas}
+
+Progresión:
+\begin{equation}
+\text{placa}\rightarrow
+\text{elipsoide}\rightarrow
+\text{cápsula}\rightarrow
+\text{cuerpo articulado}\rightarrow
+\text{SMPL}.
+\end{equation}
+La finalidad es cuantificar el grado de detalle geométrico necesario para preservar las derivadas relevantes para el sensado.
+
+\subsection{E3.3: movimiento macroscópico}
+
+Se simularán acciones de marcha, giro, sedestación, incorporación y movimiento de brazos. WiMANS y los conjuntos de datos con esqueleto corporal o video proporcionarán trayectorias de movimiento y referencias externas, pero no se utilizarán necesariamente para la calibración física.
+
+\subsection{E3.4: respiración}
+
+Se impondrá
+\begin{equation}
+x_{\rm chest}(t)=A_r\sin(2\pi f_rt+\phi)
+\end{equation}
+como estímulo inicial del fantoma, con amplitud pico $A_r\in[0.5,10]$ mm y
+frecuencia $f_r\in[0.1,0.6]$ Hz. Estos rangos definen la intervención mecánica de
+Esc. E2, no una imposición de amplitud torácica a participantes. Después se utilizarán
+formas no sinusoidales, pausas mecánicas y, en Esc. E3, referencias respiratorias
+reales autorizadas. Se contrastarán forma de onda, amplitud, fase y frecuencia.
+BreatheSmart orientará condiciones controladas y Wi-Actigraph aportará contexto de
+sueño y movimiento; su función no sustituye la referencia sincronizada del banco.
+
+\subsection{E3.5: movimiento + respiración}
+
+Se combinarán locomoción y postura con el micromovimiento torácico. Se compararán un método de filtrado de referencia, métodos de separación de fuentes y representaciones contrastivas inspiradas en MoVi-Fi.
+
+\subsection{E3.6: varios usuarios}
+
+La secuencia incluirá dos personas con movimientos distintos, señales respiratorias
+con frecuencias diferentes o similares y movimiento macroscópico simultáneo, según
+Esc. E4. Las interrupciones de una fuente se estudiarán primero en simulación o con
+fantomas; no se interpretarán como validación de apnea humana. Antes de evaluar las
+redes se verificará el condicionamiento de la FIM conjunta.
+
+\section{Línea 4: modelos de observación}
+
+\subsection{Wi-Fi}
+
+Se generarán configuraciones en 2.4, 5 y 6 GHz, con anchos de banda de 20, 40 y 80 MHz, y se variarán las subportadoras y los enlaces. Se añadirán perturbaciones controladas: CPO, STO, SFO, ruido, pérdida de paquetes y variación entre dispositivos. UWB-Fi se considerará como una extensión para evaluar diversidad frecuencial dispersa.
+
+\subsection{LoRa}
+
+Se generarán muestras I/Q para distintas configuraciones de $f_c$, factor de dispersión, ancho de banda y calendario de paquetes. Se estudiarán los desajustes de frecuencia, la interferencia LoRa/FSK, las colisiones y el tráfico irregular. OpenLoRa permitirá validar la estadística de radio y de las perturbaciones instrumentales, mientras que SenLoRa y los estudios de sensado LoRa de largo alcance orientarán los experimentos con personas y tráfico ambiente.
+
+\subsection{Experimento comparativo entre tecnologías de radio}
+
+La misma geometría humana $G_H(t)$ se renderizará bajo Wi-Fi y LoRa, produciendo $\calP_{\rm WiFi}$ y $\calP_{\rm LoRa}$ por separado. Se compararán información de detección $D_{\rm presence}$ y matrices normalizadas $\mat F_{\rm motion}$ y $\mat F_{\rm respiration}$. Presencia se tratará como hipótesis discreta; movimiento y respiración como estados continuos.
+
+\section{Línea 5: solución del problema inverso}
+
+\subsection{Inversión por optimización}
+
+Para estado $\vect q$,
+\begin{equation}
+\vect q^\star=\arg\min_{\vect q}
+D\left(Y_{\rm real},F_\theta(\vect q)\right)+R(\vect q).
+\end{equation}
+Se estudiará inicialización jerárquica: posición/orientación gruesa y posteriormente micromovimiento.
+
+\subsection{Inversión amortizada}
+
+Un codificador aproxima
+\begin{equation}
+q_\phi(\vect q\mid Y)
+\end{equation}
+y produce media y covarianza. La calibración de incertidumbre se evaluará con cobertura empírica de intervalos y error de calibración.
+
+\subsection{Abstención}
+
+Si la FIM es degenerada o la incertidumbre posterior supera un umbral, el sistema debe poder abstenerse. La tasa de cobertura--riesgo será una métrica principal, especialmente en fisiología.
+
+\section{Línea 6: diseño y despliegue de la red}
+
+Sea $u$ la configuración de nodos, ganancia, frecuencia y parámetros de radio. Se plantea
+\begin{equation}
+u^\star=\arg\max_u
+\int_{\Omega_{\rm AoI}}
+w(\vect x)
+\Phi\left(\mat F_{\bar q}(\vect x;u)\right)d\vect x
+\label{eq:deployment_opt}
+\end{equation}
+sujeto a restricciones de potencia, número de nodos, energía, tráfico y PRR. Para una selección discreta de enlaces $S$:
+\begin{equation}
+\max_{S:|S|\le K}
+\sum_{\vect x\in\Omega}
+\log\det\left(
+\mat I+\sum_{l\in S}\mat F_{\bar q,l}(\vect x)
+\right).
+\label{eq:doptimal}
+\end{equation}
+La solución se comparará con la ubicación de nodos basada en RSSI/SNR y con heurísticas geométricas.
+
+\section{Optimización multiobjetivo y funciones de pérdida}
+
+\subsection{Por qué el problema es multiobjetivo}
+
+La tesis no persigue una sola propiedad. La reconstrucción del canal, la coherencia de fase, la invariancia frente al dominio, la preservación de información fisiológica y la discriminación de perturbaciones instrumentales pueden inducir gradientes en conflicto. La función escalar básica es
+\begin{equation}
+\calL=\sum_i\lambda_i\calL_i,
+\end{equation}
+pero los pesos $\lambda_i$ no deben elegirse arbitrariamente.
+
+\subsection{Pérdidas propuestas}
+
+\begin{align}
+\calL_H & = \operatorname{NMSE}(\widehat H,H),\\
+\calL_A & = \||\widehat H|-|H|\|_1,\\
+\calL_\phi & = \E[1-\cos(\angle\widehat H-\angle H)],\\
+\calL_{\rm CIR} & = \|\widehat h-h\|_1,\\
+\calL_{\rm dyn} & = \|\Delta_t\widehat H-\Delta_tH\|_1,\\
+\calL_J & = \|\widehat J-J\|_F^2,\\
+\calL_{\rm physio} & = 1-\rho(\widehat x_{\rm chest},x_{\rm chest})
++\lambda_{dtw}\operatorname{DTW}(\widehat x_{\rm chest},x_{\rm chest}),\\
+\calL_{\rm align}&=\|z_{RF}^{\rm comun}-z_T^{\rm comun}\|_2^2,\\
+\calL_{\rm cyc}&=\|\widehat z-z\|_2^2.
+\end{align}
+
+\subsection{Selección de pesos}
+
+Se compararán tres estrategias: pesos fijos normalizados, ponderación adaptativa mediante GradNorm y optimización multiobjetivo mediante proyección de gradientes \citep{Chen2018GradNorm,Yu2020PCGrad}. Para dos objetivos con $g_i^Tg_j<0$, PCGrad proyecta
+\begin{equation}
+g_i\leftarrow g_i-
+\frac{g_i^Tg_j}{\|g_j\|_2^2}g_j.
+\end{equation}
+No se supone de antemano que PCGrad sea superior; se incluye porque el posible conflicto entre la fidelidad del modelo directo y la utilidad para el sensado constituye una hipótesis científica explícita.
+
+\subsection{Frontera de Pareto}
+
+Se evaluará además error temporal y amplitud sin deformación del eje de tiempo
+en prueba; la correlación y DTW no serán las únicas métricas de forma de onda.
+
+Se analizará si minimizar $\calL_H$ coincide con minimizar $\calL_{\rm sensado}$. Si ambas metas difieren, se presentarán las soluciones de Pareto y se discutirá el grado de fidelidad física necesario para cada tarea. Esta evaluación puede revelar que un modelo de canal ligeramente menos preciso, pero con jacobianos correctos, resulte más adecuado para resolver el problema inverso de sensado.

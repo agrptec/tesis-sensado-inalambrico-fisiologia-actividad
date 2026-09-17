@@ -1,0 +1,94 @@
+\chapter{Propuesta científica y correspondencia con el proyecto de Ciencia de Frontera}
+\label{ch:secihti_mapping}
+
+\section{Problema, hipótesis y alcance de la propuesta actualizada}
+
+La propuesta aborda la dificultad de recuperar movimiento y fisiología mediante
+infraestructura inalámbrica cuando la señal útil se superpone con multitrayectoria,
+deriva instrumental y cambios del entorno. Los avances de dc01 muestran que mejorar
+potencia y retardos no garantiza predecir fase bruta, y que una corrección espectral
+parcialmente predecible sí aporta concordancia bajo las condiciones documentadas.
+El siguiente problema científico consiste en determinar qué transformaciones pueden
+compensarse o hacerse invariantes sin perder la respuesta física de interés.
+
+Se propone un gemelo digital con geometría métrica, modelo de observación y dos ramas
+complementarias: una robusta para estructura relativa y otra coherente para dinámica.
+La hipótesis central y H1--H6 se formalizan en la \cref{sec:updated_hypotheses}.
+El contraste requiere intervenir físicamente el entorno y caracterizar la referencia
+de adquisición; no se resuelve únicamente añadiendo capacidad neuronal al ajuste
+estático. La aportación esperada es un procedimiento reproducible que relacione
+calibración, representación, sensibilidad y transferencia con incertidumbre explícita.
+
+El programa conserva Wi-Fi y LoRa como radios de interés. SDR, radar, visión y
+sensores de referencia se emplearán para validar y supervisar, declarando qué modalidades
+son necesarias durante inferencia. La aplicación humana se desarrollará después del
+reflector y el fantoma. El trabajo de laboratorio y la demostración comunitaria tendrán
+alcances propios; no se atribuye validación clínica ni despliegue formal a la Etapa 1.
+
+\section{Correspondencia científica y administrativa}
+
+El programa aprobado se organiza en diseño, implementación experimental e integración
+científica. La actualización precisa la secuencia técnica y los criterios de evidencia;
+no constituye por sí misma una modificación del presupuesto o de compromisos autorizados.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Correspondencia entre etapas del proyecto y evidencia del programa actualizado.}
+\label{tab:proposal_updated_mapping}
+\begin{tabularx}{\textwidth}{P{3.0cm}L L}
+\toprule
+Etapa & Trabajo doctoral & Evidencia y entregables\\
+\midrule
+Diseño & L1/L2/L4; S4.7a, referencia, G0--G4 y Esc. E0--E1. & Especificación geométrica,
+protocolo, comparaciones estáticas y caracterización de repetibilidad/sensibilidad.\\
+Implementación & L3/L4/L5; Esc. E2--E3 y operadores multirradio. & Fantoma, referencia
+sincronizada y estudio humano autorizado; datos con procedencia y particiones.\\
+Integración & L5/L6; Esc. E4--E5, inversión y diseño de red. & Límites de separabilidad,
+transferencia, incertidumbre y preparación del piloto según madurez demostrada.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Las etapas no implican que toda actividad de una fila deba concluir en los primeros
+diez meses. El cronograma del \cref{ch:wbs_stage1} distingue preparación, prueba
+preliminar y validación posterior. En particular, varios usuarios y transferencia
+externa se condicionarán por la evidencia acumulada y los acuerdos necesarios.
+
+\section{Productos científicos y criterios de revisión}
+
+El primer producto será un banco comparativo que conserve resultados brutos, relativos
+y diagnósticos oráculo separados, con particiones espaciales reproducibles. El segundo
+será un protocolo metrológico que registre escena, antenas, relojes y desplazamiento
+local, y evalúe G0--G4 sin confundir geometría con ajuste material. El tercero será
+un conjunto preliminar de mediciones con reflector y fantoma, seguido de datos humanos
+cuando se cumplan las condiciones técnicas y éticas. El cuarto será la comparación
+de ramas y métodos de referencia bajo presupuestos de información explícitos.
+
+Cada producto deberá contener la pregunta contrastada, configuración, artefactos de
+reproducción, distribución de errores, incertidumbre y limitaciones. La disponibilidad
+de una malla, un modelo entrenado o una demostración visual no basta para declarar
+validado el producto. El criterio científico de revisión será que otro grupo pueda
+reconstruir la correspondencia entre estado físico, señal adquirida, predicción y
+resultado evaluado.
+
+\section{Viabilidad y decisiones ante evidencia adversa}
+
+La viabilidad se apoya en reutilizar el equipo reportado, priorizar referencia RF y
+movimiento medido, y ejecutar S4.7a y el diseño del banco en paralelo. La inversión
+en reconstrucción LiDAR se justificará por la comparación geométrica y la utilidad
+multiescena; su adquisición no condiciona iniciar E0 ni una prueba local de E1 con
+geometría simple verificada. La selección comercial se decidirá mediante especificación,
+cotización y compatibilidad dentro de los rubros autorizados.
+
+Una invariancia demasiado amplia se restringirá o se reservará a la rama de contexto.
+Una referencia inestable motivará recalibración instrumental. Si el gemelo no reproduce
+la sensibilidad mecánica, se investigarán geometría local, mecanismos de propagación
+y observación antes de usarlo para inversión humana. La ausencia de separabilidad
+motivará abstención o rediseño de enlaces. Estas decisiones proporcionan resultados
+científicos útiles aun cuando una hipótesis de mejora no se confirme.
+
+La colaboración prospectiva con UPNA y el Dr. Francisco Falcone se orientará a repetir
+el protocolo canónico en otras bandas, sujeto a acuerdos, acceso y financiación.
+La vinculación con Colmenas Guadalajara conserva su función de caracterización de sitio
+y divulgación. Ninguna de estas actividades se presenta como ya ejecutada o como
+sustituto de una validación experimental independiente.

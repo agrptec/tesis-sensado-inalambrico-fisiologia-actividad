@@ -1,0 +1,232 @@
+\chapter{Observabilidad, información de Fisher e incertidumbre}
+\label{ch:observability}
+
+Los capítulos precedentes construyeron el modelo directo, desde la escena hasta la
+medición. Este capítulo estudia su dirección inversa: bajo qué condiciones una variación
+del estado humano produce cambios distinguibles en los observables. La respuesta se
+formula localmente mediante sensibilidad, información estadística e incertidumbre, y
+servirá después para evaluar tanto los algoritmos como el diseño de la red.
+
+\section{Problema inverso, identificabilidad y observabilidad local}
+
+El modelo directo lleva un estado $\vect q$ a una distribución de observaciones $p(\vect y\mid\vect q)$. La inversión pregunta qué estados son compatibles con una medición. La \emph{identificabilidad global} exige que estados distintos no induzcan la misma distribución; la \emph{identificabilidad local} estudia esa unicidad en una vecindad; y la \emph{estimabilidad práctica} incorpora ruido, número finito de muestras y error del modelo \citep{KaipioSomersalo2005,Kay1993}. En este manuscrito, \emph{observabilidad} denota información estadística local sobre variables físicas, no el criterio clásico de observabilidad de un sistema dinámico lineal.
+
+Sea
+\begin{equation}
+\vect y=\vect\mu(\vect q)+\vect w,
+\qquad
+\vect w\sim\mathcal{CN}(\vect 0,\mat\Sigma_w).
+\label{eq:local_observation}
+\end{equation}
+La matriz Jacobiana
+\begin{equation}
+\mat J_q=\frac{\partial\vect\mu}{\partial\vect q^T}
+\label{eq:state_jacobian}
+\end{equation}
+describe sensibilidad, pero su norma no considera ruido ni correlación. Para parámetros reales, ruido complejo propio, covarianza conocida e independiente de $\vect q$, la \ac{FIM} es
+\begin{equation}
+\mat F_q(\vect q)
+=2\Re\left\{
+\mat J_q^H\mat\Sigma_w^{-1}\mat J_q
+\right\}.
+\label{eq:fim}
+\end{equation}
+Si la covarianza depende del estado aparecen términos adicionales; si el ruido no es gaussiano, la FIM se deriva de la función de puntuación y no de la \cref{eq:fim}. Bajo condiciones regulares, para parámetros identificables y estimadores localmente
+insesgados, la cota de Cramér--Rao es
+$\operatorname{Cov}(\widehat{\vect q})\succeq\mat F_q^{-1}$
+\citep{Kay1993}. Si la información es singular, se declara un estimando local
+$U^T\vect q$ en un subespacio identificable de base ortonormal $U$ y se aplica
+la cota correspondiente a esa parametrización regular. La pseudoinversa no
+asigna incertidumbre nula a una dirección invisible y no garantiza la existencia
+de un estimador insesgado del vector completo. La cota tampoco equivale a un
+intervalo posterior ni incorpora automáticamente discrepancia del gemelo.
+
+\section{Perturbaciones e información equivalente}
+
+Sea $\vect\zeta$ un vector de perturbaciones que contiene, por ejemplo, la fase común, la ganancia o la incertidumbre geométrica. La FIM conjunta se particiona como
+\begin{equation}
+\mat F(\vect q,\vect\zeta)=
+\begin{bmatrix}
+\mat F_{qq}&\mat F_{q\zeta}\\
+\mat F_{\zeta q}&\mat F_{\zeta\zeta}
+\end{bmatrix}.
+\end{equation}
+Cuando $\vect\zeta$ debe estimarse junto con $\vect q$, la información equivalente para el estado de interés es el complemento de Schur
+\begin{equation}
+\mat F_q^{\rm eq}=
+\mat F_{qq}-
+\mat F_{q\zeta}\mat F_{\zeta\zeta}^{\dagger}
+\mat F_{\zeta q}.
+\label{eq:equivalent_fim}
+\end{equation}
+Esta expresión formaliza por qué un canal sensible al movimiento puede ser poco informativo si el mismo cambio puede explicarse mediante CFO, fase desconocida o movimiento de otro sujeto.
+
+\section{Escala, rango y criterios espectrales}
+
+Los autovalores de una FIM dependen de las unidades de $\vect q$. Antes de comparar posición en metros, orientación en radianes y desplazamiento torácico en milímetros, se define
+\begin{equation}
+\bar{\vect q}=\mat D_q^{-1}(\vect q-\vect q_0),
+\qquad
+\mat F_{\bar q}=\mat D_q^T\mat F_q^{\rm eq}\mat D_q,
+\label{eq:fim_normalization}
+\end{equation}
+con escalas físicas declaradas en $\mat D_q$. Para un conjunto fijo de variables
+y $\mat F_{\bar q}\succ0$, se considerarán
+\begin{align}
+\lambda_{\min}(\mat F_{\bar q})
+&\quad\text{(E-optimality)},\\
+\log\det(\mat F_{\bar q})
+&\quad\text{(D-optimality)},\\
+\tr(\mat F_{\bar q}^{-1})
+&\quad\text{(A-optimality)}.
+\end{align}
+Los criterios se comparan sobre el mismo subespacio objetivo; un diseño singular
+se declara no admisible para recuperar todas sus variables. Añadir una matriz
+de información previa define un criterio regularizado diferente y exige declarar
+ese prior. En particular, minimizar la traza de una pseudoinversa sin controlar
+el rango puede favorecer una configuración que pierde una variable.
+
+El rango identifica el subespacio localmente visible; un valor propio pequeño indica una dirección mal condicionada, no necesariamente una variable individual invisible. Estos criterios provienen del diseño óptimo de experimentos y se reutilizarán para determinar la ubicación de los nodos \citep{Pukelsheim2006}.
+
+\section{Respiración como ejemplo conductor}
+
+Para $q=x_{\rm chest}$, y bajo las condiciones de la \cref{eq:fim}, el índice escalar
+\begin{equation}
+o_{\rm resp}(\vect x)=
+2\Re\left\{
+\left(\frac{\partial\vect\mu}{\partial x_{\rm chest}}\right)^H
+\mat\Sigma_w^{-1}
+\left(\frac{\partial\vect\mu}{\partial x_{\rm chest}}\right)
+\right\}
+\label{eq:resp_observability}
+\end{equation}
+define un mapa local de información del desplazamiento torácico con las
+perturbaciones restantes conocidas. Si son desconocidas se utiliza la
+información equivalente de la \cref{eq:equivalent_fim}. Su derivada hereda la geometría biestática de la \cref{eq:bistatic_sensitivity}; por ello el mapa puede diferir radicalmente de RSSI. La tesis validará si predice zonas favorables y puntos ciegos mejor que métricas de comunicación.
+
+Presencia requiere un tratamiento diferente porque es una hipótesis discreta. Para $\mathcal H_0$ (ausencia) y $\mathcal H_1$ (presencia) se utilizarán razón de verosimilitudes, curvas ROC y separaciones distribucionales como KL o Chernoff, no una FIM ordinaria salvo que se introduzca y justifique una relajación continua.
+
+\section{Redes distribuidas y dependencia estadística}
+
+Si $N_{\rm link}$ enlaces son condicionalmente independientes dado $\vect q$, la información se suma:
+\begin{equation}
+\mat F_{\rm net}(\vect q)
+=\sum_{l=1}^{N_{\rm link}}\mat F_{q,l}(\vect q).
+\label{eq:fim_network}
+\end{equation}
+Con osciladores, interferencia o errores ambientales compartidos, la hipótesis falla y debe utilizarse la covarianza conjunta en la \cref{eq:fim}. Esta precaución distingue diversidad nominal de información realmente independiente.
+Si los enlaces comparten una incógnita instrumental, se construye primero
+la información conjunta y después se elimina esa incógnita; sumar
+complementos de Schur independientes describe en general otro modelo.
+
+\section{Observabilidad física y disponibilidad temporal}
+
+En LoRa, la información puede existir físicamente pero no muestrearse con densidad suficiente. Para un estado aproximadamente constante y muestras condicionalmente independientes en $\mathcal T_{\rm obs}$,
+\begin{equation}
+\mat F_{\rm eff}=
+\sum_{n\in\mathcal T_{\rm obs}}\mat F_{q,n}.
+\end{equation}
+Para respiración dinámica se empleará, en cambio, un modelo de estado y una FIM Bayesiana o posterior que incorpore correlación temporal. SenLoRa introduce métricas de disponibilidad en tráfico ambiente y estrategias para aumentar los símbolos útiles sin abandonar comunicación \citep{SenLoRa2025}. La tesis separará así \emph{información física por muestra}, \emph{cadencia disponible} e \emph{información acumulada}.
+
+\section{Incertidumbre y abstención}
+
+Se distinguirán el ruido aleatorio, la incertidumbre epistémica del estimador y la discrepancia del gemelo. La FIM caracteriza un límite local bajo un modelo supuesto; no cubre por sí sola el error de escena ni el cambio de dominio. El sistema informará una estimación, un intervalo calibrado y un índice de observabilidad, y podrá abstenerse cuando la evidencia sea insuficiente. La calibración se verificará mediante cobertura empírica y curvas de riesgo frente a cobertura, especialmente antes de interpretar una salida fisiológica.
+
+\section{Información de la forma de onda y de la frecuencia respiratoria}
+
+Para $x(t)=A\sin(2\pi f_rt+\varphi)$, la sensibilidad respecto de la tasa se
+obtiene combinando la derivada del canal con
+\begin{equation}
+\frac{\partial x(t)}{\partial f_r}=2\pi At\cos(2\pi f_rt+\varphi).
+\end{equation}
+La información de $f_r$ depende de amplitud, duración, tiempos observados y
+confusión con $A$, $\varphi$ y perturbaciones instrumentales. Si $A=0$, la
+frecuencia no es identificable en este modelo, aunque $\partial H/\partial x$
+sea grande. Por ello un mapa de sensibilidad del canal no basta para asegurar
+una estimación de respiraciones por minuto.
+
+En la validación externa, los índices predichos por el gemelo se contrastarán
+con errores y fallos de estimadores sobre mediciones reservadas. Se distinguirá
+el índice calculado con estado verdadero, utilizado como referencia explicativa,
+del disponible con posición u orientación inciertas en inferencia.
+
+\section{Efecto de eliminar perturbaciones sobre la sensibilidad útil}
+
+Tras blanquear y apilar partes real e imaginaria de los jacobianos, sean
+$A_q=\sqrt{2}[\Re(\Sigma_w^{-1/2}J_q)^T,
+\Im(\Sigma_w^{-1/2}J_q)^T]^T$ y $A_\zeta$ su equivalente para las
+perturbaciones. En el modelo local de covarianza fija,
+\begin{equation}
+F_q^{\rm eq}=A_q^T(I-A_\zeta A_\zeta^\dagger)A_q.
+\end{equation}
+La información útil corresponde a la sensibilidad que no puede explicarse
+mediante esas perturbaciones. En particular, una fase instrumental arbitraria
+por instante puede confundirse con el desplazamiento de un único camino.
+La calibración basal o una referencia independiente permiten estudiar otra
+condición de identificabilidad. Esta formulación fundamenta la prueba S6 de
+preservación de movimiento después del procesamiento instrumental.
+
+
+\section{Invariancia de fase y pérdida de sensibilidad física}
+\label{sec:invariance_sensing_limit}
+
+Para el observable espacial de la \cref{eq:spatial_gram_invariant}, una
+perturbación pequeña satisface
+\begin{equation}
+\delta\mat G=(\delta\vect h)\vect h^H+\vect h(\delta\vect h)^H
++\mathcal O(\|\delta\vect h\|^2).
+\end{equation}
+Si $\delta\vect h=j\alpha\vect h$ con $\alpha\in\mathbb R$, los términos
+lineales se cancelan. Para un cambio finito puramente rotacional la invariancia
+es exacta. Por tanto, una representación que elimina una fase instrumental
+común también puede eliminar una variación física que actúe en esa dirección.
+Esto ocurre, por ejemplo, en la idealización de un único camino cuyo movimiento
+sólo modifica su fase común y mantiene amplitud y vector espacial.
+
+S4.7a contrastará fidelidad estática en el espacio invariante; S6 deberá evaluar
+además $\partial\mat G/\partial x_H$ o la derivada del observable elegido,
+comparándola con una referencia mecánica. La información de Fisher del observable
+transformado debe derivarse de su distribución: los productos de canales
+ruidosos no conservan automáticamente el modelo gaussiano aditivo ni su
+covarianza original. Una buena concordancia de $G$ no garantiza que permanezca
+información suficiente para recuperar respiración. Esta limitación conecta
+la evaluación de invariantes con la proyección de perturbaciones y justifica
+mantener una referencia de fase estable cuando la tarea física la requiera.
+
+\section{Contraste experimental de la información preservada}
+\label{sec:observable_jacobian_test}
+
+La observabilidad se contrastará después de aplicar el operador realmente utilizado.
+Para $\mathcal V$ no holomorfa, como magnitud o productos conjugados, se apilarán
+partes reales e imaginarias del canal en $\mathbf y_{\mathbb R}$. Entonces
+\begin{equation}
+J_{\mathcal V,q}=\frac{\partial\mathcal V}{\partial\mathbf y_{\mathbb R}}
+\frac{\partial\mathbf y_{\mathbb R}}{\partial\mathbf q},\qquad
+\widehat J_{\mathcal V,q}^{(r)}=
+\frac{\mathcal V(Y(\mathbf q+h\mathbf e_r))-
+\mathcal V(Y(\mathbf q-h\mathbf e_r))}{2h}.
+\label{eq:observable_real_jacobian}
+\end{equation}
+Se probarán varios pasos $h$ resolubles por la referencia mecánica para separar
+error de truncamiento, histéresis y ruido amplificado por la diferencia finita.
+La distancia cociente $\mathsf V_4$ exige analizar su geometría local o un representante
+con referencia declarada; no se tratará como un vector de características arbitrario.
+
+Se compararán dirección, norma y valores singulares del Jacobiano medido y simulado,
+además de error relativo con un piso de denominador declarado. Si la sensibilidad
+medida no se distingue del ruido, un error relativo pequeño no certifica un gemelo
+útil. La FIM utilizará la covarianza del observable transformado y perturbaciones
+instrumentales residuales; no se trasladará sin cambios el supuesto gaussiano del
+CSI a productos o cocientes. Se confrontará su predicción con errores empíricos,
+cobertura de intervalos y tasa de abstención en datos reservados.
+
+Para dos personas, se estudiará el Jacobiano conjunto respecto de ambas fuentes y
+sus direcciones casi colineales. Una tasa respiratoria correcta del componente
+más fuerte no acredita separación de usuarios. Deben evaluarse asociación, errores
+por persona y condiciones no identificables, antes de optimizar una red según esa
+información. Los umbrales de confianza y de abstención se fijarán con validación.
+
+La observabilidad establece qué puede recuperarse; no determina por sí sola cómo aprender
+una representación robusta a partir de datos heterogéneos. El capítulo siguiente completa
+el marco conceptual con aprendizaje autosupervisado, supervisión multimodal y adaptación
+desde la simulación hacia las mediciones reales.

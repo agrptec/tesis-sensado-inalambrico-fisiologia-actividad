@@ -1,0 +1,623 @@
+\chapter{Plan de trabajo de la Etapa 1}
+\label{ch:wbs_stage1}
+
+\section{Alcance y criterio rector de la Etapa 1}
+
+El plan de esta etapa se conserva como marco de actividades y entregables. Su avance científico actual se documenta en el \cref{ch:avances}: el banco dc01, B0--B2 y S4.1--S4.6d.2 desarrollan LT1 y el marco de evaluación de LT2, incluida la validación regional del predictor de retardo. Estos avances no implican que se hayan completado la instrumentación multimodal, el estudio con participantes o los hitos de vinculación comunitaria.
+
+La Etapa 1 comprende los primeros diez meses del proyecto y corresponde a la fase de
+\emph{modelado, diseño experimental y vinculación comunitaria}. Su propósito es
+establecer las bases conceptuales, experimentales, metodológicas y éticas necesarias para
+estudiar la recuperación de información fisiológica y de comportamiento a partir de
+señales inalámbricas en escenarios reales. En consecuencia, la etapa articula seis tareas:
+(i) simular escenarios Wi-Fi y LoRa; (ii) caracterizar las limitaciones físicas e
+instrumentales; (iii) definir el conjunto de datos multimodal; (iv) formalizar el protocolo
+de adquisición; (v) establecer métodos de referencia con simulación, datos abiertos y
+pruebas preliminares; y (vi) seleccionar y caracterizar el sitio piloto mediante actividades
+de vinculación.
+
+Antes del despliegue comunitario se realizará una campaña experimental controlada en
+laboratorio. Esta campaña constituye el vínculo empírico entre la simulación y el piloto:
+permite verificar la instrumentación, la sincronización, la repetibilidad, la observabilidad
+y los procedimientos de calidad. No sustituye la adquisición formal prevista para la
+Etapa 2 ni pretende anticipar sus resultados; reduce la incertidumbre técnica antes de
+trasladar el protocolo a una Colmena u otro espacio comunitario de Guadalajara.
+
+El éxito de la Etapa 1 no se juzgará por el volumen de datos ni por el número de
+participantes, sino por la reducción verificable de la incertidumbre metodológica. Al
+finalizar el mes 10 deberán estar disponibles un modelo físico reproducible, una plataforma
+de adquisición estable, un estudio preliminar de laboratorio documentado, un protocolo
+validado y un sitio comunitario caracterizado para la campaña formal de la Etapa 2. Esta
+secuencia mantiene la continuidad con la metodología general: primero se determina qué
+debería ser observable, después qué puede medirse y, por último, bajo qué condiciones es
+justificado avanzar al entorno comunitario.
+
+\section{Organización de las líneas de trabajo}
+
+La Etapa 1 se organiza en seis líneas de trabajo (LT). La organización conserva los
+objetivos E1-1--E1-6 del proyecto y los agrupa de acuerdo con sus dependencias científicas
+y operativas. Las líneas no son compartimentos independientes: el modelado fundamenta
+el protocolo; el protocolo determina la instrumentación; la instrumentación hace posible
+el estudio preliminar; y la evidencia reunida condiciona la transición a la Etapa 2.
+
+\begin{table}[H]
+\centering
+\caption{Líneas de trabajo de la Etapa 1 y correspondencia con los objetivos específicos.}
+\label{tab:wbs_stage1_summary}
+\small
+\begin{tabularx}{\textwidth}{P{1.15cm}P{3.25cm}P{1.9cm}L}
+\toprule
+\textbf{Línea} & \textbf{Denominación} & \textbf{Objetivos} & \textbf{Resultado esperado}\\
+\midrule
+LT1 & Modelado físico y gemelo inalámbrico inicial
+& E1-1, E1-2
+& Entorno reproducible de simulación Wi-Fi/LoRa, comparación con mediciones reales y métricas de propagación, fase y observabilidad.\\
+
+LT2 & Marco de datos, protocolo y métodos de referencia
+& E1-3, E1-4, E1-5
+& Especificación multimodal, protocolo v1.0, esquema de metadatos, control de calidad y métodos reproducibles de referencia.\\
+
+LT3 & Plataforma experimental multimodal de laboratorio
+& E1-2, E1-4
+& Banco experimental integrado y caracterizado: Wi-Fi, LoRa, referencias mmWave/visión/fisiología y sincronización.\\
+
+LT4 & Estudio experimental preliminar y controlado
+& E1-2, E1-5
+& Conjunto preliminar de laboratorio y validación de presencia, movimiento, micromovimiento y respiración en condiciones controladas.\\
+
+LT5 & Vinculación comunitaria, Colmenas y taller de IoT
+& E1-6
+& Sitio piloto caracterizado, caso de uso comunitario seleccionado y taller práctico ejecutado en Guadalajara.\\
+
+LT6 & Integración, evaluación y transición a la Etapa 2
+& E1-3--E1-6
+& Informe técnico de Etapa 1, paquete de transición, matriz de riesgos y protocolo para despliegue formal.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{LT1 --- Modelado físico y gemelo inalámbrico inicial}
+\label{sec:wp1_stage1}
+
+\textbf{Periodo:} M1--M6; cierre inicial S4.7a en M1--M2 y ampliación geométrica en M4--M6.
+
+\textbf{Avance documentado:} S1 y B0--B2 cuantifican la discrepancia estática; S4.1--S4.6d.2 analizan fase, estructura residual y transferencia del retardo al canal. S4.6 caracteriza la fase común, recupera el tiempo de adquisición y evalúa continuidad local. El trabajo siguiente S4.7a estudiará fidelidad relativa; S4.7b abordará incertidumbre por trayectoria. Esto aporta evidencia a P1.2 y P1.3. P1.1 y la revisión R1 requieren vincular los registros reproducibles indicados en la \cref{sec:trazabilidad_avances}.
+
+\textbf{Pregunta rectora:} ¿qué información sobre entorno, movimiento y micromovimiento
+puede preservar el canal Wi-Fi/LoRa bajo geometrías y configuraciones de radio
+controladas?
+
+\paragraph{Actividades.}
+\begin{enumerate}[label=\textbf{LT1.\arabic*:},leftmargin=3.8em]
+    \item Construcción y validación de casos de referencia: espacio libre, reflexión,
+    multitrayectoria y perturbaciones geométricas controladas.
+    \item Reproducción del banco de pruebas DICHASUS dc01 y generación del conjunto
+    $(\vect p_i,H_i^{\rm real},\mathcal P_i^{\rm RT})$.
+    \item Evaluación del trazado de rayos nominal y calibración progresiva de materiales,
+    dispersión y errores locales de fase.
+    \item Implementación del modelo de observación Wi-Fi OFDM y del modelo inicial
+    LoRa CSS/IQ.
+    \item Definición de métricas de fidelidad de campo y sensibilidad diferencial,
+    incluyendo NMSE complejo, error de fase, PDP, dispersión cuadrática media del retardo y
+    $\partial H/\partial q$.
+    \item Construcción de mapas preliminares de cobertura y observabilidad en
+    escenarios de referencia en interiores y exteriores.
+\end{enumerate}
+
+\paragraph{Productos y criterio de aceptación.}
+\begin{itemize}
+    \item \textbf{P1.1} Repositorio reproducible del modelo directo.
+    \item \textbf{P1.2} Comparación DICHASUS entre mediciones y simulación.
+    \item \textbf{P1.3} Documento técnico de limitaciones físicas e instrumentales.
+    \item \textbf{Revisión R1:} las simulaciones son reproducibles y la discrepancia
+    entre simulación y medición se encuentra cuantificada mediante métricas definidas de antemano.
+\end{itemize}
+
+\subsection{LT2 --- Marco de datos, protocolo y métodos de referencia}
+\label{sec:wp2_stage1}
+
+\textbf{Periodo:} M1--M5.
+
+\textbf{Pregunta rectora:} ¿qué información debe conservarse y bajo qué reglas debe
+adquirirse para que las mediciones sean comparables, trazables y reutilizables?
+
+\paragraph{Actividades.}
+\begin{enumerate}[label=\textbf{LT2.\arabic*:},leftmargin=3.8em]
+    \item Revisión y reproducción de flujos de procesamiento sobre conjuntos de datos públicos de canal,
+    actividad y fisiología.
+    \item Definición del modelo de datos: señal de radiofrecuencia, valores de referencia, estado del participante,
+    contexto, geometría, configuración de radio y metadatos.
+    \item Especificación de nomenclatura, control de versiones, marcas temporales, estructura de
+    archivos, trazabilidad y criterios de inclusión/exclusión.
+    \item Diseño del protocolo multimodal para configuraciones sin participantes y
+    con uno o varios participantes.
+    \item Definición de procedimientos de sincronización y control de calidad.
+    \item Formalización de consentimiento, anonimización, gestión de video,
+    acceso y gobernanza de datos.
+    \item Implementación de métodos de referencia sin selección oráculo de canales,
+    subportadoras o componentes.
+\end{enumerate}
+
+\paragraph{Productos y criterio de aceptación.}
+\begin{itemize}
+    \item \textbf{P2.1} Diccionario y esquema del conjunto de datos multimodal.
+    \item \textbf{P2.2} Protocolo de adquisición v1.0.
+    \item \textbf{P2.3} Lineamientos de ética, privacidad y gobernanza.
+    \item \textbf{P2.4} Métodos reproducibles de referencia sobre datos públicos.
+    \item \textbf{Revisión R2:} no se iniciará una campaña formal con participantes sin
+    protocolo, trazabilidad, control de calidad y autorización ética aplicable.
+\end{itemize}
+
+\subsection{LT3 --- Plataforma experimental multimodal de laboratorio}
+\label{sec:wp3_stage1}
+
+\textbf{Periodo:} M1--M6; diseño y adquisición M1--M3, caracterización E0 en M2--M4.
+
+\textbf{Objetivo:} implementar una plataforma común que permita observar el mismo
+fenómeno físico mediante radios de interés y modalidades de referencia.
+
+La arquitectura experimental se define como
+
+\begin{equation}
+\begin{aligned}
+\mathcal A_{\rm lab}=\{&Y_{\rm WiFi},Y_{\rm LoRa},Y_{\rm mmWave},Y_{\rm ref},\\
+&V_{\rm RGB(D)},x_{\rm stage},x_{\rm resp},x_{\rm ECG/RR},x_{\rm IMU}\}.
+\end{aligned}
+\label{eq:lab_architecture}
+\end{equation}
+
+Esta arquitectura es un catálogo de modalidades posibles; cada captura declarará el
+subconjunto realmente disponible. $Y_{\rm ref}$ y $x_{\rm stage}$ corresponden a la
+referencia RF y al desplazamiento mecánico medido. ECG e inerciales son auxiliares
+según tarea y no requisitos para cerrar el banco mecánico.
+
+\paragraph{Bloques instrumentales.}
+\begin{description}[style=nextline]
+    \item[\textbf{Referencia RF y mecánica.}]
+    Adquisición coherente caracterizada, etapa con medición independiente y soportes
+    registrados. La incertidumbre del banco determina los pasos utilizables en E1.
+    \item[\textbf{Wi-Fi.}]
+    Enlaces configurables para CSI, con control de canal, ancho de banda,
+    geometría Tx--Rx, orientación y tasa de paquetes.
+
+    \item[\textbf{LoRa/LoRaWAN.}]
+    Nodos y puerta de enlace de laboratorio; cuando sea posible, observación I/Q mediante
+    SDR para preservar información anterior a la reducción a RSSI/SNR.
+
+    \item[\textbf{Radar de ondas milimétricas.}]
+    Modalidad de radiofrecuencia de referencia para movimiento y micromovimiento.
+
+    \item[\textbf{RGB/RGB-D.}]
+    Referencia geométrica para posición, orientación, trayectoria y actividad.
+
+    \item[\textbf{Fisiología e inerciales.}]
+    Banda de expansión respiratoria, ECG o banda torácica con intervalos RR,
+    y una o más IMU para movimiento corporal.
+\end{description}
+
+\paragraph{Actividades de caracterización.}
+Se medirán estabilidad temporal, piso de ruido, pérdida de paquetes, CFO/SFO/CPO,
+latencia entre modalidades y deriva temporal. La sincronización se expresará como
+
+\begin{equation}
+a_m t_i^{(m)}+b_m=t_i^{\rm global}+\epsilon_i^{(m)},
+\end{equation}
+
+donde $a_m,b_m$ corrigen escala y origen del reloj. El error residual
+$\epsilon_i^{(m)}$ deberá estimarse y reportarse, no asumirse nulo; se segmentarán
+las sesiones si los reinicios o la deriva invalidan un único mapa afín.
+
+\paragraph{Productos y criterio de aceptación.}
+\begin{itemize}
+    \item \textbf{P3.1} Banco experimental inventariado y documentado.
+    \item \textbf{P3.2} Procedimiento de calibración y sincronización.
+    \item \textbf{P3.3} Informe de estabilidad y repetibilidad.
+    \item \textbf{Revisión R3:} las modalidades del banco mínimo E0--E1 producen
+    registros trazables, con referencia y sincronización caracterizadas. La integración
+    adicional continuará según el cronograma y se validará antes de utilizarla.
+\end{itemize}
+
+\subsection{LT4 --- Estudio experimental preliminar y controlado}
+\label{sec:wp4_stage1}
+
+\textbf{Periodo:} M3--M9; reflector M3--M5, fantoma M5--M7 y una persona M7--M9.
+
+El estudio preliminar se ejecutará de forma acumulativa. Cada nivel habilita el siguiente; no se
+introducirán participantes antes de validar primero el comportamiento instrumental y
+geométrico.
+
+\begin{table}[H]
+\centering
+\caption{Matriz experimental mínima del estudio preliminar de laboratorio.}
+\label{tab:lab_prepilot}
+\small
+\begin{tabularx}{\textwidth}{P{1.1cm}P{3.0cm}L L}
+\toprule
+\textbf{Nivel} & \textbf{Condición} & \textbf{Variable controlada} & \textbf{Resultado buscado}\\
+\midrule
+N0 & Habitación vacía & Tiempo, canal, dispositivo & Piso de ruido, estabilidad y perturbaciones instrumentales.\\
+N1 & Reflector estático & Posición y material & Sensibilidad espacial y repetibilidad.\\
+N2 & Reflector móvil & Desplazamiento conocido & Fidelidad diferencial y $\partial H/\partial x$.\\
+N3 & Fantoma respiratorio & Amplitud, frecuencia y movimiento lento & Forma de onda mecánica y sensibilidad reproducibles.\\
+N4 & Una persona & Postura, actividad y respiración & Movimiento y forma de onda frente a referencias sincronizadas.\\
+N5 & Wi-Fi y LoRa pareados & Misma perturbación física & Comparación de sensibilidad y observabilidad entre tecnologías.\\
+N6 & Dos personas, exploratorio & Separación y actividad & Viabilidad y condicionamiento antes de la Etapa 2.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El conjunto de salida se define como
+
+\begin{equation}
+\begin{aligned}
+\mathcal D_{\rm lab}^{(0)}=\{&Y_{\rm WiFi},Y_{\rm LoRa},Y_{\rm mmWave},Y_{\rm ref},\\
+&V_{\rm RGB(D)},x_{\rm stage},x_{\rm resp},x_{\rm ECG/RR},x_{\rm IMU},M\},
+\end{aligned}
+\end{equation}
+
+donde $M$ contiene metadatos y estado de control de calidad.
+
+\paragraph{Revisión R4.}
+En M7 se revisará la evidencia de E0--E2: estabilidad instrumental, respuesta a
+movimiento medido y recuperación del fantoma con incertidumbre. La adquisición de
+una persona se prevé en M7--M9 y requiere además aprobación ética. El cumplimiento
+del hito mecánico no equivale a validación fisiológica ni habilita automáticamente
+un despliegue humano comunitario.
+
+\subsection{LT5 --- Vinculación comunitaria, Colmenas Guadalajara y taller de IoT}
+\label{sec:wp5_stage1}
+
+\textbf{Periodo:} M6--M10; preparación institucional desde M6 y taller previsto en M9--M10.
+
+\textbf{Objetivo:} seleccionar y caracterizar un sitio comunitario en Guadalajara y
+establecer una relación de trabajo que combine preparación del piloto con apropiación
+tecnológica.
+
+La vinculación seguirá cuatro fases:
+\begin{enumerate}[label=\textbf{V\arabic*:},leftmargin=3em]
+    \item \textbf{Vinculación institucional:} identificación de contraparte local,
+    condiciones de acceso, responsables y logística.
+    \item \textbf{Caracterización técnica:} geometría, materiales, energía,
+    infraestructura Wi-Fi, cobertura LoRa, ruido RF, zonas de actividad y restricciones
+    de instalación.
+    \item \textbf{Codiseño comunitario:} selección de un único caso de uso ambiental
+    para el nodo IoT de divulgación.
+    \item \textbf{Taller y preparación del despliegue:} taller práctico, demostración de sensores,
+    conectividad y energía autónoma, y pruebas técnicas sin convertir el taller en una
+    campaña experimental de sujetos humanos.
+\end{enumerate}
+
+El resultado técnico de la visita será una ficha de sitio y un primer modelo
+$G_E^{\rm Colmena}$ utilizable posteriormente para simulación y planificación de la
+Etapa 2.
+
+\paragraph{Revisión R5.}
+El sitio deberá contar con contraparte identificada, caracterización técnica, restricciones
+operativas documentadas y un caso de uso comunitario definido.
+
+\subsection{LT6 --- Integración y transición a la Etapa 2}
+\label{sec:wp6_stage1}
+
+\textbf{Periodo:} M8--M10.
+
+La línea final consolida los resultados de las cinco líneas anteriores y establece la primera
+versión operativa del sistema.
+
+\paragraph{Productos de cierre.}
+\begin{enumerate}[label=\textbf{P6.\arabic*:},leftmargin=3em]
+    \item Entorno de simulación reproducible Wi-Fi/LoRa.
+    \item Plataforma multimodal de laboratorio caracterizada.
+    \item Protocolo de adquisición, metadatos y control de calidad v1.0.
+    \item Conjunto preliminar $\mathcal D_{\rm lab}^{(0)}$.
+    \item Métodos reproducibles de referencia.
+    \item Sitio comunitario caracterizado.
+    \item Taller y materiales de vinculación ejecutados.
+    \item Matriz de riesgos y pendientes.
+    \item Plan cerrado de despliegue y adquisición para la Etapa 2.
+\end{enumerate}
+
+La transición se formaliza mediante
+
+\begin{equation}
+R_{\rm E2}=
+R_{\rm RF}\land
+R_{\rm sinc}\land
+R_{\rm protocolo}\land
+R_{\rm etica}\land
+R_{\rm sitio}\land
+R_{\rm datos}.
+\label{eq:stage2_gate}
+\end{equation}
+
+La Etapa 2 deberá iniciar su campaña formal cuando estas condiciones hayan sido
+verificadas, y no únicamente por cumplimiento cronológico del mes 10.
+
+\section{Secuencia y dependencias}
+
+Las dependencias principales siguen una secuencia de evidencia. LT1 establece las
+predicciones físicas que deben contrastarse; LT2 determina cómo adquirir y conservar las
+mediciones; LT3 materializa esas decisiones en una plataforma común; y LT4 contrasta el
+modelo con perturbaciones controladas. LT5 se inicia cuando existe suficiente madurez
+técnica para caracterizar el sitio comunitario, mientras que LT6 integra la evidencia y
+documenta los supuestos pendientes. El solapamiento temporal mostrado en la
+\cref{tab:cronograma_etapa1} expresa trabajo concurrente, no independencia entre líneas.
+
+\section{Cronograma de la Etapa 1}
+
+\subsection{Paquete técnico de las primeras ocho semanas}
+\label{sec:eight_week_package}
+
+Dentro de M1--M2 se propone un paquete corto que convierte la revisión de literatura
+en artefactos verificables antes de cerrar especificaciones de compra:
+\begin{table}[htbp]
+\centering\small
+\caption{Secuencia técnica inmediata; las semanas son relativas al inicio del paquete.}
+\label{tab:eight_week_package}
+\begin{tabularx}{\textwidth}{P{1.5cm}L L}
+\toprule
+Semana & Actividad & Evidencia de cierre\\
+\midrule
+1 & Congelar versiones, manifiestos, particiones y artefactos S1--S4.6. &
+Correspondencia reproducible y sumas de verificación.\\
+2 & Implementar $\mathsf V_0$--$\mathsf V_7$ y $\mathsf T_1$--$\mathsf T_7$. &
+Pruebas algebraicas y matriz de respuesta a perturbaciones.\\
+3 & Ejecutar fidelidad estática de dc01. & Resultados densos y por bloques con
+normalización ajustada sólo en entrenamiento.\\
+4 & Auditar d010 y realizar pruebas de sensibilidad si sus metadatos lo permiten. &
+Pareto entre rechazo de perturbaciones y cambio geométrico del transmisor.\\
+5 & Implementar S4.7b. & Baselines circulares, NLL, calibración y abstención.\\
+6 & Integrar perturbaciones seleccionadas de RadioRange. & Vulnerabilidades por
+observable bajo rangos trazables.\\
+7 & Ejecutar un caso mínimo de Indoor Radio Mapping y WiSegRT. & Flujo de nube/malla
+a RT; RSSI y canal simulado con límites declarados.\\
+8 & Auditar subconjuntos CAEZ y OpenLoRa. & Adaptadores iniciales y requisitos
+medidos para el banco propio.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El paquete no condiciona toda adquisición a obtener un método ganador. Debe responder
+qué fase necesita referencia, qué ancho de banda y coherencia preservan sensibilidad,
+qué precisión geométrica resulta relevante y qué salidas proporciona cada radio.
+Las compras de baja ambigüedad necesarias para mecánica, montaje y trazabilidad pueden
+prepararse en paralelo; las especificaciones de recepción coherente se cerrarán con
+la evidencia disponible y las cotizaciones compatibles.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Cronograma revisado: meses relativos al inicio operativo de la etapa; ventanas propuestas sujetas a evidencia.}
+\label{tab:cronograma_etapa1}
+\begin{tabularx}{\textwidth}{P{1.8cm}P{2.2cm}L L}
+\toprule
+Meses & Líneas & Actividad & Producto revisable\\
+\midrule
+M1--M2 & LT1/LT2 & S4.7a en dc01. & Comparación $\mathsf V_i$ y controles espaciales.\\
+M1--M3 & LT2/LT3 & Diseño del banco y compras prioritarias. & Referencia RF, metrología y captura especificadas.\\
+M2--M4 & LT3 & Esc. E0. & Deriva y repetibilidad documentadas.\\
+M3--M5 & LT3/LT4 & Esc. E1, reflector. & $\Delta H$ y Jacobiano con desplazamiento medido.\\
+M4--M6 & LT1/LT3 & Reconstrucción RGB-D/LiDAR. & G0--G4, registro y controles independientes.\\
+M5--M7 & LT4 & Esc. E2, fantoma. & Fidelidad diferencial y forma de onda.\\
+M6--M8 & LT1/LT4 & Wi-Fi, LoRa y radar comparativos. & Operadores y referencias bajo perturbación común.\\
+M7--M9 & LT4 & Esc. E3 con aprobación ética. & Datos humanos preliminares y límites.\\
+M8--M10 & LT6 & Integración y transferencia inicial E5. & Protocolo y conjunto v1; pendientes de Etapa 2.\\
+M6--M10 & LT5 & Vinculación; taller en M9--M10. & Sitio caracterizado y demostración de divulgación.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El calendario expresa dependencias técnicas y no acredita ejecución por transcurso
+del tiempo. Esc. E4 y transferencia externa amplia se incorporarán según madurez y
+recursos; no se prometen como resultados humanos completos dentro de esta ventana.
+Mientras se integra el equipo se puede avanzar con CAEZ, el flujo geometría--RSSI,
+OpenLoRa, reconstrucción RGB-D, marcas temporales y diseño de referencia. Cada conjunto
+adicional se someterá primero a una auditoría de observables y procedencia.
+
+\section{Movilidad científica}
+
+El presupuesto aprobado considera una bolsa de \$68,000 MXN para viáticos y
+\$30,000 MXN para pasajes nacionales, originalmente vinculados a actividades de
+divulgación y vinculación. La planeación operativa propone concentrar estas movilidades
+en una ventana M9--M10, de modo que una misma visita contribuya a: (i) revisión
+experimental; (ii) validación Wi-Fi/LoRa; (iii) caracterización de la Colmena;
+(iv) impartición del taller; y (v) preparación de la Etapa 2.
+
+La solicitud aprobada refiere hospedaje y alimentación para dos personas por 12 noches y
+tres vuelos nacionales redondos. Por tanto, una estancia presencial completa de un mes
+para el especialista deberá considerarse una extensión deseable, pero su ejecución requerirá
+validar previamente con la administración del proyecto la posibilidad de redistribución del
+rubro o complementarla con recursos institucionales. El documento operativo no debe
+suponer dicha ampliación como autorizada.
+
+La movilidad prospectiva a UPNA constituye una ampliación científica distinta de los
+pasajes nacionales presupuestados. Requerirá acuerdo con el grupo anfitrión, disponibilidad
+de instrumentación y financiación específica; su objetivo será repetir E1/E2 con el
+protocolo ya validado localmente. Una propuesta de colaboración no se registra como
+estancia concedida ni como validación realizada.
+
+\section{Plan de adquisiciones}
+
+El presupuesto aprobado contiene tres bolsas materiales diferenciadas:
+\$40,000 MXN para dispositivos electrónicos de radio configurables y accesorios;
+\$40,000 MXN para sensores y suministros de laboratorio de referencia; y
+\$70,000 MXN para 25 kits electrónicos de divulgación.
+
+
+\subsection{Inventario reportado y verificación funcional}
+
+La planeación considera como inventario reportado plataformas Wi-Fi/ESP32, nodos
+LoRa STM32WL, equipos Notecard y RAK2287, un ADALM-Pluto, tres IWRL6432BOOST y
+cámaras RGB, RGB-D o estéreo. Antes de comprar se registrarán modelos exactos,
+interfaces y estado funcional. La denominación Notecard no basta para identificar
+tecnología o acceso a señal; se comprobará el SKU. Tampoco se asumirá que un
+concentrador LoRaWAN entrega I/Q coherente.
+
+Los IWRL6432BOOST se basan en la familia radar de 57--64 GHz
+\citep{TIIWRL6432BOOST}. Su disponibilidad reportada permite plantear vistas complementarias;
+se verificarán firmware, acceso a datos, calibración y sincronización antes de fijar
+el protocolo. Su precisión de desplazamiento deberá medirse y no se adoptará como
+referencia submilimétrica independiente. Se reutilizarán estas unidades antes de
+priorizar otro radar equivalente.
+
+\subsection{Plataforma experimental de radiofrecuencia --- bolsa autorizada: \$40,000 MXN}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Prioridades RF revisadas a partir del inventario reportado.}
+\label{tab:rf_procurement}
+\begin{tabularx}{\textwidth}{P{3.4cm}L P{2.9cm}}
+\toprule
+Bloque & Función y condición & Prioridad\\
+\midrule
+Referencia coherente & Resolver recepción simultánea o referencia verificable; comprobar
+compatibilidad con SDR y reloj antes de seleccionar equipo. & Muy alta\\
+Coaxiales, divisores, atenuadores y adaptadores & Caracterizar pérdidas/fase y estabilizar
+cadenas; cantidades según arquitectura, sin asumir calibración de fábrica suficiente. & Muy alta\\
+Antenas y soportes rígidos & Registro geométrico, polarización y repetibilidad del centro
+de montaje; cables inmovilizados. & Alta\\
+Sincronización y automatización & Marcas temporales, disparos disponibles y control
+mecánico; medición de deriva entre modalidades. & Alta\\
+Ampliación Wi-Fi/LoRa/SDR & Cubrir una carencia demostrada de CSI, I/Q o enlaces;
+reutilizar primero plataformas existentes. & Condicionada\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La referencia es un requisito funcional, no una compra cerrada: el Pluto documentado
+no ofrece por sí solo dos receptores simultáneos. Se compararán soluciones compatibles
+y su coste total dentro del rubro. Compartir frecuencia o PPS no exime de verificar
+fase relativa tras reinicios.
+
+\subsection{Metrología y referencias --- bolsa autorizada: \$40,000 MXN}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Prioridades para metrología y referencias del banco actualizado.}
+\label{tab:reference_procurement}
+\begin{tabularx}{\textwidth}{P{3.4cm}L P{2.9cm}}
+\toprule
+Instrumento & Uso científico & Prioridad\\
+\midrule
+Etapa lineal y referencia micrométrica & Desplazamiento medido, control de holgura,
+reflector y fantoma; incertidumbre compatible con E1. & Muy alta\\
+Fijaciones y marcadores & Registro reproducible de escena, sensores y antenas;
+AprilTags u otros fiduciales con dimensiones verificadas. & Muy alta\\
+Referencia respiratoria & Forma de onda sincronizada para E3; no sustituible por una
+etiqueta de BPM o ECG aislado. & Alta\\
+LiDAR 3D de gama media & Geometría global y repetibilidad multiescena; comparar G1--G3
+frente a RGB-D existente. & Alta; cotizar\\
+Distanciómetro o control métrico & Comprobación independiente de dimensiones; Bosch GLM
+o equivalente es opcional, no requisito de marca. & Complementaria\\
+Radar, RGB-D, IMU y ECG & Reutilizar disponibilidad; ampliar sólo ante una necesidad
+medida. Cardiología queda fuera del núcleo E0--E2. & Condicionada\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Para LiDAR se propone evaluar una clase Livox Mid-360 o equivalente, sin fijar compra,
+precio ni exactitud no comprobados. La especificación exigirá exportación de nube de
+puntos, marcas temporales accesibles, integración mediante SDK/ROS2 o interfaz compatible,
+registro métrico y documentación de incertidumbre. No se requiere un equipo topográfico
+ni se presupone que un escáner de mayor coste resolverá la fase del canal.
+
+La selección monetaria se realizará contra cotizaciones y compatibilidad real. La
+combinación completa de instrumentos no se da por financiada dentro de \$40,000 MXN.
+Si excede el rubro, se priorizarán mecánica, referencia y sincronización, usando RGB-D
+para iniciar el registro y gestionando préstamo o recursos complementarios para LiDAR.
+No se trasladarán recursos entre bolsas ni se imputará movilidad internacional a pasajes
+nacionales mediante esta actualización metodológica.
+
+\subsection{Kits de divulgación --- bolsa autorizada: \$70,000 MXN}
+
+El presupuesto aprobado corresponde a 25 kits, equivalente a un promedio de
+
+\begin{equation}
+\bar C_{\rm kit}=
+\frac{70,000}{25}=2,800\ {\rm MXN/kit}.
+\end{equation}
+
+Cada kit se diseñará como plataforma modular con microcontrolador, conectividad,
+sensores, alimentación y material de prototipado. El sensor específico del caso de uso
+ambiental deberá seleccionarse después de la caracterización de la Colmena, evitando
+adquirir anticipadamente 25 sensores especializados para un problema todavía no
+seleccionado.
+
+\section{Presupuesto consolidado de la Etapa 1}
+
+\begin{table}[H]
+\centering
+\caption{Presupuesto aprobado y asignación por líneas de trabajo durante la Etapa 1.}
+\label{tab:stage1_budget_formal}
+\small
+\begin{tabularx}{\textwidth}{L r P{2.1cm}}
+\toprule
+\textbf{Rubro} & \textbf{Monto MXN} & \textbf{Líneas principales}\\
+\midrule
+Apoyo a la investigación científica
+& \$240,000 & LT1--LT6\\
+Honorarios por servicios profesionales
+& \$240,000 & LT1--LT6\\
+Material eléctrico/electrónico para kits del taller
+& \$70,000 & LT5\\
+Viáticos
+& \$68,000 & LT4--LT5\\
+Pasajes nacionales
+& \$30,000 & LT4--LT5\\
+Material eléctrico/electrónico para pilotos
+& \$40,000 & LT3--LT4\\
+Sensores y suministros de laboratorio
+& \$40,000 & LT3--LT4\\
+\midrule
+\textbf{Total Etapa 1}
+& \textbf{\$728,000}
+& \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El cuadro anterior conserva íntegramente los rubros y montos aprobados. Las
+subasignaciones internas de equipo se consideran planeación técnica y deberán cerrarse
+contra cotizaciones y reglas administrativas antes de comprometer el gasto.
+
+\section{Matriz de hitos y decisiones}
+
+\begin{table}[H]
+\centering
+\caption{Hitos de decisión de la Etapa 1.}
+\label{tab:stage1_milestones}
+\small
+\begin{tabularx}{\textwidth}{P{1.7cm}P{1.4cm}L L}
+\toprule
+\textbf{Revisión} & \textbf{Mes} & \textbf{Evidencia requerida} & \textbf{Decisión resultante}\\
+\midrule
+R1 & M4
+& Gemelo estático y S4.7a reproducibles; discrepancia y acceso a fase declarados.
+& Establecer el modelo físico de referencia.\\
+R2 & M5
+& Protocolo, metadatos, control de calidad y ética formalizados.
+& Autorizar el estudio preliminar con participantes cuando corresponda.\\
+R3 & M5
+& Banco mínimo E0--E1 estable, referencia y sincronización caracterizadas.
+& Continuar fantoma e integración multimodal, con control de deriva.\\
+R4 & M7
+& E0--E2: repetibilidad, sensibilidad mecánica y fantoma con incertidumbre.
+& Iniciar E3 sólo con ética y referencias verificadas; preparar transferencia.\\
+R5 & M9
+& Colmena caracterizada, contraparte y caso de uso definidos.
+& Preparar la instalación de la Etapa 2.\\
+$R_{\rm E2}$ & M10
+& Cumplimiento conjunto de radiofrecuencia, sincronización, protocolo, ética, sitio y datos.
+& Iniciar campaña formal de Etapa 2.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Síntesis}
+
+La Etapa 1 constituye una fase de reducción de incertidumbre científica, no sólo de
+cumplimiento administrativo. El modelado establece qué debería observarse; la
+instrumentación verifica qué puede medirse; el estudio preliminar determina qué
+información se conserva en condiciones reales; y la vinculación comunitaria procura que
+el despliegue posterior ocurra en un sitio técnicamente caracterizado y con una contraparte
+local. En conjunto, estas actividades convierten los fundamentos desarrollados en los
+capítulos anteriores en una secuencia experimental auditable y preparan, sin anticiparla,
+la validación de la Etapa 2.

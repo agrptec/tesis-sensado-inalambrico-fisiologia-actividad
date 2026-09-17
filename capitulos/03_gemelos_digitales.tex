@@ -1,0 +1,195 @@
+\chapter{Gemelos digitales inalámbricos y trazado de rayos diferenciable}
+\label{ch:wdt}
+
+El capítulo anterior estableció la cadena que conduce desde la propagación hasta la
+medición de canal. Sobre esa base, este capítulo introduce el gemelo digital como una
+realización computacional de dicha cadena. El interés no reside únicamente en reproducir
+el canal observado, sino en conservar la relación entre los parámetros físicos de la escena
+y las variaciones de la señal que posteriormente se utilizarán para inferir movimiento y
+fisiología.
+
+\section{De la simulación de cobertura al gemelo inalámbrico}
+
+Un simulador de propagación predice $H$ a partir de una escena; un gemelo digital persigue, además, correspondencia con un entorno físico concreto, actualización con mediciones y capacidad de responder a cambios. En el contrato de la \cref{eq:thesis_chain}, no basta con generar mapas plausibles: el modelo debe declarar qué escena, frecuencia, antena y observable reproduce. La formulación mínima es
+\begin{equation}
+\widehat H_m(f,t)=F_m
+\left(\Gamma(t),\vect p_T,\vect p_R,f;
+\vect s_R,\vect\theta_E\right),
+\end{equation}
+donde $\theta_E$ incluye parámetros materiales, dispersión, patrones de antena y otros parámetros físicos no conocidos exactamente.
+
+El reto es que una reconstrucción geométrica visualmente correcta puede producir errores de fase considerables. A frecuencia portadora $f_c$, un error de longitud $\delta L$ produce
+\begin{equation}
+\delta\phi=-2\pi\frac{\delta L}{\lambda}.
+\end{equation}
+Por tanto, los errores centimétricos o incluso milimétricos pueden ser importantes para el sensado de movimientos pequeños. Esta observación motiva dos líneas complementarias: la calibración diferenciable de propiedades electromagnéticas y la calibración que considera errores locales de fase.
+
+\section{Calibración como problema inverso}
+
+Sea $\vect\theta$ el vector de parámetros del gemelo y $\mathcal D_{\rm cal}$ un conjunto de mediciones alineadas. Se define
+\begin{equation}
+\vect\theta^\star=\arg\min_{\vect\theta}\;
+\sum_{i\in\mathcal D_{\rm cal}}
+\calL\left(
+H_{m,i}^{\rm real},
+F_m(\Gamma_i,\vect p_{T,i},\vect p_{R,i},f;
+\vect s_{R,i},\vect\theta)
+\right)+\beta R(\vect\theta).
+\label{eq:calibration_inverse}
+\end{equation}
+Para una pérdida real se vectorizan parte real e imaginaria, $\vect u=[\Re H;\Im H]$, y la diferenciabilidad permite obtener
+\begin{equation}
+\nabla_{\vect\theta}\calL
+=\left(\frac{\partial\vect u}{\partial\vect\theta^T}\right)^T
+\nabla_{\vect u}\calL.
+\end{equation}
+Trabajos recientes de calibración con \ac{DRT} muestran que las propiedades materiales, patrones de antena y parámetros de dispersión pueden optimizarse utilizando canales reales \citep{Hoydis2024DiffRT}; otros introducen errores locales de fase para modelar discrepancias geométricas pequeñas que una calibración de potencia no puede absorber \citep{Ruah2024Phase}. En esta tesis se consideran ambas familias como componentes consecutivos, no sustitutos.
+
+\section{Separación de fuentes de error}
+
+Conviene escribir
+\begin{equation}
+H_{\rm real}-H_{\rm gemelo}=
+\Delta H_{\rm geom}+
+\Delta H_{\rm mat}+
+\Delta H_{\rm scat}+
+\Delta H_{\rm ant}+
+\Delta H_{\rm hw}+
+\epsilon_{\rm model}.
+\label{eq:domain_gap_decomp}
+\end{equation}
+Esta suma es una contabilidad conceptual o una linealización local, no una descomposición identificable a partir de $H$ por sí solo. Un modelo flexible todavía puede usar materiales para compensar coordenadas. Por ello la calibración será jerárquica: registro y sincronización; antenas y escala; materiales y scattering; y sólo al final residuales de fase/modelo. Priors, mediciones auxiliares e intervenciones separadas anclarán cada bloque.
+
+\section{Jerarquía de la literatura y de la evidencia}
+\label{sec:literature_evidence_hierarchy}
+
+Los trabajos revisados no se tratarán como soluciones intercambiables. La tesis los
+ordena por el operador que modelan, la información que reciben y la evidencia con que
+se validan:
+\begin{table}[htbp]
+\centering\small
+\caption{Función científica de la literatura en la cadena metodológica.}
+\label{tab:literature_evidence_hierarchy}
+\begin{tabularx}{\textwidth}{P{2.6cm}L L}
+\toprule
+Bloque & Referencias y uso en la tesis & Límite de inferencia\\
+\midrule
+Calibración estática & Sionna RT, calibración diferenciable y error local de fase
+\citep{Hoydis2023SionnaRT,Hoydis2024DiffRT,Ruah2024Phase}. & Mejorar potencia o una
+verosimilitud con fase latente no prueba geometría verdadera ni sensado dinámico.\\
+Campo y objetos & NeRF$^2$, Learnable WDT, RFScape y RadTwin
+\citep{Zhao2023NeRF2,Jiang2025LearnableWDT,Chen2025RFScape,Zhang2026RadTwin}. &
+Interpolación de campo, edición de objetos y generalización geométrica son tareas
+distintas y requieren entradas equivalentes para compararse.\\
+Dinámica simulada & WaveVerse \citep{Zheng2026WaveVerse}. & La coherencia de una
+simulación y sus contrastes externos no validan el Jacobiano de nuestro banco ni una
+forma de onda respiratoria propia.\\
+Inversión & RayLoc, RFDT e InverTwin
+\citep{Han2026RayLoc,Chen2026RFDT,Chen2025InverTwin}. & La inversión se evaluará
+después de validar el modelo directo, su referencia y sus discontinuidades relevantes.\\
+Adquisición y robustez & FarSense, HiSAC, RadioRange y OpenLoRa
+\citep{Zeng2019FarSense,Pegoraro2024HiSAC,Lyu2026RadioRange,Mishra2023OpenLoRa}. &
+Cocientes, anclas o perturbaciones simuladas dependen de sus supuestos de hardware;
+no acreditan coherencia del equipo propio.\\
+Representación humana & BreatheSmart, WiMANS, WiMUSE, MURAL-Fi, MM-Fi y WiFi-JEPA
+\citep{Mosleh2022BreatheSmart,Huang2024WiMANS,Yi2025WiMUSE,Li2026MURALFI,
+Yang2023MMFi,Kim2026WiFiJEPA}. & Una tarea humana bien resuelta no valida por sí
+misma la geometría, la fase absoluta ni el gemelo electromagnético.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Esta jerarquía determina el orden de ejecución. DICHASUS, Hoydis y Ruah fijan el
+problema del modelo estático; los invariantes y las referencias instrumentales delimitan
+el observable; las representaciones de escena se comparan después bajo regímenes de
+información comunes; el reflector y el fantoma contrastan fidelidad diferencial; y
+la inversión y el aprendizaje humano se activan cuando el observable ha demostrado
+sensibilidad. La secuencia no resta valor a los métodos pospuestos: evita usar éxito
+en una tarea como evidencia de otra.
+
+\section{DICHASUS dc01 como banco de pruebas del gemelo estático}
+
+La primera validación desarrollada utiliza DICHASUS dc01 y la escena correspondiente empleada en trabajos de calibración diferenciable \citep{Euchner2023DICHASUSdcxx,Hoydis2024DiffRT}. El banco reportado comprende $N=10000$ posiciones y conserva el objeto experimental
+\begin{equation}
+\mathcal D_{\rm dc01}
+=\left\{
+\vect p_i,\;H_{m,i}^{\rm real},\;\calP_{m,i}^{\rm RT},\;H_{m,i}^{\rm RT}
+\right\}_{i=1}^{N}.
+\label{eq:dc01_dataset}
+\end{equation}
+El soporte geométrico y el conjunto de trayectorias radio--dependiente se conservan como interfaz física, en lugar de almacenar únicamente el canal sintetizado. Esto permite modificar posteriormente materiales, frecuencia, observación y dinámica sin confundir el mundo común $\Gamma$ con una realización particular $\calP_m$.
+
+La comparación B0--B2 y los diagnósticos de fase se documentan en el \cref{ch:avances}. DICHASUS es un banco de sondeo OFDM: su respuesta en frecuencia resulta adecuada para estudiar la propagación, mientras la validación del operador de observación de dispositivos Wi-Fi comerciales requiere pruebas específicas. Conservar la geometría tampoco autoriza reutilizar sin cambios las ganancias y trayectorias efectivas al pasar a LoRa.
+
+\section{Fidelidad de campo y fidelidad diferencial}
+
+Para comunicaciones suele ser suficiente comparar $H_{\rm sim}$ y $H_{\rm real}$. Para el sensado se requiere una condición adicional. Si $q$ es una variable física de interés,
+\begin{equation}
+J_q=\frac{\partial H}{\partial q},
+\end{equation}
+y se propone medir
+\begin{equation}
+E_J=
+\frac{\|J_q^{\rm model}-J_q^{\rm ref}\|_F}
+{\|J_q^{\rm ref}\|_F+\epsilon}.
+\label{eq:jacobian_error}
+\end{equation}
+Un modelo con bajo \ac{NMSE} de canal, pero con derivadas incorrectas respecto del movimiento humano, puede ser inadecuado para el sensado. Por ello, la tesis distingue entre \emph{fidelidad del modelo directo} y \emph{fidelidad diferencial}.
+
+$J_q^{\rm ref}$ se estimará con perturbaciones mecánicas bidireccionales, paso declarado, repeticiones y alineamiento de fase/ganancia definido antes de observar el resultado. Como el error relativo de la \cref{eq:jacobian_error} es inestable cuando $\|J_q^{\rm ref}\|$ es cercano a cero, se reportará también error absoluto con unidades, correlación compleja y error ponderado por la tarea. El término $\epsilon$ se fijará en las mismas unidades que la norma de referencia y no como constante adimensional arbitraria.
+
+\section{Reconstrucción métrica y registro del gemelo}
+\label{sec:geometric_metrology}
+
+La geometría debe representarse con unidades, sistema de coordenadas e incertidumbre
+verificables. Se distinguen tres objetivos de diseño: escala global de paredes,
+puertas y mobiliario del orden de 1--2 cm; registro de antenas del orden de 2--5 mm;
+y referencia local de desplazamiento del orden de 0.1--1 mm. Son rangos de trabajo
+que deberán demostrarse mediante controles independientes, no especificaciones
+atribuidas a cualquier LiDAR, cámara o actuador. Un experimento con pasos de
+0.25 mm sólo es interpretable si su incertidumbre efectiva permite resolverlos.
+
+Se fijará un marco global $W$ y se almacenará, para cada sensor $s$,
+\begin{equation}
+T_{W\leftarrow s}=\begin{bmatrix}R_{Ws}&\mathbf t_{Ws}\\0&1\end{bmatrix}\in SE(3),
+\qquad \widetilde{\mathbf p}_W=T_{W\leftarrow s}\widetilde{\mathbf p}_s,
+\label{eq:scene_extrinsics}
+\end{equation}
+con $R_{Ws}\in SO(3)$. Las transformaciones compuestas deberán respetar esa dirección.
+Se registrarán extrínsecos de cámara, LiDAR, radar, transmisores, receptores y antenas;
+el punto de montaje no se confundirá con el centro de fase, que puede depender de
+frecuencia y dirección. Marcadores rígidos, distancias de control y mediciones repetidas
+permitirán verificar el registro. Un residual pequeño de ICP mide concordancia entre
+nubes, pero no garantiza exactitud absoluta. Se reservarán, cuando el recinto lo permita,
+10--20 distancias de control que no se hayan utilizado para ajustar la reconstrucción.
+
+La comparación propuesta distinguirá cinco condiciones:
+\begin{description}
+\item[G0.] Planta manual y primitivas geométricas con dimensiones verificadas.
+\item[G1.] Reconstrucción RGB-D, con registro y simplificación documentados.
+\item[G2.] Reconstrucción LiDAR con las mismas referencias globales.
+\item[G3.] Geometría LiDAR regularizada para RF: superficies, espesores, huecos y
+objetos relevantes corregidos; materiales nominales y presupuesto RT controlados.
+\item[G4.] Geometría anterior con calibración RF de materiales y, si se justifica,
+parámetros geométricos restringidos por su incertidumbre metrológica.
+\end{description}
+G4 cambia más factores que la geometría. Por ello se añadirá una ablación factorial
+con materiales nominales/calibrados para separar el efecto del registro, la regularización
+y el ajuste electromagnético. Todos los ajustes utilizarán sólo entrenamiento y
+validación; los puntos reservados medirán generalización, no servirán para corregir
+la escena a posteriori. Se mantendrán mecanismos RT, frecuencias y presupuesto de
+muestreo comparables, o se informará explícitamente su coste.
+
+RFDT-Channel ofrece una referencia reciente para construir escenas RF a partir de
+RGB y LiDAR y simular canales interiores a 28 GHz \citep{Yao2026RFDTChannel}.
+El gemelo de Wang y colaboradores \citep{Wang2026WiFiTwin} contrasta predicción de señal con RSSI real.
+Ambos orientan el flujo geométrico, pero una validación de potencia o un canal simulado
+no establecen exactitud de fase medida ni fidelidad de micromovimiento de este banco.
+La comparación G0--G4 se evaluará sucesivamente en error geométrico, potencia,
+retardos, canal relativo y respuesta diferencial. No se exigirá resolver primero
+la fase absoluta de toda la habitación para iniciar una prueba local controlada.
+
+Esta distinción cierra el paso entre el modelado electromagnético y la representación: una
+aproximación útil debe conservar no sólo valores de canal, sino también las variaciones
+que contienen información acerca del estado humano. El capítulo siguiente examina qué
+estructuras explícitas, implícitas o híbridas pueden satisfacer ese requisito.

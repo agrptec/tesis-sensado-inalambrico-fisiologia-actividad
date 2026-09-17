@@ -1,0 +1,50 @@
+\chapter*{Convenciones de notación}
+\addcontentsline{toc}{chapter}{Convenciones de notación}
+\begingroup
+\small
+\setstretch{1.15}
+\begin{longtable}{P{3.6cm}P{10.0cm}}
+\toprule
+\textbf{Símbolo} & \textbf{Uso reservado en el manuscrito}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Símbolo} & \textbf{Uso reservado en el manuscrito}\\
+\midrule
+\endhead
+$m$ & Modalidad o radio; principalmente Wi-Fi o LoRa.\\
+$t,\tau,f$ & Tiempo físico, retardo de propagación y frecuencia, respectivamente.\\
+$n,k,\ell$ & Índice de captura o paquete, subportadora y trayectoria.\\
+$N_p,N_{\rm link}$ & Número de trayectorias y número de enlaces espaciales.\\
+$G_E,G_H,G_F$ & Geometría/materiales del entorno, geometría humana y deformación fisiológica.\\
+$\Gamma(t)$ & Soporte geométrico común de interacciones posibles en la escena.\\
+$\calP_m(t)$ & Conjunto de trayectorias electromagnéticas efectivas para la modalidad $m$.\\
+$h_m(t,\tau)$ & Respuesta al impulso ideal de la modalidad $m$.\\
+$H_m(t,f)$ & Respuesta en frecuencia ideal; $\widehat H_m$ denota su estimación.\\
+$Y_m$ & Dato finalmente disponible después de la forma de onda, la instrumentación, el protocolo y el muestreo.\\
+$\vect s_E,\vect s_H,\vect s_F$ & Estados físicos del entorno, macroestado humano y fisiología.\\
+$\vect s_R,\vect s_N$ & Configuración de radio y perturbaciones instrumentales.\\
+$Z_E,Z_\phi,Z_R$;\newline $Z_H,Z_F,Z_N$ & Bloques de representación latente propuestos; no son sinónimos del estado físico ni presuponen un codificador ya validado.\\
+$\phi_0^\star,\Delta\tau_{\rm eff}$ & Desfase residual efectivo y retardo relativos a medición y modelo; no se identifican automáticamente con CPO/STO físicos.\\
+$\beta_{u,a},\psi_{i,u}$ & Dirección marginal por antena y dirección común al arreglo en S4.6.\\
+$G_u(k),K_u(k,l)$ & Productos espaciales y entre frecuencias utilizados en el protocolo invariante S4.7a.\\
+$i,u,a,b$ & En los avances S1/S4: posición, arreglo, antena y modelo B0/B1/B2.\\
+$E_{\phi,\rm deg},\rho$ & Error circular absoluto en grados y coherencia compleja normalizada.\\
+$x_{\rm chest}(t)$ & Desplazamiento o forma de onda torácica; RR es una cantidad derivada.\\
+$y_{\rm L}(t)$ & Señal IQ recibida de LoRa.\\
+$\vect q$ & Vector de parámetros físicos de interés para inversión.\\
+$\mat J_q$ & Jacobiano del observable respecto de $\vect q$.\\
+$\mat F_q,\mat F_q^{\rm eq}$ & Matriz de información de Fisher y su forma equivalente tras eliminar perturbaciones.\\
+$\mat\Sigma_w,\mat\Sigma_q$ & Covarianza del ruido y covarianza estimada/posterior del estado.\\
+$\mathcal R_{\rm EM}^{(m)},\mathcal O_m$ & Simulador electromagnético y operador de observación.\\
+$\calL,R$ & Función de pérdida y regularizador; $R_{a,k}$ denota específicamente el producto residual de canales en S4.\\
+$\mathsf V_0$--$\mathsf V_7$ & Alternativas de observable, distancia o fusión para S4.7a; no son los regímenes de información $\mathcal R_i$.\\
+$z_{\rm rob},z_{\rm coh}$ & Ramas robusta y coherente propuestas.\\
+$T_{W\leftarrow s}$ & Transformación rígida desde el marco del sensor $s$ al marco global $W$.\\
+$D_{\rm rep},D_{\rm fis},Q$ & Distancias de repetibilidad, respuesta física y cociente descriptivo; no sustituyen una prueba de identificabilidad.\\
+G0--G4; Esc. E0--E5 & Condiciones de reconstrucción/calibración y escenarios físicos propuestos, respectivamente.\\
+
+\bottomrule
+\end{longtable}
+\endgroup
+\clearpage

@@ -1,0 +1,166 @@
+\chapter{Representaciones neuronales del entorno y del campo de radiofrecuencia}
+\label{ch:latent_env}
+
+Una vez definido el criterio de fidelidad del gemelo, es necesario decidir cómo representar
+la escena y el campo de radiofrecuencia. Esta decisión afecta la capacidad de edición del
+modelo, el costo computacional, la transferencia entre escenas y la cantidad de mediciones
+requerida para la calibración. Por ello, las representaciones neuronales se estudian aquí
+como aproximaciones estructuradas del modelo físico y no como sustitutos desligados de él.
+
+\section{Por qué representar y no sólo simular}
+
+El trazado de rayos explícito conserva la interpretabilidad, pero puede ser costoso y depende de una geometría detallada. Los modelos neuronales del campo buscan aproximar
+\begin{equation}
+(\vect p_T,\vect p_R,G_E)\mapsto H
+\end{equation}
+a partir de mediciones o representaciones geométricas compactas. La cuestión científica no es únicamente qué modelo reduce el error cuadrático, sino qué representación conserva la estructura necesaria para interpolar, extrapolar, editar escenas, adaptarse con pocas mediciones y soportar inversión.
+
+\section{Regímenes de información}
+
+Para comparar familias heterogéneas se fija primero una consulta $\vect u=(\vect p_T,\vect p_R,f,\vect s_R)$ y un conjunto de pares RF de calibración $\mathcal D_{\rm RF}=\{(\vect u_i,H_i)\}$. Los cuatro regímenes indican información adicional disponible en inferencia:
+\begin{align}
+\mathcal R_0 &: \{\vect u,\mathcal D_{\rm RF}\},\\
+\mathcal R_1 &: \{\vect u,\mathcal D_{\rm RF},G_E^{\rm geom}\},\\
+\mathcal R_2 &: \{\vect u,\mathcal D_{\rm RF},G_E^{\rm geom},\{O_j\}\},\\
+\mathcal R_3 &: \{\vect u,\mathcal D_{\rm RF},G_E^{\rm geom},\{O_j\},
+\vect\theta_{\rm mat},\vect\theta_{\rm ant}\}.
+\end{align}
+Aquí $G_E^{\rm geom}$ contiene sólo geometría, a diferencia del estado
+completo $G_E$ que también incluye materiales. $O_j$ es un objeto segmentado con geometría y clase semántica. El canal reservado para evaluación es siempre la variable que debe predecirse y no una entrada de la consulta. El número de muestras, la región espacial y los metadatos se mantendrán constantes dentro de cada comparación; así se evita presentar como ganancia arquitectónica una ventaja debida a la información disponible.
+
+\section{Campos implícitos}
+
+Un campo neural continuo puede aproximarse como
+\begin{equation}
+\widehat H=F_\theta(\vect p_T,\vect p_R,f).
+\end{equation}
+La ventaja es una representación continua y compacta; el riesgo es que la geometría y los materiales queden absorbidos en los pesos, lo que dificulta la edición y la transferencia. NeRF$^2$ representa una línea importante en esta dirección y se propone en S5 como método de referencia para campos implícitos \citep{Zhao2023NeRF2}.
+
+\section{Representaciones centradas en objetos e informadas por la geometría}
+
+Una alternativa factoriza el entorno:
+\begin{equation}
+Z_E=\left\{z_{\rm global},z_{O_1},\ldots,z_{O_M}\right\},
+\end{equation}
+con
+\begin{equation}
+z_{O_i}=\left[z_{\rm geom}^{(i)},z_{\rm mat}^{(i)},z_{\rm int}^{(i)}\right].
+\end{equation}
+Learnable WDT y trabajos condicionados a la geometría como RadTwin constituyen referencias para esta familia \citep{Jiang2025LearnableWDT,Zhang2026RadTwin}. RFScape constituye otro antecedente directo de objetos neuronales acoplados
+a trazado editable \citep{Chen2025RFScape}. La hipótesis es que una representación explícitamente estructurada puede necesitar más información geométrica inicial, pero generalizar mejor a cambios de objetos y soportar intervenciones físicas interpretables.
+
+\section{El espacio de trayectorias como representación intermedia}
+
+Se propone representar cada trayectoria mediante un descriptor
+\begin{equation}
+\vect p_{m,\ell}=
+[\Re\alpha_{m,\ell},\Im\alpha_{m,\ell},\tau_{m,\ell},
+\theta^{\rm AoA}_{m,\ell},\theta^{\rm AoD}_{m,\ell},
+\nu_{m,\ell},\vect c_{m,\ell}],
+\end{equation}
+donde $\vect c_{m,\ell}$ codifica interacciones; los ángulos se representarán mediante seno/coseno para evitar discontinuidad en $2\pi$. El conjunto es permutacionalmente invariante, por lo que una arquitectura de tipo Deep Sets puede escribirse como
+\begin{equation}
+z_{\calP_m}=\rho\left(\sum_{\ell}\phi(\vect p_{m,\ell})\right).
+\label{eq:deepset_paths}
+\end{equation}
+Esta forma admite un número variable de trayectorias y mantiene la correspondencia con el modelo físico; su invariancia a permutaciones sigue la construcción de Deep Sets \citep{Zaheer2017DeepSets}. Un transformador de conjuntos o un grafo pueden extenderla cuando las relaciones entre trayectorias sean relevantes. Para el alineamiento entre tecnologías de radio se aprenderá una representación común del soporte $\Gamma$, no una igualdad artificial entre los descriptores de $\calP_m$.
+
+\section{Hipótesis de factorización latente}
+
+Se propone separar
+\begin{equation}
+Z=\{Z_E,Z_\phi,Z_R,Z_H,Z_F,Z_N\},
+\label{eq:factor_latent}
+\end{equation}
+con $Z_E$ asociado al entorno, $Z_\phi$ a la estructura e incertidumbre de fase, $Z_R$ a la configuración de radio, $Z_H$ al macroestado humano, $Z_F$ a la fisiología y $Z_N$ a perturbaciones residuales. La factorización no supone independencia absoluta; busca que la información relevante sea manipulable y que el codificador no confunda la identidad del dispositivo con el estado humano.
+
+La inclusión de $Z_\phi$ está motivada por los diagnósticos del
+\cref{ch:avances}. S4.4--S4.5 muestran predictibilidad parcial del retardo;
+S4.6 encuentra una dirección común al arreglo cuya predicción mediante vecinos
+no resulta útil bajo los controles realizados. En consecuencia se propone
+$Z_\phi=[Z_\phi^{\rm pred},Z_\phi^{\rm nuisance},Z_\phi^{\rm residual}]$,
+según la \cref{eq:phase_latent_roles}. Esta clasificación distingue cantidades
+predictivas, parámetros perturbadores y discrepancia residual; no asigna causas
+físicas únicas ni presupone independencia. La elección de un observable
+invariante debe conservar sensibilidad a la tarea. Su fundamento matemático
+se presenta en la \cref{sec:phase_invariants}, y su validación es el bloque
+propuesto S4.7a. Un codificador aprendido y la incertidumbre por trayectoria
+permanecen pendientes. La clasificación se revisará si una referencia de
+adquisición o metadatos adicionales modifican la predictibilidad observada.
+
+La identificabilidad de representaciones separadas requiere restricciones e
+información adicional \citep{Locatello2019Identifiability}. Esta partición no es identificable
+a partir de una única observación sin supuestos adicionales: distintas transformaciones invertibles de las variables latentes pueden explicar el mismo $Y_m$. En consecuencia, cada bloque tendrá criterios observables: intervenciones simuladas que modifican un factor a la vez, etiquetas parciales, pares de la misma escena observados con radios distintos, predicción cruzada y pruebas de invariancia fuera de distribución. La tesis evaluará esas propiedades y no interpretará automáticamente cada coordenada latente como una causa física.
+
+\section{Dos ramas complementarias de representación}
+\label{sec:two_representation_branches}
+
+Se propone conservar simultáneamente una rama robusta $z_{\rm rob}=f_{\rm rob}(Y)$
+y una rama coherente $z_{\rm coh}=f_{\rm coh}(Y,Y_{\rm ref},M)$, donde $M$ incluye
+metadatos de adquisición y $Y_{\rm ref}$ una referencia independiente cuando exista.
+La primera describe estructura relativa estable frente a un grupo instrumental
+especificado; la segunda conserva variaciones temporales de fase y amplitud necesarias
+para inferir movimiento. Su fusión se condicionará por la calidad de referencia y
+la observabilidad, y se comparará con cada rama por separado.
+
+El requisito deseado es invariancia a perturbaciones instrumentales e identificación
+de la respuesta a intervenciones físicas. No puede garantizarse sólo mediante una
+arquitectura: si una deriva instrumental y un movimiento generan la misma rotación
+común, eliminarlos algebraicamente elimina ambas contribuciones. La separación exige
+referencias, intervenciones controladas o información adicional. La equivariancia
+física se expresará respecto de una transformación conocida del estado; no se
+supondrá que toda traslación de un objeto produce una rotación global del canal.
+
+\subsection{Familia operacional para S4.7a}
+\label{sec:representation_v_family}
+
+Se denominarán $\mathsf V_0$--$\mathsf V_7$ las alternativas del análisis; esta
+notación evita confundirlas con los regímenes de información $\mathcal R_i$ y los
+hitos administrativos R1--R5. Para $H\in\mathbb C^{A\times K}$, $\mathbf h_k=H_{:,k}$
+y $\epsilon>0$ con las unidades del denominador, se definen:
+\begin{align}
+\mathsf V_0(H)&=H, &\mathsf V_1(H)&=|H|,\nonumber\\
+[\mathsf V_2^{(\ell)}(H)]_{a,k}&=\frac{H_{a,k+\ell}H_{a,k}^{*}}
+{|H_{a,k+\ell}||H_{a,k}|+\epsilon},\qquad \ell\in\mathcal L,
+\label{eq:v_frequency_products}\\
+[\mathsf V_3(H)]_{a,b,k}&=\frac{H_{a,k}H_{b,k}^{*}}
+{|H_{a,k}||H_{b,k}|+\epsilon},\label{eq:v_antenna_products}\\
+\mathsf V_5(H)_k&=\frac{\mathbf h_k\mathbf h_k^{H}}
+{\|\mathbf h_k\|_2^2+\epsilon},\label{eq:v_spatial_gram}\\
+[\mathsf V_6(H)]_{a,k}&=H_{a,k}\exp(-j\widehat\psi+j2\pi\nu_k\widehat\tau).
+\label{eq:v_canonical_channel}
+\end{align}
+$\mathsf V_4$ designa la comparación en el cociente por $U(1)$, mediante
+$d_{U(1)}^2(x,y)=\|x\|^2+\|y\|^2-2|x^Hy|$, para el canal apilado de un arreglo.
+Es una distancia entre clases de equivalencia, no un codificador unario ni una
+predicción del desfase óptimo. La rotación es única para todas sus antenas y frecuencias.
+
+$\mathsf V_2$ conserva diferencias espectrales y elimina una fase común constante;
+$\mathcal L$ comenzará con $\{1,4,16,64\}$ cuando el soporte espectral lo permita,
+pero su selección y las máscaras de borde se fijarán con entrenamiento/validación.
+$\mathsf V_3$ y $\mathsf V_5$ eliminan además retardo común, pero no desfases
+relativos independientes entre cadenas. El producto instantáneo de
+\cref{eq:v_spatial_gram} es una matriz de Gram, no una covarianza temporal estimada.
+La normalización con $\epsilon$ mantiene invariancia exacta a fase, pero sólo
+aproxima invariancia a escala. Se declararán máscaras de desvanecimiento y pares
+seleccionados antes de evaluar; el número de características y su coste también
+forman parte de la comparación.
+
+$\mathsf V_6$ requiere que $\widehat\psi$ y $\widehat\tau$ se obtengan de una
+referencia disponible causalmente, metadatos o un predictor congelado. En dc01,
+la corrección de fase común ajustada frente al canal objetivo sigue siendo oráculo.
+Calcular productos del CSI recibido como entrada de un sensor es admisible;
+alinear una predicción RT con su objetivo de prueba y llamarla predicción autónoma
+no lo es. Ambas operaciones deben distinguirse también al entrenar modelos latentes.
+
+$\mathsf V_7$ designará la fusión de magnitud, productos espectrales, productos
+espaciales y canal canónico disponibles. No se definirá como concatenación fija antes
+del experimento: cada ablación declarará componentes, dimensión, normalización y acceso
+a referencia. La comparación con $\mathsf V_1$--$\mathsf V_6$ determinará si la
+complementariedad compensa el aumento de capacidad y de información auxiliar.
+
+Las representaciones anteriores conectan escena, estructura relativa y referencia de
+adquisición. El \cref{ch:learning_foundations} establece cómo aprenderlas y evaluarlas;
+el capítulo de observación especifica después qué información conserva cada radio.
+Esta separación permite controlar arquitectura, adquisición y fidelidad física como
+factores distintos de la comparación.

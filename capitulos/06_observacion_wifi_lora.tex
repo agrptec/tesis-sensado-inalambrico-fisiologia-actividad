@@ -1,0 +1,148 @@
+\chapter{Observación de una misma escena mediante Wi-Fi y LoRa}
+\label{ch:radio_obs}
+
+El soporte geométrico y las representaciones del capítulo anterior son comunes a la escena,
+pero la medición final depende de la frecuencia, la forma de onda, el receptor y el
+protocolo. El presente capítulo separa ambos niveles para evitar atribuir a la propagación
+una pérdida de información causada por la instrumentación o, a la inversa, interpretar
+como equivalente información obtenida mediante tecnologías distintas.
+
+\section{Principio de separación entre propagación y radio}
+
+La \cref{eq:generative_observation} distingue tres objetos que no deben intercambiarse: el canal ideal $H_m$, su estimación $\widehat H_m$ y la observación almacenada $Y_m$. El simulador produce $\calP_m$ condicionado por la escena, la frecuencia y las antenas; el receptor determina qué transformación y muestreo de $H_m$ quedan disponibles. Por ello se escribe
+\begin{equation}
+Y_m=\mathcal O_m(H_m[\calP_m];\vect s_R,\vect s_N),
+\end{equation}
+con $m\in\{\mathrm{WiFi},\mathrm{LoRa}\}$. Esta separación permite comparaciones causales: se fijan $\Gamma(t)$ y el movimiento humano, y se modifican la frecuencia, el ancho de banda, la forma de onda y la etapa de entrada del receptor. No se exige $\calP_{\rm WiFi}=\calP_{\rm LoRa}$; se exige que ambas realizaciones provengan del mismo estado físico controlado.
+
+\section{Modelo de observación Wi-Fi}
+
+Para subportadoras $f_k$,
+\begin{equation}
+H_k(t)=\sum_{\ell}\alpha_\ell(t)e^{-j2\pi\nu_k\tau_\ell(t)}.
+\end{equation}
+La observación real se obtiene después de considerar la instrumentación y el protocolo:
+\begin{equation}
+\widetilde H_k(t)=g_k(t)H_k(t)e^{j\psi_k(t)}+n_k(t).
+\end{equation}
+Las variables $g_k$ y $\psi_k$ se modelan explícitamente durante la transferencia de la simulación a las mediciones reales. UWB-Fi demuestra que el muestreo disperso en frecuencia puede aumentar el ancho de banda efectivo, pero también que cada cambio de canal introduce desajustes aleatorios de fase que deben tratarse. Su enfoque combina la teoría de recuperación dispersa con un modelo aprendido guiado por trazado de rayos \citep{Li2024UWBFI}.
+
+\section{Modelo de observación LoRa}
+
+Sea $x_{\rm CSS}(t)$ la envolvente compleja de un chirrido LoRa. Se adopta un
+coeficiente $\alpha_{{\rm L},\ell}(t)$ que ya contiene la fase de portadora
+correspondiente a la longitud instantánea del camino. El canal multitrayecto de la \cref{eq:ltv_channel} produce
+\begin{equation}
+y_{\rm L}(t)=\sum_{\ell}\alpha_{{\rm L},\ell}(t)
+ x_{\rm CSS}(t-\tau_{{\rm L},\ell}(t))+w_{\rm L}(t).
+\label{eq:lora_channel}
+\end{equation}
+Con esta convención, el Doppler de propagación está contenido en la evolución
+de fase de $\alpha_{{\rm L},\ell}(t)$; no se multiplica de nuevo por una
+rotación independiente que represente el mismo movimiento. La aproximación
+de banda estrecha permite ignorar dilataciones temporales cuando son
+despreciables para el ancho de banda y velocidades considerados.
+
+Después de retirar el chirrido,
+\begin{equation}
+d_{\rm L}(t)=y_{\rm L}(t)c^*(t),
+\end{equation}
+y posteriormente
+\begin{equation}
+D_{\rm L}[k]=\operatorname{FFT}\{d_{\rm L}(t)\}.
+\end{equation}
+La eliminación del chirrido convierte idealmente su pendiente en un tono cuya posición se detecta mediante la FFT; el CFO, el error temporal, la multitrayectoria y la interferencia alteran ese patrón \citep{Ghanaatian2019LoRaRx,Maleki2023CSS}. SenLoRa utiliza símbolos de alta confianza para incrementar la información de sensado disponible en tráfico ambiente y muestra que la disponibilidad temporal es tan importante como la sensibilidad física del canal \citep{SenLoRa2025}.
+
+\section{Jerarquía de representaciones LoRa}
+
+Se conservará la cadena de representaciones
+\begin{equation}
+IQ\rightarrow \text{dechirped IQ}\rightarrow
+\text{intervalos de FFT}\rightarrow
+(A,\phi)\rightarrow
+(\mathrm{RSSI},\mathrm{SNR}).
+\end{equation}
+La eliminación del chirrido y una FFT compleja completa son transformaciones invertibles, y el par magnitud--fase conserva un número complejo salvo por la cuantización y las convenciones en magnitud nula. La pérdida aparece al seleccionar intervalos espectrales, descartar la fase, promediar, cuantizar o reducir todo el paquete a RSSI/SNR. La tesis documentará cada operador y evaluará qué estadístico es suficiente para la presencia, el movimiento macroscópico y la respiración.
+
+La jerarquía no afirma que todo estimador basado en I/Q superará siempre a uno basado en RSSI. Afirma algo más preciso: una transformación determinista no invertible no puede crear información acerca del estado bajo un modelo probabilístico fijo. Un resumen puede, sin embargo, mejorar el desempeño con un número finito de muestras al descartar perturbaciones o regularizar el aprendizaje. Por ello se compararán tanto la información disponible como la robustez del estimador, siguiendo la distinción entre estadístico, estimador y cota de información \citep{Kay1993,CoverThomas2006}.
+
+\section{LoRa como plataforma de alcance y sensado distribuido}
+
+El estudio de sensado de largo alcance a través de paredes muestra la detección de desplazamientos pequeños mediante la razón entre las señales de dos antenas. En condiciones específicas, informa sensibilidad a movimientos de escala milimétrica y una dependencia clara entre el alcance y la magnitud del desplazamiento \citep{Zhang2020LoRa}. Más recientemente, el sensado de gran escala en edificios modela la señal como
+\begin{equation}
+s(t)=H_s+a(t)e^{-j2\pi f_cd(t)/c}
+\end{equation}
+y estudia la modificación de la cobertura efectiva de sensado mediante la configuración del transceptor \citep{Xue2025LargeScaleLoRa}. Esto sugiere que el problema de despliegue puede expresarse como una optimización de la observabilidad y no sólo de la cobertura de comunicación.
+
+Los modelos de observación definidos hasta este punto describen cómo se registra un canal
+dado. El siguiente paso consiste en introducir la evolución temporal de la escena y en
+determinar cómo el movimiento macroscópico y las deformaciones fisiológicas modifican
+las trayectorias que llegan a dichos observadores.
+
+\section{Disponibilidad instrumental y conservación de información}
+
+La recepción I/Q empleada en plataformas SDR debe distinguirse de los indicadores
+por paquete disponibles en un dispositivo de comunicaciones. Los estudios LoRa con
+dos antenas y el marco OpenLoRa justifican verificar sincronización y procesamiento,
+pero no garantizan que un gateway convencional entregue el mismo observable
+\citep{Zhang2020LoRa,Mishra2023OpenLoRa}. La validación especificará dispositivo,
+frecuencia de muestreo, referencia entre antenas y continuidad entre paquetes.
+
+Para $y_g=g\mu(q)+gw+v$, con ruido previo y posterior de covarianzas
+$\Sigma_w$ y $\Sigma_v$, la información de la media contiene
+\begin{equation}
+2g^2\Re\{J_q^H(g^2\Sigma_w+\Sigma_v)^{-1}J_q\}.
+\end{equation}
+Si $v=0$ y el escalamiento es ideal e invertible, la ganancia se cancela.
+La utilidad práctica de ajustarla depende de ruido añadido, cuantización,
+rango dinámico o saturación. En el diseño de red no se mantendrá artificialmente
+fija la covarianza mientras se amplifica señal y ruido conjuntamente.
+
+\section{Referencia coherente y control de adquisición}
+\label{sec:coherent_acquisition}
+
+Para dos cadenas simultáneas con perturbación común $c(t,k)$,
+$Y_s=c\,g_sH_s+n_s$ y $Y_r=c\,g_rH_r+n_r$. Un cociente regularizado útil es
+\begin{equation}
+\widetilde H_s=H_{r,\rm cal}\frac{Y_sY_r^{*}}{|Y_r|^2+\epsilon_r},
+\label{eq:cabled_reference_ratio}
+\end{equation}
+donde $H_{r,\rm cal}$ representa la respuesta de referencia calibrada en la convención
+adoptada, y la respuesta relativa $g_s/g_r$ deberá calibrarse. Sin ruido y para
+$\epsilon_r\to0$, se cancela $c$ si es realmente común y $H_r\ne0$; con
+regularización, el cociente conserva sesgo de amplitud. Una referencia por cable
+requiere caracterizar pérdidas, fase y estabilidad de cables, divisores y cadenas.
+Cambios de temperatura o movimiento del cable se incluyen en el presupuesto de error.
+
+Compartir 10 MHz o PPS facilita sincronización de frecuencia o tiempo, pero no
+garantiza por sí solo la fase relativa de osciladores locales después de un reinicio.
+Una captura secuencial de referencia tampoco equivale a dos receptores coherentes
+simultáneos. El ADALM-Pluto en su configuración documentada dispone de un transmisor
+y un receptor \citep{AnalogDevicesPluto}; no se le atribuirá un segundo canal de
+recepción simultánea sin una implementación adicional verificada. La arquitectura
+se elegirá tras comprobar acceso a señal, relojes, disparos y repetibilidad.
+
+FarSense utiliza el cociente entre antenas para sensado respiratorio
+\citep{Zeng2019FarSense}. En este banco se ensayará el producto regularizado
+$Y_aY_b^*/(|Y_b|^2+\epsilon_r)$ con máscaras fijadas previamente. Suprime una
+rotación común, pero puede amplificar ruido cerca de desvanecimientos y eliminar
+variación física compartida. HiSAC aporta una referencia para coherencia entre bandas
+mediante una trayectoria de anclaje \citep{Pegoraro2024HiSAC}; la aplicabilidad del
+anclaje a nuestra adquisición deberá comprobarse, no suponerse.
+
+Por paquete Wi-Fi se conservarán CSI disponible, RSSI, ganancia/AGC, canal, ancho de
+banda, configuración de antenas, MCS, identificador de secuencia y marcas temporales;
+CFO y SFO se registrarán cuando el dispositivo los exponga. En LoRa se distinguirán
+muestras I/Q, salida compleja completa de dechirp/FFT y telemetría del módem.
+Una pasarela LoRaWAN no proporciona necesariamente I/Q ni CFR. El descarte de fase,
+bins o muestras es una decisión de observación que debe documentarse; dechirp y FFT
+completos no constituyen por sí solos una pérdida irreversible de información.
+
+Para sincronización multimodal se estimará un mapa de reloj
+$t_W=a_s t_s+b_s$ y su incertidumbre; saltos o deriva no afín obligarán a segmentar
+la sesión. Índices de cuadro iguales no prueban simultaneidad. Antes y después de
+cada sesión se repetirán controles de referencia y escena vacía, y se registrarán
+reinicios, reconexiones, temperatura y versiones de firmware. RadioRange ofrece
+modelos de perturbaciones para simulación de distancias UWB, Wi-Fi y 5G
+\citep{Lyu2026RadioRange}; sus resultados de ranging no sustituyen la caracterización
+de deriva de fase ni la referencia respiratoria de este experimento.

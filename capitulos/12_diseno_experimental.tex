@@ -1,0 +1,406 @@
+\chapter{Diseño experimental, conjuntos de datos y protocolo de validación}
+\label{ch:experimental_design}
+
+\section{Función metodológica de los conjuntos de datos}
+
+La selección de conjuntos de datos depende de observables, referencias,
+ventanas temporales y condiciones de adquisición. MM-Fi aporta supervisión
+multimodal de actividad y postura; eHealth CSI aporta actividad humana,
+sin sustituir una referencia de expansión torácica sincronizada
+\citep{Yang2023MMFi,Galdino2023eHealth}.
+
+\begin{table}[ht]
+\centering
+\caption{Función de los conjuntos de datos y de las fuentes experimentales en la tesis.}
+\begin{tabularx}{\textwidth}{p{4.0cm}L L}
+\toprule
+\textbf{Rol} & \textbf{Fuentes principales} & \textbf{Uso}\\
+\midrule
+Calibración física & DICHASUS dc01; escenas adicionales & Comparación del gemelo estático con mediciones reales.\\
+Radio e instrumentación & OpenLoRa; metodología UWB-Fi & Desajustes de frecuencia, colisiones y muestreo.\\
+Dinámica macroscópica & WiMANS, MM-Fi y datos con postura & Trayectorias de movimiento y evaluación fuera de distribución.\\
+Fisiología controlada & BreatheSmart & Respiración con condiciones conocidas.\\
+Sueño/movimiento & Wi-Actigraph & Evaluación según etiquetas de sueño y movimiento disponibles; sin extrapolación clínica.\\
+Varios usuarios & WiMANS, WiMUSE, MURAL-Fi & Separabilidad y asociación.\\
+Sensado humano con LoRa & SenLoRa; estudios a través de paredes & Respiración, marcha y tráfico ambiente.\\
+Adquisición propia & laboratorio y piloto & Correspondencia con el gemelo y validación final.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Fuentes adicionales y límites de validación}
+
+La prioridad inmediata comprende DICHASUS para fase, CAEZ como segunda fuente CSI
+sujeta a auditoría de sus subconjuntos, Indoor Radio Mapping para geometría--RSSI
+y OpenLoRa para el operador de adquisición. El resto se incorporará cuando responda
+a una hipótesis concreta, evitando confundir disponibilidad de datos con cobertura
+experimental del problema doctoral.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Fuentes complementarias: evidencia disponible y uso propuesto.}
+\label{tab:additional_datasets}
+\begin{tabularx}{\textwidth}{P{3.0cm}L L}
+\toprule
+Fuente & Uso previsto & Límite de interpretación\\
+\midrule
+CAEZ \citep{ETHCAEZ,Zumegen2024CAEZWiFi} & Contraste de representaciones con CSI real adicional. & Auditar radios, calibración, geometría y sesiones antes de definir transferencia.\\
+DICHASUS d010 \citep{DICHASUSd010Web} & Sensibilidad de $\mathsf V_i$ ante el movimiento medido del transmisor. & Es otra campaña y geometría; no representa movimiento humano ni valida respiración.\\
+Indoor Radio Mapping \citep{Milosheski2026IndoorMapping} & Registro de nubes de puntos y predicción de RSSI. & RSSI no valida fase ni micromovimiento.\\
+WiSegRT \citep{Zhang2023WiSegRT} & CIR sintética en escenas segmentadas; ablaciones geométricas. & Simulación multiescena, no evidencia de transferencia real.\\
+WiInSim \citep{QualcommWiInSim} & Diversidad de escenas y propagación sintética. & Las particiones deben reservar escenas; no sustituye medición.\\
+RF-MatID \citep{Chen2026RFMatID} & Identificación de materiales y evaluación de etiquetas/priores. & Clasificar un material no identifica su permitividad efectiva en el recinto.\\
+DeepSense 6G \citep{Alkhateeb2022DeepSense} & Diseño multimodal y transferencia en contextos propios del conjunto. & Su contexto de movilidad no es un banco de respiración interior.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+BreatheSmart orienta el diseño de perturbaciones respiratorias controladas; sus
+etiquetas o resultados de clasificación no equivalen a la referencia mecánica sincronizada
+de Esc. E2. MM-Fi, WiMANS, WiMUSE y MURAL-Fi se utilizarán para representación humana,
+asociación y generalización según sus anotaciones, después de validar el observable.
+MoViFi y ViMo mantienen su naturaleza radar y no se reclasifican como mediciones CSI.
+La literatura de respiración y varios usuarios seguirá evaluándose en el nivel de
+la tarea; no servirá como sustituto de geometría y canal medidos conjuntamente.
+
+En d010 se auditarán primero las marcas temporales, la posición, el muestreo y las
+compensaciones disponibles. Sólo después se construirán pares cuasiestáticos y pares
+con desplazamiento del transmisor, sin compartir capturas entre particiones. Para cada
+$\mathsf V_i$ se compararán distancia frente a desplazamiento, tamaño del efecto,
+intervalos agrupados y capacidad de distinguir cambio físico de repetición. Esta prueba
+complementa dc01, pero no estima $\partial H/\partial\mathbf q_H$: cambia el terminal
+móvil y potencialmente todas sus trayectorias, no un dispersor humano con Tx/Rx fijos.
+
+\section{Principio de no-oráculo}
+
+Los valores de referencia se utilizarán para la evaluación y la supervisión explícita cuando corresponda, pero no para seleccionar a posteriori el canal, la subportadora o la componente que minimice el error. Toda selección destinada al despliegue deberá basarse en métricas disponibles sin recurrir a esos valores, como la observabilidad estimada, la estabilidad, la incertidumbre o criterios establecidos con el conjunto de validación.
+
+Se permiten referencias oráculo claramente identificadas para diagnosticar límites de alineación, como S4.2b, pero no se interpretan como procedimientos de despliegue. En S4.2d se reserva un grupo de antenas para evaluar transferencia del retardo; el CPO se ajusta con las antenas evaluadas, de modo que se transfiere únicamente el retardo. En S4.2e, retardo y CPO se ajustan sólo en las frecuencias de entrenamiento y se transfieren sin reajuste a las de prueba. Una partición por antenas o frecuencias dentro de la misma observación no sustituye la evaluación en posiciones o sesiones independientes.
+
+\section{Referencia de fase, trazabilidad y evaluación relativa}
+
+En S4.6, $\phi_0^\star$ y $\psi$ se construyen con el canal medido y retardo
+oráculo. Su concentración y la reducción tras centrado son diagnósticos;
+no se presentan como rendimiento predictivo independiente. Los estadísticos
+marginales por antena se calculan descriptivamente en el conjunto completo.
+Si se reutilizan como calibración de un método de despliegue deberán volver
+a estimarse sólo con entrenamiento y quedar congelados durante la prueba.
+
+S4.6d.1 recupera el tiempo físico a partir de coordenadas únicas en el
+subconjunto de 10\,000 capturas. El error XYZ nulo acredita la correspondencia
+de registros, no la exactitud física absoluta del posicionamiento o del reloj.
+Las observaciones se ordenan por su marca temporal; los índices del TFRecord
+no sustituyen el tiempo. Los dos arreglos comparten identificador y tiempo de
+captura y no se cuentan como duplicados temporales independientes.
+
+S4.7a evaluará primero cada arreglo por separado. Se fijarán máscara, frecuencias,
+pares entre frecuencias, normalización y tratamiento del ruido antes de comparar
+métodos. Los productos espaciales $G$ se utilizarán para fidelidad relativa;
+los productos $K$ y la distancia respecto de fase común, para separar esa
+fidelidad de la contribución del retardo. La identidad de $G$ con y sin retardo
+común será un control de implementación. Se conservarán errores brutos y de
+potencia para que una invariancia amplia no oculte una limitación del modelo.
+
+Las pruebas negativas de continuidad se acompañarán, en su extensión
+confirmatoria, de intervalos pareados, réplicas aleatorias y conteos de pares
+por intervalo. Se distinguirá ausencia de ventaja observada de equivalencia
+estadística y se reservarán campañas o referencias adicionales para contrastar
+el origen instrumental. La nomenclatura S4.6d.2 identifica el último bloque
+realizado; S4.7a y S4.7b identifican protocolos propuestos.
+
+
+\section{Escenarios físicos E0--E5 y criterios de avance}
+\label{sec:physical_scenarios}
+
+La campaña propia mantendrá transmisor y receptor fijos durante los contrastes de
+movimiento de objetos. Se identificarán geometría, antenas, polarización, potencia,
+forma de onda y referencia de adquisición. El estado documentado termina en S4.6d.2;
+los siguientes escenarios especifican un programa por ejecutar. Los tamaños y rangos
+iniciales se revisarán mediante un piloto de precisión antes del estudio confirmatorio.
+
+\subsection{Esc. E0: caracterización instrumental}
+\label{sec:scenario_e0}
+
+Se adquirirán intervalos iniciales de 10--30 minutos en habitación vacía, con terminales
+y cables inmovilizados. Se repetirán condiciones de encendido, reconexión, cambio de
+día y dispositivo, registrando temperatura y tiempo de estabilización. Se modificará
+un factor principal a la vez; el orden se alternará o aleatorizará cuando sea posible,
+para no confundir deriva temporal con condición experimental. Se conservará una
+condición de referencia al inicio y al final de cada bloque.
+
+Se compararán canal bruto, corrección aprendida, referencia física calibrada y productos
+relativos. Las salidas serán deriva de fase y retardo, estabilidad de amplitud,
+variabilidad entre cadenas, pérdidas de paquetes y distribución de $D_{\rm rep}$.
+La estabilidad intrasesión se separará de reproducibilidad tras reinicio. Los cocientes
+sólo se interpretarán bajo sus supuestos de perturbación común. El criterio de paso
+será conocer el piso instrumental y la incertidumbre temporal para la escala de
+movimiento de Esc. E1; si éstos son mayores que la señal esperada, se corregirá el
+banco o se ampliará justificadamente la perturbación antes de aprender un estimador.
+
+\subsection{Esc. E1: reflector con desplazamiento medido}
+\label{sec:scenario_e1}
+
+Se utilizará una etapa lineal con encoder o micrómetro calibrado y fijación rígida.
+Se propone una rejilla inicial de desplazamientos de 0, 0.25, 0.5, 1, 2, 5 y 10 mm,
+restringida a pasos resolubles por la metrología real. La posición comandada al motor
+no será la referencia: se medirá el desplazamiento, incluyendo holgura, histéresis
+y retorno al origen. Se ensayarán ambos sentidos y al menos 20 repeticiones iniciales
+por condición; esta cifra caracteriza repetibilidad y no sustituye un cálculo de
+precisión o potencia estadística a partir del piloto.
+
+Se considerarán una trayectoria dominante, una reflexión controlada y multitrayectoria,
+variando orientación del reflector y posición respecto de zonas de Fresnel. Las
+condiciones nulas y movimientos de baja sensibilidad geométrica se conservarán como
+controles. Se evaluarán $\Delta H$ con referencia común, $\Delta\mathsf V_i$,
+$\widehat J_{\mathcal V,q}$, error de fase inducida y recuperación del desplazamiento.
+LiDAR y radar complementan el contexto geométrico y dinámico, pero no reemplazan
+la referencia mecánica submilimétrica. El criterio de paso será una respuesta física
+repetible distinguible de E0, con incertidumbre y discrepancia del modelo cuantificadas,
+no únicamente una correlación elevada de curvas filtradas.
+
+\subsection{Esc. E2: fantoma respiratorio}
+\label{sec:scenario_e2}
+
+Se programará una perturbación mecánica periódica con amplitudes iniciales de
+0.5--10 mm y frecuencias de 0.1--0.6 Hz, más formas no sinusoidales, pausas y
+movimiento lento superpuesto. Se declarará si la amplitud es pico o pico a pico;
+por defecto será pico respecto del estado medio. Se medirán posición y tiempo con
+referencia independiente, sin identificar automáticamente estos rangos con desplazamiento
+torácico de toda persona. El periodo de observación contendrá suficientes ciclos de
+la frecuencia mínima y se registrará la duración exacta, así como los transitorios.
+
+Se compararán magnitud, rama coherente, productos relativos y fusión, primero con
+estimadores clásicos y después con modelos aprendidos. Las métricas incluirán error
+de desplazamiento, frecuencia, amplitud, desfase temporal, coherencia y forma de onda,
+así como detección de pausas mecánicas. Filtros, bandas y reglas de selección se fijarán
+con validación; toda alineación temporal diagnóstica adicional se reportará por separado.
+Recuperar sólo BPM puede ocultar una forma de onda incorrecta o el armónico dominante.
+Se avanzará a Esc. E3 cuando la referencia temporal y física esté caracterizada y
+la recuperación sea reproducible en condiciones reservadas. El resultado será una
+validación mecánica, sin afirmaciones clínicas sobre apnea.
+
+\subsection{Esc. E3: una persona}
+\label{sec:scenario_e3}
+
+Tras la aprobación ética y el consentimiento correspondientes, se separarán respiración
+en reposo, cambios de postura/orientación, marcha y movimiento de brazos; posteriormente
+se combinarán perturbaciones. La referencia de expansión respiratoria deberá sincronizarse
+y caracterizarse. RGB-D o visión aportarán postura y actividad cuando el protocolo lo
+permita, y el radar contrastará dinámica desde vistas calibradas. Se analizarán artefactos,
+fallos de referencia y regiones no observables antes de entrenar un clasificador.
+
+Se reservarán participantes y sesiones completos, y se reportará desempeño por condición,
+incertidumbre, abstenciones y tasa de registros excluidos. La inferencia final indicará
+expresamente sus modalidades necesarias. Una prueba de concepto de laboratorio no
+se presentará como diagnóstico médico ni como validación del despliegue comunitario.
+
+\subsection{Esc. E4: dos personas}
+
+Después de Esc. E1--E3, se evaluarán dos personas estáticas, una en movimiento,
+ambas con respiración observable y posiciones cruzadas u ocluidas. Primero se estudiará
+separabilidad de las respuestas y condicionamiento del Jacobiano conjunto; después,
+asociación de fuentes y errores individuales. Se comparará contra una fuente dominante
+y contra condiciones de señales semejantes. Tres vistas radar, si se dispone de ellas,
+requerirán registro y sincronización; su número por sí solo no garantiza separación.
+El criterio de éxito será delimitar condiciones recuperables y fallos, antes de ampliar
+usuarios o tareas fisiológicas.
+
+\subsection{Esc. E5: transferencia}
+
+Se introducirán cambios de día, dispositivo, antena, mobiliario y habitación de manera
+separable antes de combinarlos. Se compararán inferencia sin adaptación, calibración
+física y adaptación con presupuestos crecientes de datos. La evaluación multibanda
+repetirá el experimento canónico del reflector y el fantoma, ajustando el rango de
+movimiento a la longitud de onda y documentando antenas, ancho de banda y potencia.
+Un cambio de banda modifica el canal físico: la transferencia debe conservar relaciones
+físicas o eficiencia de adaptación, no exigir idénticos valores de $H$.
+
+Una extensión con la UPNA y el Dr. Francisco Falcone se plantea como colaboración
+por concretar, para repetir Esc. E1--E2 en las bandas e instrumentación que se acuerden,
+incluidas eventualmente ondas milimétricas o sub-THz. No constituye una campaña ya
+realizada ni una disponibilidad instrumental o financiación confirmadas. La comparación
+externa empleará el mismo protocolo, referencias y criterios de exclusión del banco local.
+
+\section{Trazabilidad del conjunto de datos propio}
+\label{sec:own_dataset_schema}
+
+Cada registro se asociará a la clave escena, distribución, sesión, captura, dispositivo
+y enlace. La relación entre archivos se establecerá mediante identificadores persistentes,
+no por el orden de lectura. Se conservarán muestras RF originales y productos derivados
+separados, con versiones de procesamiento y sumas de verificación. Las modalidades
+visuales y humanas seguirán las condiciones de retención, acceso y seudonimización
+aprobadas; conservar señal RF cruda no exige conservar imágenes identificables sin límite.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Especificación lógica del conjunto multimodal propuesto.}
+\label{tab:own_dataset_schema}
+\begin{tabularx}{\textwidth}{P{2.5cm}L}
+\toprule
+Componente & Contenido mínimo y finalidad\\
+\midrule
+Escena & Nubes de puntos, mallas G0--G4, materiales, dimensiones de control,
+transformaciones y unidades; reconstrucción geométrica auditable.\\
+Radio & CSI Wi-Fi, I/Q LoRa/SDR, telemetría de red y datos radar disponibles;
+forma de onda, ganancias, canales, paquetes y máscaras.\\
+Referencia física & Posición mecánica medida, postura autorizada, expansión respiratoria
+y eventos; incertidumbre y procedimiento de calibración.\\
+Simulación & Trayectorias, CIR/CFR, configuración RT, semillas y versiones;
+correspondencia de consulta con cada captura.\\
+Calibración & Relojes, cables, antenas, referencia coherente, sesgos y temperatura;
+parámetros ajustados y subconjunto utilizado.\\
+Metadatos & Identidad de sesión y dispositivo, participante seudonimizado,
+particiones, control de calidad, procedencia y sincronización.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El flujo por sesión incluirá comprobación de montaje y referencia, registro basal,
+bloques con condiciones identificadas y control final de deriva. Se anotarán cambios
+de AGC y pérdidas de captura, evitando rellenar silenciosamente intervalos ausentes.
+Cada canal temporal conservará su reloj original y su transformación al reloj global.
+Los modelos geométricos, parámetros RF y normalizaciones ajustados se congelarán antes
+de aplicar el protocolo de prueba.
+
+\section{Particiones para la evaluación}
+
+Se reportarán como mínimo:
+\begin{enumerate}
+\item posición no observada durante el entrenamiento;
+\item participante no observado durante el entrenamiento;
+\item distribución de mobiliario no observada;
+\item dispositivo no observado;
+\item habitación no observada;
+\item transferencia de interiores a exteriores;
+\item transferencia de uno a varios usuarios, cuando proceda.
+\end{enumerate}
+No se distribuirá al azar entre entrenamiento y prueba información altamente correlacionada de un mismo segmento o posición.
+
+\section{Repetibilidad y estadística}
+
+Cada configuración se repetirá en varias sesiones y con distintas semillas de entrenamiento. Se informarán las distribuciones, los intervalos de confianza y los tamaños del efecto cuando corresponda. Para comparar métodos entre condiciones se priorizarán pruebas pareadas y correcciones por comparaciones múltiples, evitando conclusiones basadas sólo en la mejor ejecución.
+
+\section{Ablaciones acumulativas}
+
+Cada experimento o publicación deberá identificar el aporte de un componente concreto. Por ejemplo:
+\begin{equation}
+\begin{aligned}
+\text{geometría y RT nominal}
+&\rightarrow \text{calibración macroscópica}\\
+&\rightarrow \text{referencia y factorización de fase}\\
+&\rightarrow \text{ramas robusta y coherente}\\
+&\rightarrow \text{fidelidad diferencial}
+\rightarrow \text{representación humana}.
+\end{aligned}
+\end{equation}
+La misma lógica se aplicará a LoRa: I/Q ideal $\rightarrow$ CFO y ruido $\rightarrow$ temporización de paquetes $\rightarrow$ interferencia $\rightarrow$ tráfico ambiente.
+
+\section{Programa experimental y criterios de validación}
+
+\subsection{Experimento A: gemelo nominal para dc01}
+
+\textbf{Pregunta:} ¿la geometría y la implementación están correctamente alineadas con mediciones reales?
+
+\textbf{Entradas:} escena INUE, posiciones DICHASUS, CSI corregido y trayectorias RT.
+
+\textbf{Salidas:} $H_{\rm real}$, $H_{\rm RT}$, PDP, RMS-DS y errores por posición.
+
+\textbf{Criterio de validación:} flujo de procesamiento completamente reproducible y discrepancia entre simulación y medición cuantificada. No se exige una coincidencia perfecta.
+
+\textbf{Avance reportado:} banco de $10000$ posiciones y métricas nominales S1/B0 disponibles en el \cref{ch:avances}. Se documentan versiones, escala, mecanismos activos, partición original y comprobaciones de correspondencia de identificadores; la reproducción independiente debe utilizar los mismos artefactos.
+
+\subsection{Experimento B: calibración física y de fase}
+
+\textbf{Pregunta:} ¿qué parte de la discrepancia entre simulación y medición proviene de los materiales y qué parte de errores geométricos o de fase?
+
+\textbf{Métodos de comparación:} parámetros ITU, ajuste exclusivo de escala, materiales globales y neuronales, diagnóstico de fase constante/retardo y calibración con incertidumbre por trayectoria.
+
+\textbf{Criterio de validación:} mejora consistente en la partición espacial de prueba, no sólo en la de entrenamiento.
+
+\textbf{Avance reportado:} B1/B2 mejoran las métricas macroscópicas; S4.2--S4.3 caracterizan fase afín y residual. S4.4--S4.5 evalúan predicción de retardo y efecto sobre el canal bajo particiones densas y por bloques. La generalización material de B1/B2 no se confunde con la del predictor de retardo sobre B0. S4.6 añade la caracterización de la fase común, la recuperación de marcas temporales y los controles de vecindad. PEAC se ha reproducido en un ejemplo controlado; su aplicación a dc01 permanece propuesta.
+
+\subsection{Experimento C: eficiencia de datos}
+
+\textbf{Pregunta:} ¿cuántas mediciones necesita cada representación?
+
+\textbf{Salida:} curvas error vs. número de posiciones de calibración, $N_{90}$ y área bajo curva.
+
+\subsection{Experimento D: fidelidad diferencial}
+
+\textbf{Pregunta:} ¿el gemelo predice los cambios producidos por perturbaciones pequeñas?
+
+\textbf{Diseño:} reflector mecánico con desplazamiento de referencia conocido.
+
+\textbf{Métrica:} $E_J$, correlación de $\Delta H$ y error de fase inducida.
+
+\subsection{Experimento E: representación realista de la capa física de LoRa}
+
+\textbf{Pregunta:} ¿el modelo de observación reproduce la estructura estadística de las muestras I/Q reales?
+
+\textbf{Conjuntos de datos:} OpenLoRa y capturas propias.
+
+\textbf{Métricas:} PSD, CFO, espectro después de retirar el chirrido, SNR, detección de paquetes y distancias entre distribuciones.
+
+\subsection{Experimento F: misma perturbación, dos tecnologías de radio}
+
+\textbf{Pregunta:} ¿qué radio conserva mejor presencia, movimiento y respiración bajo la misma escena?
+
+\textbf{Diseño:} perturbación física común y dos modelos de observación.
+
+\textbf{Métrica:} FIM, recuperación de la forma de onda y robustez frente a perturbaciones instrumentales.
+
+\subsection{Experimento G: transferencia de simulación a mediciones reales}
+
+\textbf{Pregunta:} ¿el preentrenamiento con información física reduce la cantidad de datos reales necesaria?
+
+\textbf{Comparaciones:} entrenamiento exclusivo con datos reales, entrenamiento exclusivo con datos sintéticos, datos sintéticos con adaptación y datos sintéticos con destilación multimodal.
+
+\subsection{Experimento H: varios usuarios}
+
+\textbf{Pregunta:} ¿cuándo son físicamente separables dos fuentes humanas?
+
+\textbf{Análisis:} valores singulares del jacobiano y de la FIM conjunta, separación ciega de fuentes y modelos aprendidos.
+
+\subsection{Experimento I: optimización del despliegue}
+
+\textbf{Pregunta:} ¿la ubicación de nodos y la ganancia orientadas a la tarea superan la planificación basada en RSSI?
+
+\textbf{Escenarios:} red distribuida en interiores y, posteriormente, un piloto en exteriores.
+
+\section{Criterios confirmatorios y resultados negativos}
+
+Los umbrales numéricos de error y la mejora mínima relevante se fijarán a partir de
+precisión instrumental y objetivos de la tarea, antes de abrir la prueba confirmatoria.
+No se escogerán para hacer pasar un método después de observar sus resultados. El
+piloto servirá para estimar dispersión y número de sesiones requeridas; las semillas
+de aprendizaje no sustituyen réplicas físicas independientes.
+
+Las comparaciones serán pareadas por estado y sesión, con remuestreo agrupado y
+análisis por región, orientación y potencia. Se informará el número de sesiones,
+posiciones, participantes, pares y exclusiones que sustentan cada estadístico. Para
+S4.7a se conservarán las 4900 posiciones de prueba de la partición densa y los cinco
+bloques de 2000 posiciones del protocolo espacial, con su entrenamiento correspondiente;
+no se confundirá este último total de 10\,000 evaluaciones con la partición original.
+B1/B2 requerirán reentrenamiento bajo bloques antes de atribuirles esa generalización.
+
+Si la representación robusta mejora estabilidad pero reduce la respuesta mecánica,
+se conservará como rama de contexto y se recurrirá a la rama coherente para la tarea.
+Si la referencia no es estable, se revisará E0; si el RT acierta potencia pero falla
+la respuesta diferencial, se revisarán geometría local, trayectorias, dispersión y
+operador antes de aumentar capacidad neuronal. Si las dos fuentes no son separables,
+se informará la limitación y se evaluará otra disposición de enlaces. Estas decisiones
+permiten que un resultado negativo refine la metodología sin transformarse en una
+conclusión universal sobre la imposibilidad del sensado.
+
+\section{Síntesis gráfica prevista}
+
+La narrativa experimental se condensará en cinco figuras cuando existan los resultados
+correspondientes: (i) taxonomía de fase física, geométrica, instrumental y de
+procesamiento; (ii) matriz cuantitativa $\mathsf V_0$--$\mathsf V_7$ frente a
+$\mathsf T_1$--$\mathsf T_7$; (iii) frente de Pareto entre rechazo de perturbaciones
+y sensibilidad geométrica, usando d010 sólo si supera la auditoría; (iv) fidelidad
+B0--B2 bajo protocolos denso y bloqueado, distinguiendo modelos reentrenados; y
+(v) transferencia desde DICHASUS hacia perturbaciones controladas, conjunto externo
+y sensado humano futuro. Estas figuras no se rellenarán con resultados esperados ni
+mezclarán estadísticas incompatibles: cada panel declarará datos, partición, unidad
+de réplica y acceso a referencias.

@@ -1,0 +1,125 @@
+\chapter{Introducción}
+\label{ch:introduccion}
+
+\section{Del enlace de comunicación al instrumento de observación}
+
+La ingeniería de comunicaciones inalámbricas estudia cómo transportar información de manera confiable a través de un medio que atenúa, dispersa, retarda y distorsiona la señal. Su teoría clásica conecta mecanismos de propagación, modelos de canal, formas de onda y arquitectura del receptor \citep{Molisch2022,TseViswanath2005,Goldsmith2005}. Esta tesis adopta esa misma cadena, pero cambia la variable de interés: el canal deja de ser solamente una perturbación que debe compensarse para recuperar bits y pasa a ser también una medición indirecta del entorno.
+
+La reinterpretación es física antes que algorítmica. Las reflexiones, difracciones, dispersiones, obstrucciones y movimientos modifican la amplitud, el retardo, la fase, el desplazamiento Doppler y la dirección de llegada de las contribuciones de multitrayectoria. Por tanto, una observación del canal contiene información acerca de aquello que lo perturbó. Sin embargo, esa información es parcial: depende de la geometría transmisor--objetivo--receptor, la longitud de onda, el ancho de banda, la diversidad espacial, la tasa de muestreo, la instrumentación y el ruido. Un sistema de sensado no puede recuperar información que su operador de observación no haya preservado.
+
+Esta perspectiva sustenta el campo del sensado inalámbrico. En Wi-Fi, la disponibilidad de \ac{CSI} ha permitido estudiar presencia, localización, actividades, postura y señales fisiológicas; aun así, la generalización entre habitaciones, sujetos y dispositivos continúa siendo un problema central \citep{Zhu2024Survey,Armenta2024Survey}. En LoRa, los estudios de sensado a través de paredes, con tráfico ambiente y en redes de gran escala sugieren una relación distinta entre alcance, densidad temporal e información de movimiento \citep{Zhang2020LoRa,SenLoRa2025,Xue2025LargeScaleLoRa}. La comparación de porcentajes obtenidos en conjuntos de datos independientes no permite determinar si esas diferencias provienen de la propagación, de la forma de onda, de la instrumentación o del protocolo.
+
+\section{Vacío científico y tesis de trabajo}
+
+El problema no se reduce a diseñar un clasificador sobre CSI. En una medición real aparecen mezcladas al menos cinco familias de variables: entorno, dinámica humana macroscópica, fisiología, configuración de radio y perturbaciones instrumentales. Un modelo puramente discriminativo puede minimizar su pérdida utilizando la firma de una habitación o de un dispositivo en vez de la variable humana pretendida. El buen desempeño dentro del dominio no demuestra que se haya identificado el mecanismo causal ni que el sistema pueda transferirse.
+
+La pregunta rectora es:
+\begin{quote}
+\emph{¿Puede construirse una representación físico--latente del sistema de propagación inalámbrica que separe el entorno, la configuración de radio, la instrumentación, la dinámica humana y la fisiología, de modo que un mismo marco explique el canal directo, permita invertirlo para recuperar el estado humano y cuantifique cuándo dicho estado es realmente observable?}
+\end{quote}
+
+La hipótesis de trabajo sostiene que una representación jerárquica y físicamente estructurada, calibrada con mediciones y complementada con aprendizaje multimodal, conservará mejor las variaciones relevantes para el sensado y requerirá menos datos de adaptación que una representación monolítica de la señal. Esta proposición se someterá a prueba y no se asume como resultado.
+
+\section{Modelo generativo y contrato de notación}
+
+Sea el estado total
+\begin{equation}
+\vect s(t)=
+\left[
+\vect s_E,\vect s_H(t),\vect s_F(t),
+\vect s_R,\vect s_N(t)
+\right],
+\label{eq:total_state}
+\end{equation}
+donde los subíndices $E$, $H$, $F$, $R$ y $N$ denotan, respectivamente, entorno, macroestado humano, fisiología, radio y factores instrumentales o no controlados. Se reserva $G_E$ para la geometría y los materiales del entorno, $G_H(t)$ para la geometría humana y $G_F(t)$ para la deformación fisiológica; $Z_\bullet$ denotará siempre una representación latente aprendida, no el estado físico mismo.
+
+La escena dinámica determina un soporte geométrico de interacciones $\Gamma(t)$. Para cada modalidad $m$ y configuración de radio se obtiene un conjunto electromagnético de trayectorias
+\begin{equation}
+\calP_m(t)=
+\mathcal R_{\rm EM}^{(m)}
+\left(\Gamma(t);\vect s_R\right),
+\label{eq:radio_dependent_paths}
+\end{equation}
+del cual se sintetiza el canal $H_m$ y finalmente la medición
+\begin{equation}
+Y_m(t)=
+\mathcal O_m
+\left(H_m[\calP_m(t)];\vect s_R,\vect s_N(t)\right)
++\vect{\eta}_m(t).
+\label{eq:generative_observation}
+\end{equation}
+Esta distinción es deliberada: Wi-Fi y LoRa comparten mundo físico y movimiento, pero sus ganancias, fases, antenas y aun sus trayectorias efectivamente observables dependen de frecuencia y ancho de banda. El objeto común es $\Gamma(t)$; $\calP_m(t)$ es radio--dependiente.
+
+La cadena completa de la tesis es
+\begin{equation}
+\begin{aligned}
+\underbrace{G_E,G_H(t),G_F(t)}_{\text{mundo}}
+&\rightarrow \Gamma(t)
+\xrightarrow{\;\mathcal R_{\rm EM}^{(m)}\;}
+\calP_m(t)\rightarrow H_m(t)\\
+&\xrightarrow{\;\mathcal O_m\;}Y_m(t)
+\xrightarrow{\;E_m\;}
+\{Z_E,Z_\phi,Z_R,Z_H,Z_F,Z_N\}\\
+&\rightarrow
+\{\widehat{\vect q},\mat\Sigma_q,\mat F_q\}.
+\end{aligned}
+\label{eq:thesis_chain}
+\end{equation}
+Cada flecha establece una relación que se utilizará en el resto del manuscrito: el gemelo resuelve el modelo directo hasta $Y_m$; el codificador factoriza la observación; el problema inverso estima el estado; y la información de Fisher $\mat F_q$ expresa qué direcciones del estado pueden determinarse localmente.
+
+\section{Posicionamiento metodológico y alcance}
+
+El trabajo no corresponde, en sentido estricto, a una \ac{PINN}. Una red de este tipo aproxima la solución de una ecuación diferencial y penaliza su residuo \citep{Raissi2019PINN}. En esta investigación, la física interviene principalmente como estructura del modelo generativo: la geometría, la propagación, la síntesis del canal y la observación de radio forman un grafo computacional diferenciable. El aprendizaje se reserva para calibrar parámetros desconocidos, aproximar bloques costosos, construir representaciones y acelerar la solución del problema inverso. En adelante, esta formulación se denomina \emph{gemelo digital inalámbrico diferenciable y fundamentado en la física}.
+
+El alcance primario comprende Wi-Fi y LoRa, presencia, movimiento macroscópico y respiración. La postura detallada, el ritmo cardiaco, la fisiología de varios usuarios y el despliegue exterior son extensiones progresivas sujetas a los criterios de observabilidad definidos posteriormente. La tesis no presupone que toda variable sea recuperable ni que una sola representación sea óptima para todas las tareas. Precisamente busca distinguir un fallo del estimador de una carencia física de información.
+
+\section{Avance experimental y delimitación de la evidencia}
+
+El aporte principal sobre la fase es una mejora efectiva mediante un retardo
+parcialmente predecible. Se distinguen concordancia bruta, capacidad de alineación
+con la medición y transferencia de la corrección a datos reservados. Con retardo
+predicho y manteniendo ajuste del desfase constante por enlace, el error angular
+mediano disminuye de 81.42 a 45.59 grados en interpolación densa y de 81.49 a
+64.08 grados por bloques espaciales. La corrección completa de fase absoluta
+permanece abierta, pero la utilidad predictiva del retardo queda documentada.
+La \cref{sec:synthesis} y el \cref{ch:contributions} presentan respectivamente
+el balance experimental y los aportes consolidados.
+
+
+La primera etapa comprende el banco DICHASUS dc01, la calibración B0--B2 y la
+serie S4.1--S4.6d.2. Tras comprobar que la mejora macroscópica no se traduce en
+alineación angular bruta, se estudian retardo efectivo, CPO y residual espectral.
+S4.3 relaciona el residual con descriptores energéticos mediante análisis
+agrupado; S4.4 compara predictores y audita proximidad y separación espacial;
+S4.5 cuantifica el efecto de predecir el retardo sobre el canal corregido.
+S4.6 analiza 640\,000 fases residuales, recupera sus marcas temporales y compara
+reglas de vecindad espacial y temporal para la dirección común al arreglo.
+Su falta de ventaja clara motiva evaluar productos relativos e invariantes
+en S4.7a, sin atribuir automáticamente esa fase al hardware.
+La validación por bloques aporta evidencia regional dentro de dc01, condicionada
+a un CPO ajustado con la medición evaluada. La fase completamente predicha,
+la transferencia entre escenas y la fidelidad ante movimiento humano requieren
+experimentos posteriores. El \cref{ch:avances} presenta la evidencia y sus límites.
+
+\section{Orientación de la propuesta después del diagnóstico de fase}
+
+El programa actualizado conserva una representación robusta de estructura relativa y
+una rama coherente sensible al movimiento. La distinción requiere medir perturbaciones
+instrumentales e intervenciones físicas: no toda fase común es irrelevante para la tarea.
+El gemelo incorporará geometría métrica con incertidumbre, registro de antenas y una
+referencia local de desplazamiento, en lugar de atribuir a la reconstrucción visual
+la capacidad de determinar por sí sola la fase absoluta.
+
+La campaña propuesta progresa desde E0, estabilidad instrumental, hasta E1, reflector
+medido, y E2, fantoma respiratorio. E3 introduce una persona, E4 la separabilidad de
+dos fuentes y E5 transferencia entre condiciones independientes. La comparación G0--G4
+cuantificará el aporte de geometría y calibración. Esta secuencia vincula DICHASUS con
+la investigación humana sin equiparar el desplazamiento del transmisor de dc01 con
+movimiento torácico. Las hipótesis, el diseño y la propuesta administrativa se ajustan
+a esos contrastes en los capítulos correspondientes.
+
+\section{Ruta de lectura}
+
+El manuscrito se desarrolla en cuatro niveles sucesivos. Primero se establece el lenguaje de comunicaciones necesario para describir propagación, canales variantes en el tiempo, multitrayectoria, coherencia, sistemas MIMO y estimación. Después se introduce el gemelo digital y se estudian las representaciones del entorno. El tercer nivel incorpora los operadores de observación de Wi-Fi y LoRa, la dinámica humana, la observabilidad y la transferencia entre simulación y medición. Finalmente, el marco conceptual se traduce en preguntas, hipótesis, líneas metodológicas, experimentos y criterios verificables de avance. De este modo, las cantidades definidas al inicio ---retardo, Doppler, fase, ancho de coherencia, jacobiano y covarianza de ruido--- reaparecen como magnitudes observables en el programa experimental. Esta progresión también determina el orden de los capítulos y evita presentar la simulación, el aprendizaje y la instrumentación como componentes aislados.
+
+Después del diseño experimental se incorpora un capítulo de avances con la secuencia S1/B0--B2 y S4.1--S4.6d.2. Esta ubicación permite leer primero los criterios generales y después contrastarlos con la evidencia disponible, antes de revisar las contribuciones, el plan de trabajo y las conclusiones provisionales.

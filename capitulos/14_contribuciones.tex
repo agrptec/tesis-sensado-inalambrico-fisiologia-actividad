@@ -1,0 +1,73 @@
+\chapter{Contribuciones en desarrollo y alcance científico}
+\label{ch:contributions}
+
+\section{Aportes experimentales documentados sobre la fase}
+
+El aporte actual es demostrar que una corrección de retardo parcialmente
+predecible mejora la concordancia de fase del canal. La predicción completa de
+fase absoluta permanece abierta; esta limitación no elimina el resultado
+positivo de la corrección espectral. La \cref{sec:synthesis} reúne las cifras,
+los protocolos y las hipótesis que sostienen esta distinción.
+
+\begin{enumerate}
+\item \textbf{Descomposición y transferencia de una corrección de baja dimensión.}
+S4.2 distingue retardo efectivo e interceptos por enlace, encuentra acuerdo
+parcial entre modelos y transfiere la corrección entre antenas y frecuencias.
+La alineación oráculo define un límite diagnóstico; la transferencia estricta
+entre frecuencias demuestra reutilización de los parámetros sin reajuste en
+las frecuencias reservadas.
+\item \textbf{Predicción de retardo con utilidad sobre el canal complejo.}
+S4.4 identifica información predictiva en los descriptores RT y separa
+interpolación densa de evaluación regional. S4.5 reduce el error angular de
+81.42 a 45.59 grados en el protocolo denso y de 81.49 a 64.08 grados por
+bloques, respecto de las referencias con CPO. La coherencia pasa de 0.156 a
+0.634 y de 0.157 a 0.448, respectivamente. El retardo se predice sin el canal
+objetivo, aunque el desfase constante continúa ajustándose con ese canal.
+\item \textbf{Caracterización del error que permanece.}
+S4.3 documenta estructura espectral y asociaciones con la energía multitrayecto;
+S4.6 distingue una dirección común estimable en la captura cuya copia desde
+vecinos espaciales o temporales no aporta una ventaja clara. La trazabilidad
+temporal recuperada permite evaluar esa hipótesis con tiempo físico. Estos
+hallazgos motivan invariantes de fase y modelado residual, sin identificar
+una causa instrumental única ni demostrar independencia estadística.
+\end{enumerate}
+
+B0--B2 y S4.1 se sitúan como reproducción y adaptación de la calibración
+diferenciable y del tratamiento de incertidumbre de fase
+\citep{Hoydis2024DiffRT,Ruah2024Phase}. Las extensiones S4.2--S4.6 aportan
+la caracterización y la evaluación anteriores sobre dc01. Su alcance de
+novedad doctoral deberá contrastarse con métodos de referencia bajo protocolos
+comunes; la ejecución de un diagnóstico no constituye por sí sola una
+prioridad científica universal.
+
+\section{Contribuciones doctorales por completar}
+
+Sobre esta base, se mantienen las siguientes contribuciones doctorales como objetivos por completar:
+\begin{enumerate}
+\item una definición de gemelo inalámbrico orientado al sensado, basada en fidelidad de campo y fidelidad diferencial;
+\item un banco de pruebas común para representaciones físicas y neuronales del entorno bajo regímenes de información explícitos;
+\item una interfaz de trayectorias que desacople propagación de observación Wi-Fi/LoRa;
+\item una representación factorizada del entorno, la estructura de fase, el ser humano, la fisiología, la radio y las perturbaciones instrumentales;
+\item un marco de observabilidad basado en Fisher para determinar zonas y variables recuperables;
+\item un procedimiento de transferencia de simulación a mediciones reales, evaluado mediante la eficiencia de datos y la generalización fuera de distribución;
+\item una formulación del diseño de red orientada al sensado mediante criterios de diseño óptimo de experimentos;
+\item un conjunto de datos multimodal propio que vincule la señal compleja de radiofrecuencia, el estado humano y referencias sincronizadas.
+\end{enumerate}
+
+La contribución principal no se define por lograr la mayor exactitud en un conjunto de datos particular, sino por establecer una metodología transferible para responder tres preguntas: \textit{qué información física existe}, \textit{qué representación la conserva} y \textit{qué configuración de infraestructura permite recuperarla de forma confiable}.
+
+\section{Criterio de contribución de la actualización metodológica}
+
+La propuesta actual concentra la contribución por demostrar en la relación entre
+invariancia instrumental y sensibilidad física. El artefacto central será un banco
+que compare ramas robusta y coherente bajo intervenciones conocidas, con geometría,
+referencia y observación declaradas. Se exigirá mostrar qué información conserva cada
+rama y en qué condiciones su combinación mejora transferencia o incertidumbre.
+La mera combinación de RT, LiDAR y una red neuronal no bastará como novedad.
+
+Tres contrastes harán revisable esa aportación: G0--G4 con ablación material para medir
+el efecto geométrico; E0--E2 para separar repetibilidad de respuesta diferencial; y
+E3--E5 para contrastar si ese conocimiento se transfiere a variables humanas y otros
+dominios. El conjunto propio incluirá también condiciones nulas, fallos y límites
+de referencia. La evidencia de dc01 sustenta la motivación y los protocolos de fase;
+la validación de estas nuevas contribuciones permanece pendiente.

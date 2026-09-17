@@ -1,0 +1,441 @@
+\chapter{Fundamentos del canal inalámbrico: de propagación a observación}
+\label{ch:marco_canal}
+
+\section{Jerarquía de modelos y escalas}
+
+Un modelo útil no reproduce todos los grados de libertad de la realidad; conserva aquellos que determinan la pregunta estudiada. En electromagnetismo, el nivel más completo parte de las ecuaciones de Maxwell y de condiciones de frontera sobre materiales. En sistemas de comunicación se adopta habitualmente una jerarquía de reducciones: campo electromagnético $\rightarrow$ trayectorias o respuesta de Green $\rightarrow$ canal equivalente en banda base $\rightarrow$ muestras del receptor. Molisch organiza precisamente la teoría inalámbrica alrededor de la interacción entre propagación, canal y diseño de sistema, mientras que Tse y Viswanath enfatizan cómo la estructura del canal condiciona diversidad, multiplexación y estimación \citep{Molisch2022,TseViswanath2005}.
+
+En esta tesis se utilizará el modelo más sencillo que conserve la variable de sensado pertinente. La cobertura promedio puede estudiarse mediante la pérdida de trayecto; la respuesta compleja de banda ancha exige retardos y ganancias de multitrayectoria; la respiración exige, además, coherencia de fase y evolución temporal. Esta regla evita dos extremos: atribuir realidad física a un modelo estadístico que sólo describe promedios, o resolver un problema electromagnético completo cuando una aproximación local ofrece la precisión necesaria.
+
+\section{De Maxwell a los mecanismos de propagación}
+
+En un medio lineal, isotrópico y local, los campos satisfacen
+\begin{align}
+\nabla\times\vect E&=-\frac{\partial\vect B}{\partial t}, &
+\nabla\times\vect H&=\vect J+\frac{\partial\vect D}{\partial t},\\
+\nabla\cdot\vect D&=\rho, &
+\nabla\cdot\vect B&=0,
+\end{align}
+con relaciones constitutivas $\vect D=\epsilon\vect E$, $\vect B=\mu\vect H$ y $\vect J=\sigma\vect E$. La permitividad compleja resume almacenamiento y pérdida; su valor depende de material y frecuencia. Las discontinuidades de $\epsilon$, $\mu$ y $\sigma$ producen reflexión y transmisión; aristas y objetos finitos introducen difracción y dispersión. En interiores, la señal recibida resulta de la superposición de estas interacciones, no de un único rayo geométrico \citep{Molisch2022,Rappaport2002}.
+
+La longitud de onda
+\begin{equation}
+\lambda=\frac{c}{f_c}
+\label{eq:wavelength}
+\end{equation}
+fija la escala de sensibilidad de fase. Un desplazamiento que parece pequeño en metros puede representar una fracción apreciable de $\lambda$ y modificar notablemente el canal complejo. Esta relación será reutilizada en la derivación biestática de la \cref{eq:bistatic_sensitivity} y en el experimento de fidelidad diferencial.
+
+\section{Presupuesto de enlace y variación a gran escala}
+
+En espacio libre y campo lejano, la ecuación de Friis expresa
+\begin{equation}
+P_r=P_tG_tG_r
+\left(\frac{\lambda}{4\pi d}\right)^2,
+\label{eq:friis}
+\end{equation}
+donde $d$ es distancia y $G_t,G_r$ son ganancias en las direcciones relevantes \citep{Friis1946}. En entornos reales se emplea con frecuencia un modelo log-distancia
+\begin{equation}
+PL(d)=PL(d_0)+10n\log_{10}\!\left(\frac{d}{d_0}\right)+X_\sigma,
+\label{eq:logdistance}
+\end{equation}
+con exponente $n$ y sombreado lognormal $X_\sigma$. Estas ecuaciones describen tendencia y cobertura de comunicación; no describen por sí solas la respuesta a un desplazamiento torácico. Esta separación entre potencia media y sensibilidad local anticipa una tesis recurrente: buen RSSI o buena \ac{SNR} son condiciones de medición, pero no garantizan observabilidad de una variable humana.
+
+\section{Representación equivalente en banda base}
+
+Sea una señal pasabanda real
+\begin{equation}
+x_{\rm RF}(t)=\sqrt{2}\,\Re\left\{x(t)e^{j2\pi f_ct}\right\},
+\label{eq:complex_envelope}
+\end{equation}
+donde $x(t)$ es su envolvente compleja. La representación en banda base conserva amplitud y fase relativas y permite trabajar con muestras \ac{IQ}. Para un canal lineal variante en el tiempo, la relación entrada--salida es
+\begin{equation}
+y(t)=\int h(t,\tau)x(t-\tau)\,d\tau+n(t),
+\label{eq:ltv_channel}
+\end{equation}
+donde $h(t,\tau)$ es la respuesta al impulso dependiente del tiempo y $n(t)$ agrega ruido e interferencia. La caracterización de canales \ac{LTV} mediante retardo y Doppler proporciona el lenguaje formal para separar variación rápida y dispersión temporal \citep{Bello1963,Molisch2022}.
+
+Si el canal cambia poco durante una ventana de observación, puede aproximarse como \ac{LTI}: $h(t,\tau)\approx h(\tau)$. Esta es una aproximación local, no una propiedad permanente del entorno. En el sensado, el movimiento humano es precisamente aquello que viola la invariancia temporal y genera información; por tanto, la duración de la ventana debe declararse siempre que se adopte el modelo LTI.
+
+\section{Retardo, Doppler y coherencia}
+
+El perfil de potencia--retardo se define como $P_h(\tau)=\E[|h(t,\tau)|^2]$. A partir de él se obtienen el retardo medio $\bar\tau$ y el \ac{RMSDS}
+\begin{align}
+\bar\tau&=\frac{\int \tau P_h(\tau)d\tau}{\int P_h(\tau)d\tau},\\
+\tau_{\rm rms}&=
+\left[
+\frac{\int(\tau-\bar\tau)^2P_h(\tau)d\tau}
+{\int P_h(\tau)d\tau}
+\right]^{1/2}.
+\label{eq:rms_delay}
+\end{align}
+El ancho de coherencia $B_c$ es inversamente proporcional a la dispersión de retardos, aunque el factor exacto depende del umbral de correlación adoptado. De forma dual, el espectro Doppler describe la distribución de variación temporal y el tiempo de coherencia $T_c$ es inversamente proporcional a su extensión. No se usarán $B_c$ o $T_c$ sin indicar la definición operativa, pues no son constantes universales \citep{Molisch2022,Goldsmith2005}.
+
+Estas cantidades conectan directamente fundamentos y experimento. Si el ancho de señal $B$ supera de forma apreciable a $B_c$, el canal es selectivo en frecuencia y las subportadoras ofrecen diversidad; el tiempo de coherencia caracteriza correlación, pero no proporciona por sí solo un teorema de muestreo. La reconstrucción dinámica depende del espectro de la variable objetivo, los tiempos observados, los huecos de tráfico y el ruido. La selectividad frecuencial y la disponibilidad temporal se evalúan por separado.
+
+\section{Modelos deterministas y estadísticos}
+
+Los modelos estadísticos describen distribuciones de pérdida, desvanecimiento, retardo y Doppler sobre una clase de entornos. Son indispensables para el diseño robusto y para sintetizar variabilidad, pero no identifican necesariamente qué pared o persona generó una componente. Los modelos deterministas condicionados por la geometría, como el trazado de rayos, conservan esa correspondencia a costa de requerir una escena y propiedades materiales. Los modelos híbridos combinan una estructura geométrica con componentes difusas o parámetros aprendidos \citep{Molisch2022,SalehValenzuela1987}.
+
+La tesis asigna funciones distintas a ambos paradigmas. El gemelo utiliza un modelo condicionado por la escena para realizar intervenciones y calcular derivadas; las distribuciones estadísticas describen los errores residuales, la instrumentación, la dispersión no modelada y las condiciones fuera de distribución. Un ajuste estadístico no se interpretará como una reconstrucción causal de la escena.
+
+\section{Canal multitrayecto condicionado al entorno}
+
+Considérese un transmisor en $\vect p_T$, un receptor en $\vect p_R$ y un entorno $G_E$. Para una modalidad $m$, el canal complejo puede aproximarse mediante $N_p^{(m)}$ contribuciones:
+\begin{equation}
+H_m(f,t)=\sum_{\ell=1}^{N_p^{(m)}(t)}
+\alpha_{m,\ell}(f,t)
+\exp\{-j2\pi f\tau_{m,\ell}(t)\},
+\label{eq:multipath}
+\end{equation}
+con $\alpha_{m,\ell}$ el coeficiente complejo y $\tau_{m,\ell}=d_{m,\ell}/c$ el retardo asociado a longitud $d_{m,\ell}$. Cada elemento se representa como
+\begin{equation}
+\calP_{m,\ell}=
+\left\{\alpha_{m,\ell},\tau_{m,\ell},
+\theta^{\rm AoA}_{m,\ell},
+\theta^{\rm AoD}_{m,\ell},
+\nu_{m,\ell},
+\chi_{m,\ell}\right\},
+\label{eq:path_element}
+\end{equation}
+donde $\nu_{m,\ell}$ es el desplazamiento Doppler y $\chi_{m,\ell}$ codifica la secuencia de interacciones. El subíndice $m$ impide suponer que las ganancias y las trayectorias efectivas son idénticas entre bandas. La correspondencia entre tecnologías de radio se establece mediante el soporte geométrico $\Gamma$, no mediante la igualdad directa de $\calP_{\rm WiFi}$ y $\calP_{\rm LoRa}$.
+
+La respuesta al impulso es
+\begin{equation}
+h_m(t,\tau)=\sum_{\ell=1}^{N_p^{(m)}(t)}
+\alpha_{m,\ell}(t)\,\delta(\tau-\tau_{m,\ell}(t)),
+\end{equation}
+y supone que la ganancia de cada interacción es aproximadamente plana dentro del ancho de banda modelado. Si $\alpha_{m,\ell}(f,t)$ varía de forma apreciable con $f$, la contribución deja de ser un delta ponderado y debe representarse mediante una respuesta dispersiva por trayectoria.
+y la relación entre \ac{CIR} y \ac{CFR} está dada por transformada de Fourier:
+\begin{equation}
+H_m(t,f)=\int h_m(t,\tau)e^{-j2\pi f\tau}\,d\tau.
+\end{equation}
+En un sistema de banda limitada, dos trayectorias con retardos próximos pueden no ser separables. La resolución temporal aproximada es
+\begin{equation}
+\Delta\tau\approx \frac{1}{B},
+\qquad
+\Delta d_{\rm path}\approx \frac{c}{B},
+\label{eq:delay_resolution}
+\end{equation}
+donde $\Delta d_{\rm path}$ es diferencia de longitud de trayectoria; para rango monostático el factor es $c/(2B)$. Esta distinción explica por qué Wi-Fi convencional conserva información de micro-movimiento en la fase aun cuando no sea capaz de resolver físicamente cada reflector en retardo.
+
+\section{Dimensión espacial y canal MIMO}
+
+Con $N_t$ antenas transmisoras y $N_r$ receptoras, cada frecuencia posee una matriz $\mat H(f,t)\in\cpx^{N_r\times N_t}$. Sus entradas no son repeticiones independientes: comparten elementos dispersores y presentan una correlación espacial determinada por la geometría, la separación entre antenas, la polarización y los diagramas de radiación. En comunicaciones, esta estructura determina la diversidad y la multiplexación; en sensado, proporciona vistas biestáticas con jacobianos distintos respecto del estado humano \citep{TseViswanath2005,Molisch2022}.
+
+La resolución angular no depende sólo del número de antenas, sino de la apertura efectiva y de la relación entre espaciado y longitud de onda. Por ello, el número de enlaces no se utilizará como sinónimo de número de observaciones independientes. Más adelante, la FIM conjunta medirá cuánta información adicional aporta realmente cada enlace.
+
+\section{OFDM y CSI}
+
+Para una subportadora $k$ y un instante discreto $n$,
+\begin{equation}
+Y_n[k]=H_n[k]X_n[k]+W_n[k],
+\end{equation}
+y, cuando $X_n[k]$ es conocido,
+\begin{equation}
+\widehat H_n[k]=\frac{Y_n[k]}{X_n[k]}.
+\end{equation}
+En \ac{MIMO}, $H_n[k]\in\cpx^{N_r\times N_t}$. Por tanto, una captura puede representarse como un tensor complejo
+\begin{equation}
+\mat H\in\cpx^{N_{\rm snap}\times N_{\rm link}\times K},
+\end{equation}
+donde $N_{\rm snap}$ es el número de capturas, $N_{\rm link}=N_tN_r$ representa los enlaces espaciales y $K$ el número de subportadoras. La ortogonalidad de \ac{OFDM} convierte una convolución con memoria en ganancias aproximadamente escalares por subportadora cuando el \ac{CP} excede el soporte significativo del canal \citep{Molisch2022,ProakisSalehi2008}. La CSI es una estimación de esas ganancias, no el canal físico libre de efectos instrumentales.
+
+Las revisiones del sensado mediante Wi-Fi distinguen enfoques basados en modelos físicos, métodos basados en patrones y métodos de aprendizaje profundo. Asimismo, subrayan que la dificultad práctica se concentra en la variación entre dominios, la cobertura y la estabilidad de las mediciones \citep{Zhu2024Survey,Armenta2024Survey}. Esta taxonomía sugiere que un marco híbrido entre modelo y datos resulta más adecuado para el objetivo de esta tesis que una solución puramente discriminativa.
+
+\section{Movimiento humano como perturbación del camino}
+
+Sea un punto del cuerpo $\vect p_H(t)$ que perturba una trayectoria biestática Tx--humano--Rx. Su longitud es
+\begin{equation}
+L_H(t)=\|\vect p_T-\vect p_H(t)\|_2+
+\|\vect p_H(t)-\vect p_R\|_2.
+\end{equation}
+La fase correspondiente es
+\begin{equation}
+\phi_H(t)=-\frac{2\pi}{\lambda}L_H(t).
+\end{equation}
+Se definen $\widehat{\vect u}_{TH}=(\vect p_H-\vect p_T)/\|\vect p_H-\vect p_T\|$
+y $\widehat{\vect u}_{RH}=(\vect p_H-\vect p_R)/\|\vect p_H-\vect p_R\|$,
+ambos dirigidos desde cada radio hacia el punto humano. Para un pequeño desplazamiento $x$ en dirección $\vect n$,
+\begin{equation}
+\frac{\partial \phi_H}{\partial x}
+=-\frac{2\pi}{\lambda}
+\left(\widehat{\vect u}_{TH}+\widehat{\vect u}_{RH}\right)^T\vect n.
+\label{eq:bistatic_sensitivity}
+\end{equation}
+Esta ecuación es central: el mismo desplazamiento torácico puede ser fuertemente visible o casi invisible dependiendo de la geometría. Por ello, la potencia recibida o la \ac{SNR} de comunicación no son equivalentes a observabilidad de una variable fisiológica.
+
+\section{Fresnel, interferencia constructiva y puntos ciegos}
+
+La contribución dinámica no se observa aislada, sino sumada a un canal estático:
+\begin{equation}
+H(t)=H_s+H_d(t).
+\end{equation}
+Esta descomposición se define respecto de un estado basal y una ventana temporal; no es una separación física única. La amplitud resultante depende de la relación geométrica y de fase entre ambas componentes. Dos posiciones con niveles de potencia similares pueden presentar sensibilidades radicalmente diferentes a desplazamientos pequeños. Este fenómeno aparece repetidamente en la literatura de respiración basada en CSI y justifica el uso de razones complejas, diversidad de enlaces y métricas basadas en estructura de fase, en lugar de seleccionar canales exclusivamente por energía \citep{Mosleh2022BreatheSmart,Zhu2024Survey}.
+
+\section{Distorsiones instrumentales}
+
+Una observación COTS puede modelarse como
+\begin{equation}
+\widetilde H_n[k]
+=g_n[k]H_n[k]\exp\left\{j\left[
+\varphi_{0,n}+2\pi\Delta f_{\rm CFO}t_n
+-2\pi f_k\Delta\tau_n
+\right]\right\}+w_n[k],
+\label{eq:hardware_model}
+\end{equation}
+donde $g_n[k]\geq0$ incluye la ganancia y la respuesta de la etapa de entrada del receptor, $\varphi_{0,n}$ es la fase común, $\Delta f_{\rm CFO}$ produce rotación temporal y $\Delta\tau_n=\tau_{\rm STO}+t_n\epsilon_{\rm SFO}$ produce una pendiente de fase dependiente de la subportadora que puede derivar entre paquetes. El modelo es deliberadamente parsimonioso; las versiones específicas de cada dispositivo podrán incluir ruido de fase, no linealidad y control automático de ganancia. Una metodología rigurosa debe distinguir la calibración de la medición de la calibración electromagnética: la primera busca un observable coherente; la segunda ajusta materiales, geometría e interacciones.
+
+\subsection{Taxonomía operacional de la fase}
+\label{sec:phase_taxonomy}
+
+La fase observada no constituye una sola variable física. Una factorización mínima,
+válida como modelo local de adquisición, es
+\begin{equation}
+\widehat H_{a,k,t}=
+g_{a,k,t}\exp\!\left[j\psi_{a,t}-j2\pi\nu_k\delta\tau_t\right]
+H_{a,k,t}^{\rm phys}+n_{a,k,t},
+\label{eq:observed_phase_taxonomy}
+\end{equation}
+donde $H^{\rm phys}$ es la suma coherente de las trayectorias del entorno y del
+objeto dinámico; $g$ reúne ganancia y respuesta compleja de cadena; $\psi$ incluye
+la referencia de fase de la captura o de la cadena; $\delta\tau$ es un error de
+referencia temporal en la convención adoptada; y $n$ representa ruido y discrepancia.
+La expresión no afirma independencia ni identificabilidad desde una sola observación.
+
+La metodología distinguirá cuatro orígenes que pueden producir patrones algebraicamente
+semejantes:
+\begin{enumerate}
+\item \emph{fase de propagación física}, determinada por longitud de trayectoria,
+interacciones, movimiento y frecuencia;
+\item \emph{fase por discrepancia geométrica}, causada por errores de escena, registro,
+centro de fase o posición;
+\item \emph{fase de adquisición}, asociada con relojes, osciladores, cadenas RF,
+reinicios, CFO/SFO/STO y referencia común;
+\item \emph{fase de procesamiento}, introducida por compensación, interpolación,
+selección de portadora, alineación o convención de banda base.
+\end{enumerate}
+Una pendiente espectral no identifica por sí sola STO, pues una discrepancia de
+longitud produce la misma forma. Una rotación común tampoco es automáticamente
+instrumental: un movimiento puede proyectarse sobre esa dirección. La identificación
+exige metadatos, una referencia independiente o intervenciones que modifiquen un
+factor manteniendo los demás controlados. Esta taxonomía conecta la calibración de
+errores locales de fase de Ruah y colaboradores \citep{Ruah2024Phase} con los contrastes de invariancia y
+fidelidad diferencial, sin interpretar sus variables latentes como geometría recuperada.
+
+
+\section{Convenciones de frecuencia, materiales e interferencia coherente}
+\label{sec:phase_conventions}
+
+La síntesis del canal debe declarar si los coeficientes complejos contienen la fase de
+propagación a la portadora. Con frecuencia física $f=f_{\rm ref}+\nu$ y coeficiente
+$\widetilde\alpha_\ell(f)$ que excluye esa fase, se tiene
+\begin{equation}
+H(f)=\sum_\ell\widetilde\alpha_\ell(f)e^{-j2\pi f\tau_\ell}
+=\sum_\ell\alpha_\ell(f;f_{\rm ref})e^{-j2\pi\nu\tau_\ell},\qquad
+\alpha_\ell=\widetilde\alpha_\ell e^{-j2\pi f_{\rm ref}\tau_\ell}.
+\label{eq:reference_frequency}
+\end{equation}
+Ambas expresiones son equivalentes. Aplicar $e^{-j2\pi f\tau_\ell}$ a un coeficiente
+que ya contiene la fase de portadora la contaría dos veces. En los experimentos S4 se
+usa una referencia común y $\nu_k=f_k-f_{\rm ref}$ para separar intercepto y pendiente.
+En el modelo instrumental de la \cref{eq:hardware_model}, la frecuencia multiplicada
+por el error de temporización se interpreta igualmente como frecuencia de banda base;
+el término constante que produzca otra referencia se absorbe en el intercepto.
+
+Para la convención temporal $e^{j\omega t}$, un dieléctrico conductor puede representarse
+por $\epsilon_c=\epsilon_0\epsilon_r-j\sigma/\omega$. En incidencia plana entre medios
+homogéneos, los coeficientes de Fresnel dependen de polarización, ángulo e impedancia;
+por ejemplo, para polarización transversal eléctrica,
+\begin{equation}
+\Gamma_{\rm TE}=\frac{\eta_2\cos\theta_i-\eta_1\cos\theta_t}
+{\eta_2\cos\theta_i+\eta_1\cos\theta_t},\qquad
+\eta_m=\sqrt{\frac{j\omega\mu_m}{\sigma_m+j\omega\epsilon_m}}.
+\end{equation}
+La rama se elige compatible con un medio pasivo y las condiciones de radiación.
+Esta dependencia explica por qué un material modifica amplitud y fase de cada interacción.
+No obstante, los parámetros recuperados con un canal finito pueden ser efectivos si
+compensan geometría o mecanismos ausentes. La jerarquía de campo, mecanismos de
+propagación, estadísticas y canal de banda base sigue el enfoque de Molisch
+\citep{Molisch2022}.
+
+Con caminos coherentes, la potencia contiene términos cruzados:
+\begin{equation}
+|H(f)|^2=\sum_\ell|\alpha_\ell|^2+
+2\Re\sum_{\ell<r}\alpha_\ell\alpha_r^*
+ e^{-j2\pi\nu(\tau_\ell-\tau_r)}.
+\label{eq:coherent_power}
+\end{equation}
+Por tanto, sumar energías individuales no equivale a calcular la potencia del canal.
+Las fracciones de energía de S4.3 son descriptores del soporte multitrayecto. Su utilidad
+predictiva debe evaluarse frente al canal complejo, sin interpretar la normalización
+como una separación experimental de cada camino físico.
+
+\section{Retardo absoluto, retardo relativo y dispersión temporal}
+\label{sec:delay_gauge}
+
+Una transformación $H'(\nu)=e^{j\phi_0}e^{-j2\pi\nu\delta\tau}H(\nu)$ conserva
+la magnitud y traslada la respuesta temporal ideal: $h'(\tau)=e^{j\phi_0}h(\tau-\delta\tau)$.
+Si se observa el perfil completo, cambia el retardo medio pero no su dispersión RMS.
+Así, potencia y RMS-DS no identifican el origen de retardos ni una fase constante.
+En una IFFT finita deben controlarse ventana, máscara y plegado circular antes de
+aplicar esta invariancia a un estadístico estimado.
+
+Un retardo relativo ajustado entre medición y simulación puede contener diferencias
+de referencia, registro geométrico o interferencia entre caminos. Aunque las mediciones
+ya tengan calibración de STO/CPO, ese parámetro puede seguir siendo distinto de cero.
+S4.2 lo denomina retardo efectivo y no una estimación identificada del reloj del receptor.
+
+El caso analítico de espacio libre verifica la escala y fase; una reflexión controlada
+verifica Fresnel; la multitrayectoria verifica interferencia y resolución en retardo;
+el movimiento verifica continuidad y Doppler. Son validaciones complementarias:
+una concordancia de potencia en una escena extensa no reemplaza las comprobaciones
+de fase y derivada en configuraciones controladas \citep{Molisch2022,ProakisSalehi2008}.
+
+\section{Síntesis: cantidades que reaparecerán en la tesis}
+
+Este capítulo fija las variables que sostienen el resto del manuscrito. La longitud de onda de la \cref{eq:wavelength} determina sensibilidad de fase; la respuesta LTV de la \cref{eq:ltv_channel} fundamenta la dinámica; $\tau_{\rm rms}$ se relaciona con ancho de coherencia, mientras el ancho de señal $B$ fija la resolución nominal $1/B$; el modelo por trayectorias de la \cref{eq:multipath} sirve de interfaz para el gemelo; y el modelo instrumental de la \cref{eq:hardware_model} separa mundo de medición. Los capítulos siguientes no redefinen estas cantidades: las especializan para calibración, Wi-Fi, LoRa, respiración e información de Fisher.
+
+
+\section{Fase de referencia e invariantes espaciales y espectrales}
+\label{sec:phase_invariants}
+
+Una respuesta compleja incluye una referencia de fase. La diferencia entre
+simulación y medición puede contener una transformación común al arreglo,
+\begin{equation}
+\vect h'_u(\nu_k)=e^{j\psi_u-j2\pi\nu_k\delta\tau_u}\vect h_u(\nu_k),
+\qquad \vect h_u(\nu_k)\in\mathbb C^{A}.
+\label{eq:array_phase_group}
+\end{equation}
+El término común no representa necesariamente un error puramente instrumental:
+una modificación física también puede producir una rotación compartida. Su
+tratamiento como perturbación exige declarar qué variable física se desea
+preservar. La distinción es coherente con la separación entre propagación,
+canal equivalente y referencia de recepción en comunicaciones
+\citep{Molisch2022,Bello1963}.
+
+El producto exterior espacial
+\begin{equation}
+\mat G_u(k)=\vect h_u(\nu_k)\vect h_u(\nu_k)^H
+\label{eq:spatial_gram_invariant}
+\end{equation}
+es hermítico, semidefinido positivo y de rango uno para un vector no nulo.
+Es un producto instantáneo; sólo tras una esperanza o promedio con supuestos
+adecuados puede interpretarse como matriz de segundo momento, y no es una
+covarianza centrada por definición. Sus diagonales son potencias y sus términos
+fuera de diagonal contienen productos relativos entre antenas.
+
+La transformación de la \cref{eq:array_phase_group} satisface
+\begin{equation}
+\mat G'_u(k)=\mat G_u(k)
+\end{equation}
+para cualquier $\psi_u$ y $\delta\tau_u$. De hecho, este observable es invariante
+a una fase arbitraria en cada frecuencia. Por ello permite evaluar estructura
+espacial relativa, pero elimina también el retardo común: comparar $G$ antes
+y después de corregir ese retardo no es una ablación informativa. Diferencias
+numéricas superiores a la tolerancia indicarían cambios de máscara, ponderación
+o una corrección que no es realmente común al arreglo.
+
+Para preservar fase relativa entre frecuencias se utiliza
+\begin{equation}
+\mat K_u(k,l)=\vect h_u(\nu_k)\vect h_u(\nu_l)^H,
+\qquad
+\mat K'_u(k,l)=e^{-j2\pi(\nu_k-\nu_l)\delta\tau_u}\mat K_u(k,l).
+\label{eq:cross_frequency_invariant}
+\end{equation}
+$K$ elimina $\psi_u$ y conserva sensibilidad al retardo cuando $\nu_k\ne\nu_l$.
+La interpretación requiere que $\psi_u$ sea constante sobre las frecuencias
+comparadas. Los productos entre arreglos distintos conservan la fase relativa
+$\psi_u-\psi_v$; no son invariantes a rotaciones independientes de ambos arreglos.
+
+Una alternativa compacta apila antenas y frecuencias válidas en
+$\vect x_u=\operatorname{vec}(H_u)$. Para un canal medido $\vect x$ y uno
+predicho $\vect y$, la discrepancia respecto de una sola fase común es
+\begin{equation}
+d_{\mathrm U(1)}^2(\vect x,\vect y)
+=\min_{\psi}\|\vect x-e^{j\psi}\vect y\|_2^2
+=\|\vect x\|_2^2+\|\vect y\|_2^2-2|\vect x^H\vect y|.
+\label{eq:phase_quotient_distance}
+\end{equation}
+Cuando el producto interior no es nulo, la rotación aplicada a $\vect y$ es
+$\psi^\star=-\angle(\vect x^H\vect y)$. El valor mínimo sigue definido si el
+producto se anula, aunque la fase óptima deje de ser única. Esta distancia
+no ajusta fases independientes por antena ni por frecuencia, y no predice
+la fase absoluta: evalúa una clase de equivalencia expresamente declarada.
+
+Para $\vect x$ y $\vect y$ normalizados a norma uno,
+$\|\vect x\vect x^H-\vect y\vect y^H\|_F^2
+=2(1-|\vect x^H\vect y|^2)$.
+Esta identidad permite evaluar el producto exterior conjunto sin construir
+una matriz de tamaño $AK\times AK$, con $(AK)^2$ entradas. La normalización elimina también escala,
+por lo que debe acompañarse de métricas de potencia; el error sin normalizar
+conserva esa discrepancia. Todas las comparaciones usan un soporte y pesos
+fijados antes de evaluar el método, con tratamiento explícito de energía nula.
+
+\section{Escalas geométricas y sensibilidad de fase}
+\label{sec:geometry_phase_scales}
+
+Para una trayectoria de longitud total $d(\mathbf q)$ y coeficiente de interacción
+$\alpha(\mathbf q,f)$, la contribución al canal es
+$H_p=\alpha\exp[-j2\pi d/\lambda]$. Por tanto,
+\begin{equation}
+\nabla_{\mathbf q}H_p=e^{-j2\pi d/\lambda}
+\left(\nabla_{\mathbf q}\alpha-j\frac{2\pi}{\lambda}\alpha\nabla_{\mathbf q}d\right),
+\qquad
+\delta\phi_p\simeq-\frac{2\pi}{\lambda}\nabla_{\mathbf q}d^{\mathsf T}\delta\mathbf q.
+\label{eq:geometry_phase_jacobian}
+\end{equation}
+La derivada incluye cambios de amplitud y de fase de reflexión, además de longitud.
+En un reflector puntual biestático,
+$d=\|\mathbf q-\mathbf p_T\|+\|\mathbf q-\mathbf p_R\|$; su gradiente es la
+suma de los vectores unitarios desde ambos terminales hacia el reflector. El factor
+$4\pi/\lambda$ corresponde al desplazamiento radial monostático, no a cualquier
+movimiento en un enlace Wi-Fi. La orientación y la geometría pueden anular la
+sensibilidad de primer orden aun cuando la potencia recibida sea elevada.
+
+Los valores del \cref{tab:wavelength_metrology} no se extraen de una tabla
+experimental: se calculan con
+\begin{equation}
+\lambda=\frac{c}{f},\qquad
+|\delta\phi_p|_{\rm deg}=360^{\circ}\frac{|\delta d|}{\lambda},
+\qquad c=299\,792\,458\ \mathrm{m/s},
+\label{eq:phase_length_conversion}
+\end{equation}
+que es la conversión directa entre longitud eléctrica y fase
+\citep{Molisch2022,Rappaport2002}. La frecuencia de 3.438 GHz corresponde a dc01
+\citep{Euchner2023DICHASUSdcxx}; 5 GHz representa una banda Wi-Fi de trabajo, y
+28/60 GHz sirven como escalas mmWave relacionadas con la extensión experimental
+propuesta \citep{Yao2026RFDTChannel,TIIWRL6432BOOST}. Los cambios de longitud de
+10 mm y 1 mm son ejemplos metrológicos deliberados, no errores medidos del banco.
+
+\begin{table}[htbp]
+\centering
+\caption{Sensibilidad geométrica aproximada calculada con la
+\cref{eq:phase_length_conversion}. $|\delta d|$ es el cambio de longitud total de
+trayectoria, no necesariamente el desplazamiento del objeto.}
+\label{tab:wavelength_metrology}
+\begin{tabular}{rrrr}
+\toprule
+Frecuencia (GHz) & $\lambda$ (mm) & $|\delta d|$ (mm) & $|\delta\phi_p|$ (grados)\\
+\midrule
+3.438 & 87.2 & 10 & 41.3\\
+5 & 60.0 & 10 & 60.0\\
+28 & 10.7 & 1 & 33.6\\
+60 & 5.0 & 1 & 72.0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A 60 GHz, un milímetro radial en configuración monostática produce aproximadamente
+144 grados. Estos valores explican por qué una nube de puntos visualmente convincente
+puede resultar insuficiente para predecir fase. Para incertidumbre geométrica pequeña
+$\delta\mathbf q$ con covarianza $\Sigma_q$, manteniendo fija la fase del coeficiente
+de interacción, la contribución de longitud de una trayectoria satisface
+\begin{equation}
+\sigma_{\phi_p}^2\simeq\left(\frac{2\pi}{\lambda}\right)^2
+\nabla d^{\mathsf T}\Sigma_q\nabla d.
+\label{eq:geometric_phase_uncertainty}
+\end{equation}
+La aproximación exige una familia de trayectorias estable. Cerca de oclusiones,
+transiciones de visibilidad o nulos por interferencia, se utilizarán perturbaciones
+geométricas Monte Carlo y métricas del canal complejo; la fase de una suma casi nula
+es inestable y no hereda directamente la varianza de una trayectoria aislada.

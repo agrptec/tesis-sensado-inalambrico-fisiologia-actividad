@@ -1,0 +1,95 @@
+\chapter{Planteamiento del problema, objetivos e hipótesis}
+\label{ch:problem}
+
+\section{Problema general}
+
+El problema central se formula como sigue:
+\begin{quote}
+\emph{¿Qué representación física y latente del entorno, del canal y de la dinámica humana conserva la información necesaria para reconstruir observaciones inalámbricas y, simultáneamente, permite recuperar de forma robusta variables de presencia, movimiento y fisiología cuando cambian la geometría, la instrumentación, el protocolo y el dominio de despliegue?}
+\end{quote}
+
+La formulación evita restringirse a una sola tecnología. Wi-Fi y LoRa se estudian como operadores de observación diferentes de un mismo proceso físico. La cuestión prioritaria es qué variaciones pertenecen al entorno y al movimiento, cuáles dependen de la adquisición y qué evidencia permite distinguirlas. El modelo deberá conservar tanto estructura relativa estable como información coherente de la perturbación física.
+
+\section{Preguntas específicas}
+
+\begin{enumerate}[label=\textbf{PI\arabic*:},leftmargin=3em]
+\item ¿Qué nivel de calibración física es necesario para que un gemelo reproduzca no sólo el canal complejo, sino también su sensibilidad a pequeñas perturbaciones geométricas?
+\item ¿Qué representación del entorno ---trazado de rayos explícito, campo implícito, representación centrada en objetos o híbrida--- generaliza mejor con pocas mediciones?
+\item ¿Puede separarse de manera útil la representación en $Z_E$, $Z_\phi$, $Z_R$, $Z_H$, $Z_F$ y $Z_N$, y distinguir dentro de la fase los componentes predecibles de aquellos que requieren calibración o invariancia?
+\item ¿Qué información de sensado se pierde al pasar de muestras I/Q complejas a representaciones más comprimidas, como amplitud, fase, características demoduladas o RSSI?
+\item ¿Cómo cambia la observabilidad de una misma perturbación humana entre Wi-Fi y LoRa?
+\item ¿Cuándo un fallo de estimación es atribuible al algoritmo y cuándo a falta de observabilidad física?
+\item ¿Puede la simulación diferenciable reducir de forma medible la cantidad de datos reales necesarios para transferir el sistema a una nueva escena?
+\item ¿Cómo deben seleccionarse posiciones, enlaces, ganancias y configuraciones de radio para maximizar observabilidad de una región objetivo bajo restricciones de comunicación y energía?
+\end{enumerate}
+
+Los objetivos y las hipótesis que siguen traducen las preguntas anteriores en resultados
+observables. Su formulación conserva la distinción entre lo que se propone construir y lo
+que deberá demostrarse mediante los experimentos.
+
+\section{Objetivo general}
+
+Desarrollar y validar un marco físico--latente de gemelo digital inalámbrico para el sensado humano mediante infraestructura de comunicación existente, capaz de modelar el canal de forma diferenciable, separar los factores del entorno, la dinámica humana, la fisiología y la instrumentación, cuantificar la observabilidad y la incertidumbre, y transferirse progresivamente desde la simulación y los datos públicos hacia escenarios propios en interiores y exteriores con Wi-Fi y LoRa.
+
+\section{Objetivos específicos}
+
+\begin{enumerate}[label=\textbf{O\arabic*:},leftmargin=3em]
+\item Construir un banco de pruebas de canal estático, con datos reales y simulados de DICHASUS dc01, y comparar el trazado de rayos nominal con la calibración de materiales y la calibración sensible a la fase, caracterizando por separado retardo efectivo, dirección común y estructura relativa.
+\item Evaluar representaciones explícitas e implícitas del entorno en términos de error complejo, eficiencia de datos, generalización espacial y editabilidad, distinguiendo error bruto y error respecto de invariancias de fase explícitas.
+\item Construir y registrar una geometría métrica con incertidumbre explícita, distinguir las escalas global, de antenas y de desplazamiento local, y evaluar G0--G4 junto con una referencia coherente y controles de repetibilidad.
+\item Construir una representación común de escena con trayectorias específicas de cada radio, capaz de sintetizar observaciones Wi-Fi OFDM y LoRa CSS/IQ bajo modelos controlados de instrumentación e interferencia.
+\item Introducir la dinámica de manera acumulativa: reflector mecánico, primitivas humanas, movimiento macroscópico, respiración, combinación de movimiento y respiración, y varios usuarios.
+\item Definir y validar criterios de detección para presencia y métricas de observabilidad basadas en jacobianos e información de Fisher para movimiento y respiración.
+\item Aprender representaciones factorizadas y multimodales que reduzcan la dependencia respecto del entorno y la instrumentación, y que preserven las variables humanas de interés.
+\item Resolver el problema inverso con estimación de incertidumbre y capacidad explícita de abstención cuando el estado sea pobremente observable.
+\item Optimizar redes distribuidas Wi-Fi/LoRa para maximizar la información útil de sensado dentro de áreas de interés, bajo restricciones de potencia, tráfico, número de nodos y cobertura de comunicación.
+\end{enumerate}
+
+
+\section{Hipótesis central y contrastes falsables}
+\label{sec:updated_hypotheses}
+
+Se plantea que una representación factorizada, robusta frente a transformaciones
+instrumentales identificadas y sensible a cambios físicos del canal, puede mejorar
+la transferencia entre días, dispositivos y escenarios sin perder la información
+diferencial necesaria para el sensado humano. La referencia coherente y la geometría
+métrica constituyen variables experimentales explícitas. La hipótesis no afirma
+reconstrucción perfecta de fase absoluta a partir de LiDAR, ni identificabilidad
+universal de la factorización latente.
+
+Las siguientes seis hipótesis operacionalizan esta formulación. Se contrastarán con
+intervalos pareados y un tamaño mínimo de efecto fijado antes de la evaluación
+confirmatoria; resultados compatibles con ausencia de mejora se informarán como tales.
+\begin{description}
+\item[H1: robustez relativa.] Productos espaciales/espectrales y distancias respecto de
+fase común reducirán discrepancia entre sesiones y dispositivos frente al canal bruto,
+bajo perturbaciones compatibles con su grupo de invariancia. Se contrastará en S4.7a,
+Esc. E0 y Esc. E5, conservando error bruto y sensibilidad física como controles.
+\item[H2: sensibilidad coherente.] Una rama con referencia independiente preservará mejor
+la respuesta a micromovimientos que magnitud o Gram espacial en configuraciones donde
+la perturbación se exprese predominantemente en fase. Esc. E1--E2 contrastarán Jacobianos,
+desplazamiento y forma de onda; se reportarán también geometrías de sensibilidad nula.
+\item[H3: eficiencia física.] Geometría registrada y descriptores RT reducirán las
+mediciones de adaptación necesarias respecto de métodos puramente basados en datos.
+S5 y Esc. E5 compararán curvas error--datos, costes y G0--G4. $N_{90}$ se calculará
+respecto de una referencia de rendimiento y tarea fijadas previamente; no se mezclará
+entre tareas ni se escogerá retrospectivamente el mejor techo de cada método.
+\item[H4: referencia instrumental.] Un canal de referencia calibrado reducirá la
+variabilidad instrumental más que una corrección exclusivamente aprendida bajo reinicio,
+deriva y cambio de sesión. Esc. E0 medirá error residual y repetibilidad; Esc. E1
+comprobará que la reducción conserva respuesta al movimiento. Se incluirá el coste
+de instrumentación adicional y el fracaso cuando la perturbación no sea común.
+\item[H5: complementariedad.] La combinación robusta--coherente mejorará transferencia
+frente a CSI bruto, magnitud sola y cada rama aislada con igual supervisión y presupuesto.
+Esc. E2--E5 medirán error de tarea, incertidumbre y abstención; la fusión no se
+considerará superior si su beneficio desaparece al controlar referencia y datos.
+\item[H6: observabilidad orientada a la tarea.] Jacobianos y Fisher predecirán mejor las
+condiciones de recuperación de una o dos personas que RSSI/SNR por sí solos. Esc. E1--E4
+permitirán contrastar esa capacidad predictiva antes de utilizarla para seleccionar enlaces
+y optimizar una red. Se evaluarán falsos diagnósticos de observabilidad y cobertura de
+incertidumbre, además del error medio.
+\end{description}
+
+La interfaz multirradio, la inversión y el diseño de red se mantienen como objetivos;
+su desarrollo depende de los contrastes anteriores. Un resultado favorable de H1 no
+prueba H2, y una mejora de potencia en G4 no verifica H3 para canal complejo o fisiología.

@@ -1,0 +1,123 @@
+\chapter{Dinámica humana, fisiología y coherencia temporal}
+\label{ch:human_dynamics}
+
+La separación entre propagación y observación permite incorporar ahora la dinámica sin
+confundirla con los efectos propios de la radio. Este capítulo distingue el movimiento
+corporal macroscópico de las deformaciones fisiológicas y formula las condiciones de
+coherencia temporal que un gemelo debe preservar para representar ambos fenómenos.
+
+\section{Separación entre macroestado y microestado}
+
+Se define
+\begin{equation}
+\vect s_H(t)=\left[\vect p_H(t),\vect r_H(t),\vect q_{\rm pose}(t),\vect v_H(t)\right]
+\end{equation}
+y
+\begin{equation}
+\vect s_F(t)=\left[x_{\rm chest}(t),\dot x_{\rm chest}(t),\ldots\right].
+\end{equation}
+El primero contiene movimiento de centímetros a metros; el segundo desplazamientos de milímetros. Son estados físicos; $Z_H$ y $Z_F$ se reservaron en la \cref{eq:factor_latent} para sus representaciones aprendidas. Mezclar ambas escalas desde el principio produce un problema numéricamente mal condicionado y metodológicamente ambiguo.
+
+\section{Coherencia temporal de trayectorias}
+
+Para una trayectoria móvil,
+\begin{equation}
+\phi_\ell(t)=-\frac{2\pi f_c}{c}L_\ell(t),
+\qquad
+\dot\phi_\ell(t)=2\pi\nu_\ell(t).
+\end{equation}
+Un simulador dinámico debe preservar la continuidad de fase y la correspondencia temporal entre trayectorias. Recalcular cada captura sin mantener la identidad de las trayectorias puede introducir saltos artificiales que destruyan precisamente la componente de micromovimiento que se pretende estudiar. WaveVerse se toma como referencia reciente de simulación dinámica con coherencia de fase \citep{Zheng2026WaveVerse}; en la implementación propia se estudiará una solución híbrida entre el nuevo trazado de trayectorias y su actualización local.
+
+\section{Aproximación local diferenciable}
+
+Para desplazamientos pequeños,
+\begin{equation}
+H(\vect q+\Delta\vect q)
+\approx H(\vect q)+
+\mat J_H(\vect q)\Delta\vect q+
+\vect R_2(\Delta\vect q),
+\label{eq:taylor_dynamic}
+\end{equation}
+donde $\vect R_2$ agrupa términos de segundo orden calculados componente a componente para el canal vectorial. Si se necesitara una expansión cuadrática explícita, cada componente compleja de $H$ tendría su propia Hessiana; no existe una única matriz Hessiana que produzca todo el tensor de canal.
+En respiración, una primera aproximación es
+\begin{equation}
+\Delta H(t)\approx
+\frac{\partial H}{\partial x_{\rm chest}}
+ x_{\rm chest}(t).
+\end{equation}
+Esta aproximación se utilizará sólo cuando el conjunto de trayectorias sea estable. Para cambios grandes de postura, orientación o posición se realizará re-tracing.
+
+La validez no se decidirá únicamente por la magnitud de $\Delta\vect q$. La aproximación también falla cerca de oclusiones, sombras, puntos de reflexión degenerados o eventos de aparición y desaparición de trayectorias. El reflector mecánico de la línea metodológica L3 permitirá medir el residuo de primer y segundo orden antes de aplicar la aproximación al tórax.
+
+\section{Respiración como problema de recuperación de la forma de onda}
+
+BreatheSmart estudia mediante un maniquí y clasificación supervisada cómo cambios pequeños en amplitud y fase de CSI contienen información de movimiento respiratorio y proporciona un entorno controlado para estudiar límites y factores de falla \citep{Mosleh2022BreatheSmart}. Wi-Actigraph amplía el contexto hacia sueño y perturbaciones respiratorias/motoras en un entorno realista \citep{Alzaabi2025WiActigraph}. En esta tesis, el objetivo primario no será clasificar BPM directamente, sino recuperar primero
+\begin{equation}
+Y(t)\rightarrow \widehat x_{\rm chest}(t)
+\end{equation}
+y después obtener métricas derivadas, por ejemplo $\mathrm{RR}=60f_{\rm resp}$ en respiraciones por minuto cuando una frecuencia instantánea sea una descripción válida. Esta elección conserva estructura temporal y permite evaluar pausas, irregularidad y variabilidad sin reducir toda la señal a un pico espectral.
+
+\section{Movimiento macroscópico como fuente no lineal de interferencia}
+
+MoVi-Fi, implementado con radares IR-UWB y FMCW, sostiene que la componente de signos vitales no desaparece necesariamente durante el movimiento, sino que se mezcla de manera no lineal con reflexiones de mayor energía, y emplea aprendizaje contrastivo para recuperar las formas de onda \citep{Chen2022MoViFi}. Su adaptación a CSI Wi-Fi constituye una hipótesis adicional. Este resultado motiva modelar
+\begin{equation}
+Y_m(t)=F_m(\vect s_E,\vect s_H(t),\vect s_F(t),
+\vect s_R,\vect s_N(t))
+\end{equation}
+en lugar de asumir una suma aditiva independiente entre movimiento y fisiología.
+
+\section{Varios usuarios y separabilidad física}
+
+WiMANS contiene muestras con cero a cinco personas, CSI en dos bandas y video sincronizado, y muestra que el paso de uno a varios usuarios continúa siendo difícil \citep{Huang2024WiMANS}. WiMUSE formula la respiración de varias personas como un problema de \ac{BSS} de formas de onda y señala que los métodos puramente espectrales fallan cuando los sujetos presentan frecuencias cercanas o patrones no estacionarios \citep{Yi2025WiMUSE}. MURAL-Fi muestra, a su vez, que añadir diversidad espacial (AoA, ToF, AoD y Doppler) mejora la separación de regiones torácicas y la robustez frente a movimientos involuntarios \citep{Li2026MURALFI}. Estos trabajos respaldan una conclusión central: la complejidad del estimador no puede compensar de manera indefinida la ausencia de observabilidad física.
+
+\section{Correspondencia entre variable física y referencia experimental}
+
+La señal de una banda de expansión respiratoria no se identifica automáticamente
+con desplazamiento local en milímetros. El estimando puede ser forma de onda
+normalizada, desplazamiento calibrado o tasa; su referencia y métricas deben
+corresponder. ViMo utiliza radio comercial de 60 GHz y una respuesta temporal
+con recursos de separación distintos del CSI sub-7 GHz; sus resultados se
+consideran un antecedente complementario, no un rendimiento directamente
+transferible \citep{Wang2020ViMo}.
+
+Se incluirán controles de sala vacía, actuador inmóvil y perturbaciones no
+respiratorias. Una correlación elevada tras normalizar o deformar el eje temporal
+no garantiza amplitud ni tiempo de eventos correctos. La evaluación informará
+error temporal sin reajuste de prueba, tasa cuando esté definida, falsas detecciones
+y riesgo frente a cobertura de las ventanas aceptadas.
+
+\section{De la movilidad del terminal al movimiento de un dispersor}
+\label{sec:motion_intervention}
+
+El canal de dc01 cambia con la posición del transmisor en un entorno estático.
+La derivada respecto de esa posición no equivale a la derivada respecto del tórax
+u otro objeto con transmisor y receptor fijos. En el segundo caso pueden coexistir
+trayectorias estáticas y dinámicas, cambios de visibilidad y variaciones del coeficiente
+de dispersión. La intervención mecánica propuesta separará estos mecanismos antes
+de interpretar señales humanas.
+
+Para un estado de referencia $\mathbf q_0$ y perturbaciones pequeñas, se ensayará
+\begin{equation}
+\Delta H\simeq J_{\rm macro}\delta\mathbf q_{\rm macro}
++J_{\rm resp}\delta\mathbf q_{\rm resp}+r,
+\label{eq:local_motion_decomposition}
+\end{equation}
+con $r$ que incluye términos no lineales y discrepancia. Es una expansión local;
+no una separación exacta de contribuciones independientes en multitrayectoria.
+La resta de canales requerirá una referencia común estable entre instantes.
+Compensar libremente la fase de cada cuadro con el propio objetivo puede suprimir
+la señal que se pretende medir. Por ello se evaluarán en paralelo el canal referido
+y la respuesta de $\mathsf V_i$ al mismo desplazamiento.
+
+Un fantoma mecánico permite variar amplitud, frecuencia, orientación y movimiento
+lento con una referencia independiente. Una forma de onda periódica recuperada en
+ese banco no valida respiración humana, y una pausa mecánica no valida detección
+clínica de apnea. La transición a personas añade deformación no rígida, postura,
+ropa, oclusión y movimiento espontáneo. Se analizarán primero esos factores y la
+forma de onda de referencia antes de entrenar clasificadores de actividad o salud.
+
+La conclusión anterior conduce de manera natural al problema de observabilidad. Antes de
+seleccionar un estimador conviene determinar si la geometría, las tecnologías de radio y la
+cadencia de medición contienen información suficiente para distinguir las variables de
+interés. El capítulo siguiente formaliza esta pregunta mediante jacobianos e información
+de Fisher.

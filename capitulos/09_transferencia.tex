@@ -1,0 +1,107 @@
+\chapter{Aprendizaje de representaciones y transferencia a mediciones reales}
+\label{ch:representation_learning}
+
+El aprendizaje se incorpora después de fijar el modelo físico y los criterios de
+observabilidad. Este orden permite asignarle una función precisa: aproximar componentes
+costosos, aprovechar datos sin etiquetar y adaptar la representación, sin exigir que una
+red neuronal descubra por sí sola toda la estructura del problema.
+
+\section{Motivación para aprendizaje autosupervisado}
+
+Los conjuntos de datos reales de radiofrecuencia son costosos y abarcan una gran diversidad de geometrías. La simulación permite controlar factores y generar intervenciones, pero introduce discrepancias respecto de las mediciones. Una estrategia natural consiste en preentrenar representaciones mediante tareas que no requieran etiquetas humanas exhaustivas y, posteriormente, alinear la simulación, las mediciones reales de radiofrecuencia y las modalidades de referencia.
+
+\section{Representación compartida y privada}
+
+Para modalidad $m$ se propone
+\begin{equation}
+z_m=\left[z_{\rm comun},z_m^{\rm propio}\right].
+\end{equation}
+La parte compartida contiene variables físicas comunes (posición, postura, movimiento y respiración), mientras que la parte específica puede conservar peculiaridades de cada modalidad. No se impone una igualdad completa entre $z_{\rm RF}$ y $z_{\rm vision}$.
+
+\section{Destilación multimodal}
+
+Durante entrenamiento se dispone de una modalidad directa $V$ y una indirecta $Y$:
+\begin{equation}
+z_T=E_T(V),\qquad z_S=E_S(Y).
+\end{equation}
+Una pérdida de alineamiento es
+\begin{equation}
+\calL_{\rm align}=
+\|P_S z_S^{\rm comun}-P_Tz_T^{\rm comun}\|_2^2.
+\end{equation}
+El trabajo de MERL, centrado en descripciones de actividades y no en
+reconstrucción fisiológica, muestra que las modalidades directas e indirectas pueden combinarse durante el entrenamiento y que el conocimiento multimodal puede transferirse a un modelo que opera con información indirecta \citep{Hori2024Fusion}. En esta tesis, la cámara, el sensor de profundidad y el radar serán instrumentos de supervisión y validación, no necesariamente sensores del sistema desplegado.
+
+\section{Objetivos predictivos y enmascaramiento estructurado}
+
+Una arquitectura inspirada en I-JEPA \citep{Assran2023IJEPA} puede predecir representaciones ocultas en lugar de reconstruir todas las muestras. Las máscaras pueden operar sobre el tiempo, la frecuencia o el enlace:
+\begin{align}
+\mathcal M_T &: \text{ventanas temporales},\\
+\mathcal M_F &: \text{subportadoras/canales},\\
+\mathcal M_L &: \text{enlaces transmisor--receptor}.
+\end{align}
+El objetivo es inducir al codificador a capturar la estructura redundante del fenómeno y no únicamente artefactos locales.
+
+\section{Transferencia de la simulación a las mediciones reales}
+
+Se consideran tres dominios:
+\begin{equation}
+\mathcal D_{\rm sim},\qquad
+\mathcal D_{\rm public},\qquad
+\mathcal D_{\rm own}.
+\end{equation}
+El entrenamiento se organiza en tres fases: preentrenamiento físico a gran escala, adaptación con conjuntos de datos públicos y calibración con pocas muestras de adquisición propia. La eficiencia de datos se expresa mediante la curva de error frente a
+mediciones reales y el número $N_{\rm objetivo}$ necesario para alcanzar
+un umbral de tarea fijado en validación. Si se conserva $N_{90}$, se define
+como el número que logra el 90\% de la mejora entre una referencia y una
+saturación estimada, declarando ambas y el sentido de la métrica. Se cuentan
+por separado posiciones, sesiones, participantes y datos auxiliares de adaptación.
+
+\section{Separación de las perturbaciones instrumentales}
+
+Se buscará reducir dependencia entre $Z_H$ y $Z_N$. Una regularización posible usa HSIC:
+\begin{equation}
+\calL_{\rm dep}=\operatorname{HSIC}(Z_H,Z_N),
+\end{equation}
+o un modelo adversario que intente predecir el dispositivo o el entorno a partir de la representación latente humana. Este término no garantiza independencia causal, pero proporciona un mecanismo empírico para evitar que el codificador utilice correlaciones espurias evidentes.
+
+\section{Transferencia escalonada y comparación con modelos recientes}
+\label{sec:transfer_updated_program}
+
+La transferencia se distinguirá en cuatro niveles: región reservada de una escena;
+nueva sesión o dispositivo; nueva distribución de objetos; y nueva habitación o banda.
+Los cinco bloques de dc01 sólo respaldan el primero para los predictores evaluados.
+Se reservarán sesiones completas incluso durante preentrenamiento autosupervisado;
+ventanas solapadas y capturas contiguas no se repartirán entre entrenamiento y prueba.
+La adaptación utilizará un presupuesto explícito de referencias y mediciones, incluyendo
+el tiempo de registro geométrico y calibración, además del número de etiquetas.
+
+En el cambio de objetos de S5, se comparará el material neuronal global B2 con una
+variante local propuesta, $\mathbf x_{\rm loc}=T_{W\leftarrow o}^{-1}\mathbf x_W$.
+Mover el objeto modificará su transformación, conservando identidad y parámetros
+cuando el modelo lo permita. Esta variante no forma parte de B2 ya ejecutado.
+Learnable WDT, RFScape y RadTwin se ubican en esta comparación editable; NeRF$^2$
+se mantendrá como referencia de campo espacial aprendido. Se informarán error antes
+de adaptar, curvas de adaptación y coste de actualización bajo el mismo acceso a
+geometría y mediciones.
+
+RFDT e InverTwin se incorporan como referencias de modelado diferenciable e inversión,
+particularmente para el tratamiento de cambios de visibilidad y objetivos de ajuste
+\citep{Chen2026RFDT,Chen2025InverTwin}. No se contarán sus contribuciones relacionadas
+como validaciones independientes de esta tesis. Su evaluación inversa se condicionará
+a haber contrastado sensibilidad y referencia instrumental; una buena reconstrucción
+estática no garantiza un gradiente físico correcto. RayLoc conserva su función de
+comparación inversa, mientras que WaveVerse orienta coherencia dinámica. Los resultados
+externos de estos trabajos no validan automáticamente nuestro banco ni sus hipótesis.
+
+La comparación aprendida incluirá el enfoque CSI de WiFi-JEPA, además de I-JEPA como
+antecedente conceptual, autocodificación y métodos temporales. Las cámaras y el radar
+podrán aportar supervisión durante entrenamiento; el experimento de despliegue declarará
+si la inferencia usa sólo RF o requiere dichas modalidades. Se compararán escenarios
+con y sin referencia de fase, para evitar atribuir al aprendizaje una mejora debida
+exclusivamente a instrumentación adicional.
+
+Con ello queda establecido el marco conceptual completo: modelo directo, representación,
+operadores de observación, dinámica, observabilidad y aprendizaje. La parte siguiente
+convierte estos elementos en preguntas de investigación, objetivos, hipótesis y un programa
+experimental verificable.

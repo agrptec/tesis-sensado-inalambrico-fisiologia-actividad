@@ -1,0 +1,2516 @@
+\chapter{Avances experimentales del modelado de canal: calibración,
+estructura de fase y transferencia espacial}
+\label{ch:avances_rf_twin_completo}
+\label{ch:avances}
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Objetivo científico del bloque experimental}
+% ----------------------------------------------------------------------
+
+La secuencia experimental desarrollada hasta ahora estudia una pregunta que
+precede al objetivo final de sensado fisiológico:
+
+\begin{quote}
+\emph{¿Qué parte de la respuesta compleja de un canal inalámbrico puede
+reconstruirse, calibrarse, descomponerse y predecirse a partir de un gemelo
+electromagnético antes de introducir explícitamente personas, movimiento o
+fisiología?}
+\end{quote}
+
+La motivación es metodológica. En un sistema de sensado por radiofrecuencia, el observable que
+finalmente contiene información humana es una perturbación pequeña del canal.
+La concordancia estática proporciona una primera comprobación del entorno y de
+la cadena de síntesis. Su insuficiencia exige delimitar qué predicciones siguen
+siendo contrastables mediante observables relativos o perturbaciones controladas.
+Sin embargo, la condición opuesta tampoco es suficiente: un modelo que
+reconstruye bien el canal estático puede no preservar la sensibilidad del canal
+frente a una perturbación humana. Por ello, la tesis no busca únicamente
+minimizar una pérdida de reconstrucción, sino descomponer la fidelidad en
+propiedades físicamente distintas.
+
+La progresión experimental seguida puede resumirse como
+
+\begin{equation}
+\begin{aligned}
+\Gamma&\longrightarrow\mathcal P_{\rm RT}\longrightarrow H_{\rm RT}
+\longrightarrow\Delta\phi,\\
+\Delta\phi&\longrightarrow\{\Delta\tau_{\rm eff},\phi_0,r_\phi\}
+\longrightarrow\widehat{\Delta\tau}_{\rm eff}\longrightarrow\widetilde H_{\rm RT}.
+\end{aligned}
+\label{eq:avance_general}
+\end{equation}
+
+donde $\Gamma$ representa la escena, $\mathcal P_{\rm RT}$ el conjunto de
+trayectorias trazadas, $H_{\rm RT}$ la respuesta compleja sintetizada,
+$\Delta\tau_{\rm eff}$ una pendiente espectral efectiva, $\phi_0$ un desfase
+constante residual y $r_\phi$ el componente no explicado por la pendiente común y los interceptos
+por enlace. El número de parámetros depende de los ejes de ajuste; no se trata
+de dos parámetros escalares para todo el tensor.
+
+Este programa se relaciona directamente con cuatro líneas de literatura.
+Primero, Hoydis et al.~\cite{Hoydis2024DiffRT} muestran que un trazador de rayos
+diferenciable permite calibrar propiedades electromagnéticas, dispersión difusa y
+patrones de antena usando mediciones. Segundo, Ruah et
+al.~\cite{Ruah2024Phase} muestran que pequeñas discrepancias geométricas pueden
+hacer que la fase simulada de cada trayectoria sea suficientemente incorrecta
+como para sesgar la calibración, motivando métodos con incertidumbre de fase. Tercero,
+NeRF$^2$~\cite{Zhao2023NeRF2}, Learnable Wireless Digital
+Twins~\cite{Jiang2025LearnableWDT} y RadTwin~\cite{Zhang2026RadTwin} proponen
+representaciones neuronales alternativas del campo RF o de las interacciones
+electromagnéticas. Cuarto, WaveVerse~\cite{Zheng2026WaveVerse} muestra que la
+coherencia temporal de fase resulta crítica cuando el simulador se utiliza en
+escenarios dinámicos y de sensado.
+
+La contribución experimental actual caracteriza la estructura de discrepancia
+y su transferencia parcial. La conservación conjunta del canal y de sus
+perturbaciones humanas constituye la hipótesis que esos avances permiten
+formular con mayor precisión, y permanece sujeta a validación diferencial.
+
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\section{Alcance del registro y convenciones de evaluación}
+\label{sec:metricas_avances}
+
+Este capítulo integra los resultados documentados hasta S4.6d.2, con precisión
+numérica conservada en las tablas de cada ejecución. El análisis de S4.3--S4.5
+se realiza sobre la referencia B0, salvo indicación expresa; no debe extenderse
+su validación regional a materiales B1/B2 sin reentrenarlos bajo ese protocolo.
+La ejecución documentada no equivale a una reproducción independiente de
+los tensores. Los scripts y artefactos que permiten verificarla se identifican
+en la \cref{sec:artifacts}.
+
+Para cada enlace $v=(i,u,a)$ y conjunto de frecuencias válidas $\mathcal K_v$,
+se definen
+\begin{align}
+E_{\phi,v}&=\frac{180}{\pi|\mathcal K_v|}\sum_{k\in\mathcal K_v}
+\left|\wrap_{(-\pi,\pi]}\bigl(\angle H^{\rm real}_{v,k}-\angle\widehat H_{v,k}\bigr)\right|,
+\label{eq:error_angular_avances}\\
+\rho_v&=\frac{\left|\sum_{k\in\mathcal K_v}H^{\rm real}_{v,k}\widehat H_{v,k}^*\right|}
+{\sqrt{\sum_k|H^{\rm real}_{v,k}|^2}\sqrt{\sum_k|\widehat H_{v,k}|^2}}.
+\label{eq:coherencia_avances}
+\end{align}
+La mediana del MAE angular por enlace difiere de la mediana de todos los
+residuos elementales. Las tablas que indican fase mediana o coherencia mediana
+resumen los indicadores de enlace; los cuantiles deben interpretarse sobre
+esa misma unidad. Las máscaras de amplitud nula o insuficiente, su umbral y
+las exclusiones deben acompañar los resultados, pues la fase no está definida
+en amplitud nula.
+
+El NMSE de magnitud por enlace se expresa como
+\begin{equation}
+\mathrm{NMSE}_{|H|,v}=10\log_{10}
+\frac{\sum_k(|\widehat H_{v,k}|-|H^{\rm real}_{v,k}|)^2}
+{\sum_k|H^{\rm real}_{v,k}|^2},
+\end{equation}
+y el complejo sustituye el numerador por
+$\sum_k|\widehat H_{v,k}-H^{\rm real}_{v,k}|^2$. Se distinguen esas reducciones
+por enlace de una razón de sumas globales. Las comparaciones de potencia y
+RMS-DS conservan el MAE y correlaciones del registro; la conversión a dB y
+el orden de agregación forman parte de la especificación del evaluador.
+
+La coherencia $\rho_v$ es invariante a una rotación constante del enlace.
+Por ello el CPO puede reducir el error angular sin modificar esa coherencia.
+Para $R_{v,k}=H^{\rm real}_{v,k}\widehat H_{v,k}^*$, un retardo candidato
+produce
+\begin{equation}
+C_v(\tau)=\sum_k R_{v,k}e^{j2\pi\nu_k\tau},\qquad
+\widehat\phi_{0,v}(\tau)=\angle C_v(\tau),\qquad
+\widetilde H_{v,k}=\widehat H_{v,k}e^{j\widehat\phi_{0,v}-j2\pi\nu_k\widehat\tau}.
+\label{eq:cpo_delay_avances}
+\end{equation}
+El módulo del producto residual pondera frecuencias por las amplitudes de ambos
+canales. Maximizar $\sum_a|C_{i,u,a}(\tau)|$ minimiza el error cuadrático
+complejo respecto de las rotaciones permitidas; no equivale necesariamente a
+maximizar la media no ponderada de coherencias normalizadas ni a minimizar
+el error angular absoluto. Los resultados deben interpretarse bajo el objetivo
+y los grados de libertad efectivamente utilizados.
+
+En S4.2b todos los parámetros de fase utilizan la observación evaluada y
+constituyen una referencia oráculo. S4.2d transfiere retardo entre antenas con
+CPO libre en evaluación. S4.2e transfiere retardo e intercepto entre frecuencias
+sin reajuste. S4.5 predice retardo desde descriptores y ajusta CPO con el canal
+evaluado. La denominación de cada condición conserva esa diferencia de acceso.
+
+\FloatBarrier
+\section{Banco común S1: DICHASUS dc01 y gemelo estático nominal}
+\label{sec:bank_dc01}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{Datos, dimensionalidad y escena}
+
+El banco utiliza DICHASUS dc01, perteneciente a la familia dcxx. Esta familia
+contiene mediciones de canal con posicionamiento y un modelo tridimensional
+del entorno, por lo que permite contrastar una respuesta compleja real con un
+modelo geométrico de propagación. En el procesamiento utilizado en esta tesis
+se trabajan $N=10\,000$ posiciones. Para cada posición se conserva una
+respuesta compleja medida
+
+\begin{equation}
+H_i^{\rm real}\in\mathbb C^{2\times 32\times 1024},
+\end{equation}
+
+correspondiente a dos arreglos de 32 antenas y 1024 subportadoras
+\citep{Euchner2023DICHASUSdcxx}. La portadora
+de la escena es \SI{3.438}{GHz} y el ancho de banda es \SI{50}{MHz}.
+
+La unidad básica de trabajo puede representarse como
+
+\begin{equation}
+\mathcal D_{S1}
+=
+\left\{
+\left(
+\mathbf p_i,\,
+H_i^{\rm real},\,
+\mathcal P_i^{\rm RT}
+\right)
+\right\}_{i=1}^{10000}.
+\label{eq:s1_data_object}
+\end{equation}
+
+El trazado nominal se ejecutó con profundidad máxima cinco y produjo, como
+máximos estructurales del TFRecord, 198 trayectorias especulares, 6 difractadas
+y 445 de dispersión difusa. El tensor almacenado se validó para las 10\,000
+posiciones. Aunque las trayectorias de dispersión difusa se conservan en el archivo,
+los canales evaluados en B0--B2 y S4 se reconstruyen con
+\path{cir(scattering=False)}; por ello, los caminos activos en el cálculo de
+$H_{\rm RT}$ son las contribuciones especulares y difractadas.
+
+Con $\nu_k=f_k-f_{\rm ref}$ y ganancias complejas que incorporan la fase
+de propagación referida a $f_{\rm ref}$, el canal sintetizado tiene la forma
+
+\begin{equation}
+H_{i,u,a}(f_k)
+=
+\sum_{\ell\in \mathcal P_{i,u,a}}
+\alpha_{i,u,a,\ell}(f_k)
+\exp\left[-j2\pi\nu_k\tau_{i,u,a,\ell}\right],
+\label{eq:synth_channel}
+\end{equation}
+
+donde $u\in\{1,2\}$ identifica el arreglo y $a\in\{1,\ldots,32\}$ su
+antena. Las etiquetas Tx1/Tx2 de los registros se conservan como identificadores
+de los dos bloques de enlaces; no implican dos transmisores móviles adicionales.
+Si el simulador invierte los extremos por reciprocidad, debe mantenerse explícita
+la correspondencia entre índices de adquisición y de síntesis.
+
+\FloatBarrier
+\subsection{Entorno de software y trazabilidad}
+
+La ejecución principal se realizó con Python 3.10, TensorFlow 2.15.1 y
+Sionna 0.19.2. El trazado de rayos se apoya en la escena
+\path{inue_simple}. Debido a diferencias de API respecto del repositorio
+original, se introdujo un adaptador de compatibilidad para el formato de
+\path{trace_paths}, pero el módulo de síntesis posterior quedó congelado. La respuesta
+simulada utilizada en B1/B2 se calcula mediante:
+
+\begin{enumerate}
+\item colocación de receptores;
+\item reconstrucción de los caminos trazados;
+\item \path{scene.compute_fields};
+\item \path{paths.cir(scattering=False)};
+\item conversión a OFDM mediante \path{cir_to_ofdm_channel};
+\item división por $\sqrt{1024}$;
+\item escalamiento global equivalente del canal medido.
+\end{enumerate}
+
+La escala nominal congelada fue
+
+\begin{equation}
+\alpha_{B0}=5.762854637936243\times10^{-10},
+\end{equation}
+
+cuya conversión $10\log_{10}\alpha_{B0}$ es $-92.3936$ dB y
+
+\begin{equation}
+\sqrt{\alpha_{B0}}
+=
+2.4005946425700954\times10^{-5}.
+\end{equation}
+
+La escala es un factor de potencia de normalización y su raíz actúa sobre
+amplitudes; no constituye por sí sola una potencia recibida en dBm. En esta
+serie B0 ya incorpora la escala congelada: no representa una comparación sin
+normalización. B1 modifica también la escala; su mejora no debe atribuirse
+exclusivamente a materiales sin una ablación de ganancia. Deben conservarse
+las convenciones de normalización de ambos canales y su conjunto de ajuste.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{B0--B2: reconstrucción estática del entorno}
+\label{sec:b012_detailed}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{B0: RT nominal con materiales ITU}
+
+B0 utiliza geometría y materiales nominales. Su objetivo no es ser el mejor
+modelo, sino fijar un punto de referencia para cuantificar la discrepancia
+entre una escena plausible y la medición real.
+
+Sobre 4900 posiciones de prueba se obtuvieron:
+
+\begin{align}
+\rho_P &= 0.699401,\\
+{\rm MAE}_P &= 6.290937~{\rm dB},\\
+\rho_{\tau_{\rm RMS}} &= 0.173353,\\
+{\rm MAE}_{\tau_{\rm RMS}} &= 43.211357~{\rm ns},\\
+{\rm mediana~NMSE}_{|H|} &= -3.173375~{\rm dB},\\
+{\rm mediana~coh} &= 0.156483,\\
+{\rm mediana~MAE_{\phi}} &= 89.925659^\circ.
+\end{align}
+
+El resultado es físicamente informativo: la escena nominal recupera una parte
+considerable de la variación espacial de potencia, pero reproduce pobremente
+la estructura temporal fina y prácticamente no está alineada en fase.
+
+\FloatBarrier
+\subsection{B1: calibración global de materiales}
+
+B1 sigue la idea de RT diferenciable de Hoydis et
+al.~\cite{Hoydis2024DiffRT}. Se optimizan propiedades globales por objeto o
+material manteniendo fija la geometría. El entrenamiento usó lotes de ocho posiciones,
+tasa de aprendizaje $10^{-3}$ y la partición original del banco: 5000
+posiciones de entrenamiento, 100 de validación y 4900 de prueba. Las 10\,000
+posiciones constituyen el banco completo, no el tamaño del conjunto de entrenamiento.
+
+Los parámetros finales reportados fueron aproximadamente:
+
+\begin{table}[!htbp]
+\centering
+\caption{Parámetros electromagnéticos aprendidos en B1.}
+\label{tab:b1_materials}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+Objeto/material & $\epsilon_r$ & $\sigma$ [S/m]\\
+\midrule
+Piso & 1.0010 & 0.0010\\
+Techo & 70.4308 & 8.089956\\
+Muros & 7.3262 & 1.952099\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La escala final fue $8.191072820018519\times10^{-10}$. Los valores ajustados
+se interpretan como parámetros efectivos del modelo. En particular, la permitividad
+elevada del techo no identifica por sí sola una propiedad intrínseca del material: puede
+compensar geometría, patrones de antena u otras interacciones no modeladas.
+
+En prueba:
+
+\begin{align}
+\rho_P &= 0.736297, &
+{\rm MAE}_P &= 3.815674~{\rm dB},\\
+\rho_{\tau_{\rm RMS}} &= 0.278345, &
+{\rm MAE}_{\tau_{\rm RMS}} &= 27.320232~{\rm ns},\\
+{\rm mediana~NMSE}_{|H|} &= -3.918742~{\rm dB},\\
+{\rm coh} &= 0.155111,\\
+{\rm MAE_{\phi}} &= 89.953903^\circ.
+\end{align}
+
+Por tanto, aprender parámetros materiales mejora claramente potencia,
+dispersión de retardos y magnitud, pero no la fase bruta.
+
+\FloatBarrier
+\subsection{B2: materiales neuronales dependientes de posición}
+
+B2 introduce una función neuronal espacial de 57\,860 parámetros que devuelve
+propiedades electromagnéticas efectivas en función de la posición de
+interacción:
+
+\begin{equation}
+\boldsymbol\theta_M(\mathbf x)
+=
+g_\psi\bigl(\gamma(\mathbf x)\bigr).
+\end{equation}
+
+Esta formulación permite absorber heterogeneidad espacial que un único valor
+por material no puede representar. Es importante no confundir B2 con
+NeRF$^2$: B2 conserva el soporte físico de trazado de rayos y aprende parámetros de
+interacción/material; NeRF$^2$ aprende directamente una representación
+continua del campo RF~\cite{Zhao2023NeRF2}.
+
+B2 alcanza:
+
+\begin{align}
+\rho_P &= 0.870918, &
+{\rm MAE}_P &= 2.223648~{\rm dB},\\
+\rho_{\tau_{\rm RMS}} &= 0.646920, &
+{\rm MAE}_{\tau_{\rm RMS}} &= 16.498459~{\rm ns},\\
+{\rm mediana~NMSE}_{|H|} &= -4.455138~{\rm dB},\\
+{\rm NMSE_{H}} &= 3.115020~{\rm dB},\\
+{\rm coh} &= 0.145279,\\
+{\rm MAE_{\phi}} &= 89.961143^\circ.
+\end{align}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Comparación consolidada B0--B2.}
+\label{tab:b012_consolidated}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lccc}
+\toprule
+Métrica & B0 & B1 & B2\\
+\midrule
+Correlación potencia $\uparrow$ & 0.699 & 0.736 & \textbf{0.871}\\
+MAE potencia [dB] $\downarrow$ & 6.29 & 3.82 & \textbf{2.22}\\
+Correlación RMS-DS $\uparrow$ & 0.173 & 0.278 & \textbf{0.647}\\
+MAE RMS-DS [ns] $\downarrow$ & 43.21 & 27.32 & \textbf{16.50}\\
+NMSE magnitud med. [dB] $\downarrow$ & $-3.17$ & $-3.92$ & \textbf{$-4.46$}\\
+Coherencia compleja bruta $\uparrow$ & 0.156 & 0.155 & 0.145\\
+Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
+Error angular tras CPO [$^\circ$] & 81.42 & 81.39 & 81.58\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La conclusión de B0--B2 es una de las primeras observaciones fuertes de la
+tesis:
+
+La mejora de potencia, magnitud y dispersión de retardos no implica, en esta
+comparación, una mejora de la concordancia angular bruta.
+
+B2 obtiene los mejores agregados de potencia, dispersión de retardos y magnitud,
+pero eso no resuelve la correspondencia compleja.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.1: reproducción de calibración con incertidumbre de fase}
+\label{sec:s41_full}
+% ----------------------------------------------------------------------
+
+Ruah et al.~\cite{Ruah2024Phase} identifican una debilidad del enfoque que
+optimiza materiales directamente contra el canal complejo: un error geométrico
+pequeño cambia la longitud de trayectoria y, por tanto, la fase
+$2\pi d/\lambda$. El material puede terminar absorbiendo un error cuya causa es
+geométrica o instrumental.
+
+Se reprodujeron tres esquemas del trabajo:
+
+\begin{description}
+\item[PEOC:] Fase Error-Oblivious Calibration, que confía en la fase RT.
+\item[UPEC:] Uniform Fase Error Calibration, que elimina prácticamente la
+información de fase de trayectoria.
+\item[PEAC:] Fase Error-Aware Calibration, con errores locales modelados
+mediante una distribución circular y optimización variacional.
+\end{description}
+
+La distribución base puede escribirse
+
+\begin{equation}
+p(\epsilon|\mu,\kappa)
+=
+\frac{\exp[\kappa\cos(\epsilon-\mu)]}
+{2\pi I_0(\kappa)}.
+\end{equation}
+
+Se evaluaron varias semillas y, entre otros, los regímenes $\kappa=0$ y
+$\kappa=2.253$. El resultado experimental fue que UPEC resultó especialmente
+estable para la permitividad, PEOC mostró sesgo sistemático cuando la fase
+simulada era incorrecta y PEAC pudo recuperar soluciones muy precisas, pero con
+sensibilidad a inicialización y cuencas de fallo. La conductividad fue
+considerablemente menos identificable.
+
+La lección no fue ``PEAC gana'', sino:
+
+La expresividad del modelo de fase debe evaluarse junto con su estabilidad
+de optimización e identificabilidad.
+
+Esto motivó no aplicar PEAC inmediatamente a dc01, sino caracterizar primero
+qué estructura de error de fase existe realmente.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.2: descomposición de baja dimensión de la fase}
+\label{sec:s42_full}
+% ----------------------------------------------------------------------
+
+Se define
+
+\begin{equation}
+R_{i,u,a,k}
+=
+H^{\rm real}_{i,u,a,k}
+H^{{\rm RT}*}_{i,u,a,k}.
+\end{equation}
+
+La hipótesis inicial es
+
+\begin{equation}
+\angle R_{i,u,a,k}
+\simeq
+\phi_{0,i,u,a}
+-
+2\pi\nu_k\Delta\tau_{{\rm eff},i,u}
++
+r_{i,u,a,k}
+\pmod{2\pi}.
+\label{eq:low_dim_phase}
+\end{equation}
+
+$\Delta\tau_{\rm eff}$ debe denominarse \emph{retardo espectral relativo efectivo}; no es correcto llamarlo STO físico. Las mediciones utilizadas ya
+incluyen compensación de STO/CPO y el parámetro ajustado es relativo al modelo
+RT concreto.
+
+\FloatBarrier
+\subsection{S4.2a: diferencias adyacentes}
+
+A partir de
+
+\begin{equation}
+R_{k+1}R_k^*
+\simeq
+B_k e^{-j2\pi\Delta f\Delta\tau_{\rm eff}},
+\end{equation}
+
+se obtiene un estimador local de pendiente. Los resultados agregados fueron:
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.2a: error angular tras estimación local del retardo.}
+\label{tab:s42a_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrr}
+\toprule
+Modelo & CPO [$^\circ$] & común adyacente [$^\circ$] & por enlace [$^\circ$]\\
+\midrule
+B0 & 81.42 & 66.05 & 66.23\\
+B1 & 81.39 & 66.48 & 65.31\\
+B2 & 81.58 & 54.99 & 60.71\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+En este estimador B2 parecía particularmente favorable. Sin embargo, el
+resultado dependía del procedimiento local elegido.
+
+\FloatBarrier
+\subsection{S4.2b: retardo oráculo de alineación óptima}
+
+Se define
+
+\begin{equation}
+\widehat\tau_{i,u}
+=
+\arg\max_\tau
+\sum_a
+\left|
+\sum_k
+R_{i,u,a,k}
+e^{j2\pi\nu_k\tau}
+\right|.
+\label{eq:s42b_objective}
+\end{equation}
+
+Se utilizó una rejilla espectral de 8192 puntos, un paso de búsqueda de 2.5 ns
+y un intervalo de $\pm500$ ns. El relleno con ceros interpola el objetivo y
+no aumenta la resolución física: $1/B=20$ ns para 50 MHz. El periodo de
+ambigüedad es $1/\Delta f=20.48$ microsegundos con la rejilla nativa. La
+selección intercalada modifica la ambigüedad y requiere conservar las frecuencias
+originales y el intervalo común de búsqueda.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.2b: alineación global oráculo. Los errores angulares se expresan en grados; las coherencias son adimensionales.}
+\label{tab:s42b_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
+\toprule
+Modelo & fase CPO & fase oráculo & $\rho$ bruto & $\rho$ oráculo\\
+\midrule
+B0 & 81.42 & \textbf{31.63} & 0.156 & \textbf{0.745}\\
+B1 & 81.39 & 37.15 & 0.155 & 0.696\\
+B2 & 81.58 & 38.17 & 0.145 & 0.683\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Este experimento cambia la interpretación de B0--B2. B0, inferior en
+reconstrucción macroscópica, resulta el más fácil de alinear en fase mediante
+una transformación oráculo. Por ello:
+
+La capacidad de alineación a posteriori es una propiedad condicionada a la
+transformación y los datos disponibles; no sustituye la fidelidad predictiva del modelo.
+
+\FloatBarrier
+\subsection{S4.2c: acuerdo del retardo efectivo entre modelos}
+
+Los retardos oráculo presentan:
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.2c: acuerdo entre modelos.}
+\label{tab:s42c_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+Par & Pearson & diferencia mediana\\
+\midrule
+B0--B1 & 0.886 & 0--2.5 ns\\
+B0--B2 & 0.834 & 0--2.5 ns\\
+B1--B2 & 0.819 & 0--2.5 ns\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Las tres estimaciones quedan dentro de 10 ns en 69.46\% de los casos. Esto
+apoya la existencia de un componente compartido de baja dimensión, aunque con
+una cola dependiente del modelo.
+
+\FloatBarrier
+\subsection{S4.2d: transferencia entre antenas}
+
+Se estima el retardo usando 16 antenas y se aplica a las otras 16. El CPO de
+las antenas evaluadas sigue siendo libre, de modo que esta prueba transfiere
+retardo, no fase completa.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.2d: transferencia entre antenas. Los errores angulares se expresan en grados; las coherencias son adimensionales.}
+\label{tab:s42d_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Modelo & CPO & transferido & oráculo & $\rho_{\rm tr}$ & $\rho_{\rm or}$\\
+\midrule
+B0 & 81.42 & 35.52 & 30.49 & 0.715 & 0.754\\
+B1 & 81.39 & 42.19 & 35.34 & 0.652 & 0.708\\
+B2 & 81.58 & 41.56 & 37.11 & 0.654 & 0.690\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La correlación del retardo ajuste/oráculo es 0.833, 0.762 y 0.789 para B0, B1 y
+B2, respectivamente, con diferencia mediana de 2.5 ns.
+
+\FloatBarrier
+\subsection{S4.2e: transferencia estricta en frecuencia}
+
+Esta prueba es más estricta porque tanto $\tau$ como $\phi_0$ se estiman
+exclusivamente en las frecuencias de ajuste y se transfieren sin recalibración
+a las frecuencias reservadas.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.2e: transferencia estricta en frecuencia. Los retardos se expresan en ns y los errores angulares en grados.}
+\label{tab:s42e_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrr}
+\toprule
+Partición & Modelo & fase bruta & fase transf. & fase oráculo &
+$\rho_{\rm tr}$ & $\rho_{\rm or}$ & $|\Delta\tau|_{\rm med}$\\
+\midrule
+pares$\to$impares & B0 & 89.93 & 31.65 & 31.65 & 0.745 & 0.745 & 0\\
+ & B1 & 89.96 & 37.17 & 37.17 & 0.695 & 0.695 & 0\\
+ & B2 & 89.96 & 38.18 & 38.18 & 0.683 & 0.683 & 0\\
+impares$\to$pares & B0 & 89.92 & 31.62 & 31.62 & 0.745 & 0.745 & 0\\
+ & B1 & 89.95 & 37.14 & 37.13 & 0.696 & 0.696 & 0\\
+ & B2 & 89.96 & 38.16 & 38.16 & 0.683 & 0.683 & 0\\
+bajas$\to$altas & B0 & 89.92 & 44.80 & 25.49 & 0.785 & 0.791 & 2.5\\
+ & B1 & 89.88 & 50.00 & 30.35 & 0.742 & 0.749 & 2.5\\
+ & B2 & 89.88 & 49.64 & 32.28 & 0.723 & 0.733 & 2.5\\
+altas$\to$bajas & B0 & 89.90 & 45.33 & 25.95 & 0.791 & 0.799 & 2.5\\
+ & B1 & 90.00 & 50.00 & 30.60 & 0.752 & 0.759 & 2.5\\
+ & B2 & 90.01 & 49.78 & 32.79 & 0.732 & 0.742 & 2.5\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La interpolación intercalada alcanza prácticamente el oráculo. La extrapolación
+de media banda es más difícil pese a que la diferencia de retardo mediana es
+sólo 2.5 ns. A 25 MHz:
+
+\begin{equation}
+2\pi(25\times10^6)(2.5\times10^{-9})
+\approx 22.5^\circ.
+\end{equation}
+
+Por tanto, errores de pocos nanosegundos tienen una consecuencia angular
+macroscópica.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.3: estructura del residual sensible a la fase}
+\label{sec:s43_full}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{S4.3a: diagnóstico espectral}
+
+Después de eliminar el mejor retardo común y CPO se analiza el residual
+$r_\phi$. Sobre B0, 4900 posiciones y 313\,600 enlaces de antena:
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.3a: estadísticos del residual de fase.}
+\label{tab:s43a_stats}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+Indicador & Valor\\
+\midrule
+Mediana del MAE angular por enlace & 31.634$^\circ$\\
+Q25 & 18.643$^\circ$\\
+Q75 & 51.994$^\circ$\\
+Q90 & 71.166$^\circ$\\
+Media & 37.087$^\circ$\\
+Resultante circular mediana & 0.7860\\
+Varianza circular mediana & 0.2140\\
+MAE de incrementos de fase & 2.407$^\circ$\\
+Concentración de incrementos & 0.997427\\
+Coherencia residual & 0.745215\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La resultante de incrementos espectrales por separación fue:
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.3a: resultante circular de incrementos por separación espectral.}
+\label{tab:s43a_lag}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cr}
+\toprule
+Separación [subportadoras] & $C_\phi(L)$ mediano\\
+\midrule
+1 & 0.997427\\
+2 & 0.995886\\
+4 & 0.991220\\
+8 & 0.976974\\
+16 & 0.938767\\
+32 & 0.870279\\
+64 & 0.838135\\
+128 & 0.784616\\
+256 & 0.738365\\
+512 & 0.761427\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Los incrementos presentan elevada concentración a pequeña separación y una
+estructura espectral que no queda descrita por el error angular marginal.
+Estos resultados motivan contrastar modelos de dependencia; una resultante
+no nula a separaciones grandes no rechaza por sí sola independencia, según
+la distinción de la \cref{sec:circular_foundations}.
+
+\FloatBarrier
+\subsection{S4.3b: complejidad geométrica}
+
+Las medianas de los descriptores de trayectorias fueron aproximadamente:
+$n_{\rm spec}=168$, $n_{\rm diff}=6$, $n_{\rm active}=174$,
+$n_{\rm scat}=304$ y extensión de retardo activo 687.36 ns. Los conteos brutos
+presentan asociaciones débiles; el extensión de retardo, por ejemplo, tiene
+Spearman $\simeq-0.015$ con el residual de fase.
+
+Esto descarta una hipótesis demasiado simple: el residual no queda explicado
+por ``tener más trayectorias''.
+
+\FloatBarrier
+\subsection{S4.3c: multitrayecto efectivo ponderado por energía}
+
+Se construyen descriptores como
+
+\begin{align}
+D_1 &= \max_\ell p_\ell,\\
+D_3 &= \sum_{\ell\in{\rm top3}} p_\ell,\\
+D_5 &= \sum_{\ell\in{\rm top5}} p_\ell,\\
+N_{\rm eff} &= \frac{1}{\sum_\ell p_\ell^2},\\
+\mathcal H_p &=
+-\frac{\sum_\ell p_\ell\log p_\ell}{\log L}.
+\end{align}
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.3c: complejidad multitrayecto efectiva.}
+\label{tab:s43c_stats}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+Descriptor & Mediana\\
+\midrule
+$n_{\rm energy>0}$ & 174\\
+Fracción dominante $D_1$ & 0.2660\\
+Fracción de los tres caminos dominantes & 0.5692\\
+Fracción de los cinco caminos dominantes & 0.7099\\
+Número efectivo de trayectorias $N_{\rm eff}$ & 7.1667\\
+Entropía normalizada & 0.5183\\
+dispersión RMS de retardos ponderado & 15.2584 ns\\
+$n_{10{\rm dB}}$ & 9\\
+$n_{20{\rm dB}}$ & 17\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+A nivel de posición, entre otros resultados:
+
+\begin{align}
+\rho_S(\mathcal H_p,E_\phi) &= +0.491,\\
+\rho_S(\mathcal H_p,C_\phi(64)) &= -0.679,\\
+\rho_S(D_1,C_\phi(64)) &= +0.670,\\
+\rho_S(\tau_{\rm RMS},C_\phi(16)) &= -0.520,\\
+\rho_S(\tau_{\rm RMS},C_\phi(64)) &= -0.437.
+\end{align}
+
+Los descriptores de distribución energética muestran asociaciones de mayor
+magnitud con la estructura residual que los conteos geométricos considerados.
+Esta comparación es descriptiva y no atribuye causalidad a un descriptor aislado.
+
+\FloatBarrier
+\subsection{S4.3d: efectos entre posiciones y dentro de posición}
+
+Se separa la variación entre posiciones de la variación entre enlaces dentro
+de una misma posición. Aparecen inversiones de signo:
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.3d: ejemplos de efectos multiescala.}
+\label{tab:s43d}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrr}
+\toprule
+Relación & Entre posiciones & Dentro de posición & Enlaces agrupados\\
+\midrule
+$N_{\rm eff}\leftrightarrow E_\phi$ & -0.461 & +0.247 & +0.265\\
+$N_{\rm eff}\leftrightarrow C_\phi(64)$ & +0.492 & -0.361 & -0.474\\
+$\mathcal H_p\leftrightarrow E_\phi$ & +0.521 & +0.249 & +0.372\\
+$\mathcal H_p\leftrightarrow C_\phi(64)$ & -0.700 & -0.341 & -0.425\\
+$\tau_{\rm RMS}\leftrightarrow C_\phi(16)$ & -0.589 & -0.130 & -0.312\\
+$\tau_{\rm RMS}\leftrightarrow C_\phi(64)$ & -0.575 & -0.182 & -0.278\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+El caso de $N_{\rm eff}$ tiene una interpretación tipo Simpson: comparar dos
+entornos y comparar dos enlaces del mismo entorno no representa la misma
+pregunta física.
+
+\FloatBarrier
+\subsection{S4.3e: bootstrap agrupado por posición}
+
+Se ejecutaron 2000 remuestreos a nivel de receptor, evitando tratar antenas
+correlacionadas como observaciones independientes. Entre los intervalos de
+confianza obtenidos:
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.3e: asociaciones con bootstrap por posición.}
+\label{tab:s43e}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lccc}
+\toprule
+Relación & Entre posiciones [95\% CI] & Dentro de posición [95\% CI] & Fracción reportada\\
+\midrule
+$\mathcal H_p\leftrightarrow E_\phi$ &
++0.521 [0.499,0.543] & +0.304 [0.297,0.314] & 82.7\%\\
+$\mathcal H_p\leftrightarrow C_\phi(64)$ &
+-0.700 [-0.717,-0.681] & -0.557 [-0.565,-0.547] & 83.0\%\\
+$D_1\leftrightarrow C_\phi(64)$ &
++0.754 [0.739,0.768] & +0.540 [0.530,0.550] & 84.2\%\\
+$N_{\rm eff}\leftrightarrow E_\phi$ &
+-0.461 [-0.485,-0.439] & +0.295 [0.285,0.303] & 81.6\%\\
+$N_{\rm eff}\leftrightarrow C_\phi(64)$ &
++0.492 [0.475,0.508] & -0.552 [-0.560,-0.543] & 83.2\%\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Las reducciones de S4.3d y S4.3e se conservan separadas: sus coeficientes
+intrapositivos no son numéricamente intercambiables. El análisis dentro de posición
+puede calcularse sobre residuos centrados o resumir coeficientes por posición,
+como se distingue en la \cref{sec:multilevel_foundations}. La configuración de
+cada script debe fijar cuál se utiliza. La última columna reproduce la fracción
+denominada ``mismo signo'' en el registro, cuyo referente de comparación debe
+especificarse antes de interpretarla; no representa concordancia entre las dos
+columnas anteriores, que presentan signos opuestos para $N_{\rm eff}$.
+
+S4.3 documenta asociaciones entre el residual de fase y la distribución de
+energía y retardo de las trayectorias. Los intervalos del remuestreo por
+posición cuantifican estabilidad bajo ese esquema, sin eliminar la posible
+dependencia espacial entre posiciones ni identificar una causa única.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.4: predictibilidad del retardo efectivo}
+\label{sec:s44_full}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{S4.4a: conjunto de datos de predicción}
+
+La variable objetivo por posición y Tx es el retardo de alineación óptima de S4.2b:
+\begin{equation}
+y_{i,u}=\Delta\tau_{{\rm eff},i,u}^{\star}.
+\end{equation}
+
+Los descriptores provienen únicamente del RT. Se calculan 48 variables a partir de
+estadísticos (media, mediana, desviación e IQR) de concentración de potencia,
+número efectivo de trayectorias, entropía, dispersión RMS de retardos, conteos dentro de umbrales de dB y
+potencia total sobre las 32 antenas.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.4a: conjunto de datos para predicción del retardo efectivo.}
+\label{tab:s44a_split}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrr}
+\toprule
+Partición & posiciones & filas posición--Tx & descriptores RT\\
+\midrule
+Entrenamiento & 5000 & 10000 & 48\\
+Validación & 100 & 200 & 48\\
+Prueba & 4900 & 9800 & 48\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La comprobación de correspondencia interna con S4.3a produjo error máximo de posición cero y
+diferencia de variable objetivo mediana/máxima cero.
+
+\FloatBarrier
+\subsection{S4.4b: métodos de referencia}
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.4b: métodos de referencia de predicción en la partición original. Los errores de retardo se expresan en ns.}
+\label{tab:s44b_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Modelo & MAE & MedAE & RMSE & $R^2$ & Pearson & Spearman &
+$\le5$ns & $\le10$ns\\
+\midrule
+Constante & 47.38 & 20.00 & 73.43 & -0.118 & -- & -- & 0.186 & 0.288\\
+Ridge pos & 49.98 & 42.67 & 62.40 & 0.193 & 0.440 & 0.397 & 0.050 & 0.109\\
+Ridge RT & 19.57 & 11.53 & 34.30 & 0.756 & 0.870 & 0.832 & 0.247 & 0.444\\
+Ridge pos+RT & 19.30 & 11.52 & 34.00 & 0.760 & 0.872 & 0.831 & 0.245 & 0.445\\
+RF pos+RT & \textbf{10.89} & \textbf{4.74} & \textbf{25.37} &
+\textbf{0.867} & \textbf{0.931} & \textbf{0.928} & \textbf{0.515} &
+\textbf{0.724}\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\FloatBarrier
+\subsection{S4.4c: ablación no lineal}
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.4c: Random Forest con distintos grupos de descriptores. Los errores de retardo se expresan en ns.}
+\label{tab:s44c_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+Modelo & MAE & MedAE & Q90 & $R^2$ & Pearson & Spearman\\
+\midrule
+RF posición & 11.15 & 5.09 & 24.66 & 0.867 & 0.931 & 0.929\\
+RF RT & 11.24 & 5.20 & 24.79 & 0.864 & 0.930 & 0.925\\
+RF pos+RT & \textbf{10.89} & \textbf{4.74} & \textbf{24.12} &
+0.867 & 0.931 & 0.928\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+En RT, las variables de mayor importancia predictiva son $n_{20\,\mathrm{dB}}$, fracción de potencia dominante, número efectivo de trayectorias y fracciones de los tres y cinco caminos dominantes. Este resultado es
+coherente con S4.3. Sin embargo, posición sola obtiene prácticamente la precisión semejante, lo que motiva una auditoría dla partición.
+
+\FloatBarrier
+\subsection{S4.4d: auditoría de proximidad espacial}
+
+La distancia del prueba a su vecino entrenamiento más cercano es:
+
+\begin{align}
+{\rm mediana} &= 0.048289~{\rm m},\\
+Q_{25}&=0.016304~{\rm m},\\
+Q_{75}&=0.107514~{\rm m},\\
+Q_{90}&=0.184428~{\rm m},\\
+Q_{95}&=0.252456~{\rm m},\\
+{\rm max}&=0.494789~{\rm m}.
+\end{align}
+
+Un método de referencia que simplemente copia el variable objetivo del vecino entrenamiento más cercano
+alcanza MedAE 2.5 ns; Spearman 0.899 en Tx1 y 0.931 en Tx2. Además, el error
+del RF aumenta con distancia. Para RF pos+RT, la MedAE pasa de 2.70 ns en el
+primer cuartil a 6.90 ns en el cuarto.
+
+Por ello, la partición original mide principalmente interpolación espacial densa y
+no debe presentarse como una prueba fuerte de generalización espacial.
+
+\FloatBarrier
+\subsection{S4.4e: bloques espaciales con margen de exclusión}
+
+El eje $y$ tiene el mayor extensión, aproximadamente 39.99 m. Se divide en cinco
+bloques contiguos de 2000 posiciones y se elimina del entrenamiento cualquier
+posición a menos de 0.5 m del bloque prueba.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.4e: geometría de las cinco particiones espaciales.}
+\label{tab:s44e_blocks}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{crrrr}
+\toprule
+Bloque & Posiciones de prueba & Entrenamiento conservado & removidos & NN mediana [m]\\
+\midrule
+0 & 2000 & 7917 & 83 & 7.331\\
+1 & 2000 & 7749 & 251 & 1.677\\
+2 & 2000 & 7603 & 397 & 2.131\\
+3 & 2000 & 7605 & 395 & 3.314\\
+4 & 2000 & 7916 & 84 & 2.520\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\FloatBarrier
+\subsection{S4.4f: generalización espacial bloqueada}
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.4f: MAE/MedAE por bloque para el retardo efectivo. Los errores de retardo se expresan en ns.}
+\label{tab:s44f_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{clrrrr}
+\toprule
+Bloque & Modelo & MAE & MedAE & $R^2$ & Spearman\\
+\midrule
+0 & RF posición & 48.66 & 28.73 & 0.146 & 0.692\\
+0 & RF RT & 21.76 & 16.02 & 0.782 & 0.874\\
+0 & RF pos+RT & \textbf{20.66} & \textbf{13.07} & 0.785 & 0.890\\
+1 & RF posición & \textbf{13.77} & \textbf{9.13} & 0.224 & 0.710\\
+1 & RF RT & 15.07 & 10.65 & 0.185 & 0.585\\
+1 & RF pos+RT & 14.43 & 10.04 & 0.235 & 0.630\\
+2 & RF posición & 17.44 & 10.31 & -0.046 & 0.480\\
+2 & RF RT & 15.83 & 10.63 & 0.346 & 0.619\\
+2 & RF pos+RT & \textbf{15.03} & \textbf{9.09} & 0.363 & 0.638\\
+3 & RF posición & 38.74 & 22.33 & 0.463 & 0.649\\
+3 & RF RT & 27.35 & 17.52 & 0.716 & 0.832\\
+3 & RF pos+RT & \textbf{25.81} & \textbf{16.26} & 0.738 & 0.834\\
+4 & RF posición & 19.19 & 13.32 & 0.885 & 0.820\\
+4 & RF RT & \textbf{16.45} & 13.93 & 0.930 & 0.779\\
+4 & RF pos+RT & 17.50 & 15.48 & 0.927 & 0.784\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La siguiente tabla reporta la media de los indicadores de las cinco particiones;
+no corresponde a recalcular una mediana global de todas las filas:
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.4f: agregado de cinco particiones espaciales. Los errores de retardo se expresan en ns.}
+\label{tab:s44f_aggregate}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
+\toprule
+Modelo & MAE medio & MedAE media & $R^2$ medio & Spearman medio\\
+\midrule
+RF posición & 27.56 & 16.76 & 0.334 & 0.670\\
+RF RT & 19.29 & 13.75 & 0.592 & 0.738\\
+RF pos+RT & \textbf{18.69} & \textbf{12.79} & \textbf{0.610} &
+\textbf{0.755}\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+RT reduce aproximadamente 30\% el MAE medio frente a sólo posición. La
+ganancia es particularmente notable en bloque 0, donde la separación mediana
+al entrenamiento es 7.33 m. Este resultado aporta evidencia, en los bloques de dc01 evaluados, de que los
+descriptores físicos de $\mathcal P_{\rm RT}$ contienen información
+transferible sobre $\Delta\tau_{\rm eff}$ más allá de la proximidad espacial.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.5: efecto del retardo predicho sobre el canal}
+\label{sec:s45_full}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{S4.5a: partición original}
+
+El predictor de $\tau$ se aplica sobre el CFR y se recalculan MAE angular y
+coherencia. El CPO por enlace todavía se estima desde la medición prueba, por lo
+que el experimento aísla la transferibilidad del retardo, no una corrección
+completamente sin acceso a la medición evaluada.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.5a: resultados sobre el canal corregido en 4900 posiciones. Los errores angulares se expresan en grados; las coherencias son adimensionales.}
+\label{tab:s45a_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
+\toprule
+Método & fase med. & fase Q75 & $\rho$ med. & $\rho$ Q25\\
+\midrule
+RAW & 89.93 & 95.83 & 0.156 & 0.047\\
+CPO & 81.42 & 87.96 & 0.156 & 0.047\\
+Pred. $\tau$ + CPO & \textbf{45.59} & 70.07 & \textbf{0.634} & 0.361\\
+Oráculo $\tau$ + CPO & 31.63 & 51.99 & 0.745 & 0.559\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+El error de $\tau$ es MedAE 4.7399 ns, Q75 11.1313 ns, Q90 24.1221 ns y
+MAE 10.8904 ns. El predictor mejora el error angular respecto de CPO en 81.50\% de
+los enlaces y la coherencia en 83.47\%.
+
+Definiendo
+
+\begin{equation}
+\eta_\phi
+=
+\frac{
+E_{\phi,\rm CPO}-E_{\phi,\rm pred}
+}{
+E_{\phi,\rm CPO}-E_{\phi,\mathrm{or}}
+},
+\end{equation}
+
+se obtiene aproximadamente $\eta_\phi=0.72$. Es una razón de mejoras de
+agregados, no el promedio de fracciones por enlace. La razón sólo se interpreta
+cuando el denominador es positivo y suficientemente distinto de cero; no está
+forzada al intervalo $[0,1]$ para cualquier predictor o métrica. Para coherencia, la fracción
+análoga es aproximadamente 0.81. El predictor recupera, por tanto, una parte
+sustancial de la corrección oráculo.
+
+\FloatBarrier
+\subsection{S4.5b: generalización por bloques espaciales sobre el canal corregido}
+
+S4.5b utiliza las predicciones de S4.4f, sin reentrenar durante la evaluación
+del canal. La trazabilidad fue comprobada explícitamente:
+los errores máximos de posición entre el manifiesto y los TFRecords fueron
+$3.55\times10^{-15}$ m en entrenamiento, $3.55\times10^{-15}$ m en validación y
+$2.22\times10^{-16}$ m en prueba.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.5b: resultados sobre el canal corregido por partición espacial. Los retardos se expresan en ns y los errores angulares en grados.}
+\label{tab:s45b_fold_results}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{clrrrrrr}
+\toprule
+Bloque & Predictor & $\tau$ MedAE & fase med. & $\rho$ med. &
+$\eta_\phi$ & $\eta_\rho$ & $P(E_\phi<CPO)$\\
+\midrule
+0 & posición & 28.73 & 83.28 & 0.121 & 0.017 & 0.037 & 0.544\\
+0 & RT & 16.02 & 72.07 & 0.350 & 0.224 & 0.381 & 0.692\\
+0 & pos+RT & \textbf{13.07} & \textbf{66.49} & \textbf{0.427} & 0.328 & 0.496 & 0.726\\
+1 & posición & \textbf{9.13} & \textbf{55.70} & \textbf{0.535} & 0.440 & 0.549 & 0.665\\
+1 & RT & 10.65 & 58.74 & 0.507 & 0.361 & 0.481 & 0.641\\
+1 & pos+RT & 10.04 & 57.57 & 0.519 & 0.391 & 0.510 & 0.649\\
+2 & posición & 10.31 & 60.91 & 0.482 & 0.371 & 0.504 & 0.655\\
+2 & RT & 10.63 & 60.09 & 0.486 & 0.394 & 0.514 & 0.647\\
+2 & pos+RT & \textbf{9.09} & \textbf{56.83} & \textbf{0.525} & 0.481 & 0.604 & 0.686\\
+3 & posición & 22.33 & 76.31 & 0.261 & 0.155 & 0.261 & 0.703\\
+3 & RT & 17.52 & 73.62 & 0.289 & 0.204 & 0.303 & 0.751\\
+3 & pos+RT & \textbf{16.26} & \textbf{72.18} & \textbf{0.317} & 0.229 & 0.344 & 0.770\\
+4 & posición & 13.32 & 67.27 & 0.427 & 0.321 & 0.514 & 0.799\\
+4 & RT & 13.93 & \textbf{65.39} & \textbf{0.444} & 0.352 & 0.537 & 0.840\\
+4 & pos+RT & 15.48 & 68.24 & 0.407 & 0.305 & 0.486 & 0.821\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.5b: agregado sobre cinco particiones espaciales. Los retardos se expresan en ns y los errores angulares en grados.}
+\label{tab:s45b_aggregate}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+Predictor & $\tau$ MedAE & $\tau$ MAE & fase med. & $\rho$ med. &
+$\eta_\phi$ & $\eta_\rho$\\
+\midrule
+Posición & 14.83 & 27.56 & 69.72 & 0.377 & 0.235 & 0.373\\
+RT & 13.32 & 19.29 & 65.97 & 0.427 & 0.310 & 0.458\\
+Pos+RT & \textbf{12.30} & \textbf{18.69} & \textbf{64.08} &
+\textbf{0.448} & \textbf{0.348} & \textbf{0.493}\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+En S4.5b los indicadores se calculan sobre las predicciones agrupadas de los
+bloques. Por ello la mediana de retardo 12.30 ns no debe confundirse con
+la media de medianas 12.79 ns de S4.4f.
+
+El método de referencia CPO agregado es 81.49 grados y coherencia 0.157; el oráculo alcanza
+31.46 grados y 0.746. Por tanto, en regiones reservadas el
+predictor combinado recupera 34.8\% del beneficio angular oráculo y 49.3\% del
+beneficio de coherencia.
+
+La comparación entre S4.5a y S4.5b cuantifica la pérdida de transferibilidad:
+
+\begin{table}[!htbp]
+\centering
+\caption{Comparación entre interpolación densa y extrapolación espacial.}
+\label{tab:dense_vs_blocked}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+Indicador & Partición densa & Bloques espaciales\\
+\midrule
+$\tau$ MedAE [ns] & 4.74 & 12.30\\
+Fase predicha [deg] & 45.59 & 64.08\\
+Coherencia predicha & 0.634 & 0.448\\
+$\eta_\phi$ & 0.720 & 0.348\\
+$\eta_\rho$ & 0.812 & 0.493\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La corrección de retardo es, por tanto, \emph{transferible pero localmente
+condicionada}. La dependencia regional motiva estudiar el soporte espacial de calibración
+de $Z_\phi^{\rm pred}$. Los cinco bloques no identifican por sí solos una
+longitud universal de generalización.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{S4.6: naturaleza del desfase constante residual}
+\label{sec:s46_full}
+% ----------------------------------------------------------------------
+
+Los experimentos S4.2--S4.5 mostraron que una parte importante de la discrepancia
+compleja puede representarse mediante una pendiente espectral efectiva
+$\Delta\tau_{\rm eff}$. Sin embargo, aun después de compensar esa pendiente se
+requiere un término de fase constante por enlace para alcanzar la referencia
+oráculo utilizada en la descomposición. S4.6 estudia la naturaleza de ese segundo
+grado de libertad antes de intentar incorporarlo a una representación latente o
+predecirlo mediante aprendizaje automático.
+
+Las etiquetas \texttt{Tx0} y \texttt{Tx1} se conservan en las tablas porque así
+figuran en el registro S4.6; aquí indexan los dos arreglos de 32 antenas del
+tensor, no dos transmisores móviles adicionales. El bloque caracteriza la
+referencia B0 y no extiende automáticamente sus resultados a B1/B2.
+
+
+Para cada posición $i$, arreglo $u$ y antena $a$ se define
+\begin{equation}
+\phi_{0,i,u,a}^{\star}
+=
+\angle\left[
+\sum_k
+H^{\rm real}_{i,u,a,k}
+H^{{\rm RT}*}_{i,u,a,k}
+\exp\left(j2\pi\nu_k\tau_{i,u}^{\star}\right)
+\right],
+\label{eq:s46_phi0_def}
+\end{equation}
+donde $\tau_{i,u}^{\star}$ es el retardo óptimo según el criterio de S4.2b. El
+superíndice $\star$ recuerda que $\phi_0$ es un descriptor posterior de la
+medición y no una cantidad disponible a priori para una consulta nueva.
+Se utiliza $\nu_k=f_k-f_c$, con la misma referencia que en S4.2.
+Cambiar el origen frecuencial cambia también el intercepto; una comparación de
+$\phi_0^\star$ o $\psi$ exige conservar esa convención y las máscaras de validez.
+
+Es importante evitar una identificación causal prematura. DICHASUS dcxx
+proporciona estimaciones de desfases de fase y tiempo para compensar el canal de
+referencia y advierte que dichas estimaciones son \emph{best effort}, que son
+más fiables dentro de un mismo arreglo que entre arreglos distantes y que el
+canal de referencia puede fluctuar temporalmente \cite{DICHASUSdcxxWeb}. Por
+otro lado, Ruah et al.\ muestran que errores geométricos pequeños pueden inducir
+errores de fase importantes en los caminos simulados \cite{Ruah2024Phase}. En
+consecuencia, $\phi_0^\star$ se interpreta en esta etapa como \emph{desfase constante residual efectivo entre la medición y el trazado}; no como el CPO
+físico original del receptor.
+
+\FloatBarrier
+\subsection{S4.6a: construcción del conjunto completo de fases residuales}
+
+La prueba preliminar de integridad reportó 1536 observaciones y una resultante
+circular global $R=0.05123$. El registro suministrado contiene una discrepancia en la descripción
+del tamaño: 24 posiciones en cada una de tres particiones, con dos arreglos y
+32 antenas, producirían $24\times3\times2\times32=4608$ observaciones;
+1536 corresponden a 24 posiciones en total. Se conserva el conteo reportado,
+sin asignar retrospectivamente una distribución por partición no corroborada.
+Esta prueba comprueba el procesamiento a pequeña escala y no sustenta las
+conclusiones estadísticas del conjunto completo.
+
+Posteriormente se ejecutó el cálculo completo sobre las 10\,000 posiciones del banco. El conjunto final contiene
+\begin{equation}
+10000\times2\times32=\boxed{640000}
+\end{equation}
+observaciones de $\phi_0^\star$. Las cuentas por partición son 320\,000 para entrenamiento,
+6400 para validación y 313\,600 para prueba. La resultante circular global cae a
+\begin{equation}
+R_{\rm global}=0.001088,
+\end{equation}
+con rango prácticamente completo $[-\pi,\pi]$.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.6a: construcción del conjunto de datos de desfase constante residual.}
+\label{tab:s46a_dataset}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+Partición & Filas & Interpretación\\
+\midrule
+Entrenamiento & 320\,000 & 5000 posiciones $\times2\times32$\\
+Validación & 6400 & 100 posiciones $\times2\times32$\\
+Prueba & 313\,600 & 4900 posiciones $\times2\times32$\\
+\midrule
+Total & 640\,000 & 10\,000 posiciones $\times2\times32$\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La concentración global casi nula es incompatible con una fase universal
+fuertemente concentrada en estas observaciones, pero no demuestra uniformidad ni
+independencia circular: diferentes antenas o posiciones
+podrían poseer desfases concentrados alrededor de medias distintas que se cancelan
+al agregarse. Por ello S4.6b descompone explícitamente las escalas de variación.
+
+\FloatBarrier
+\subsection{S4.6b: descomposición circular por arreglo, antena y posición}
+
+Se probó inicialmente la jerarquía descriptiva
+\begin{equation}
+\phi_{0,i,u,a}
+\simeq
+\beta_{u,a}+\psi_{i,u}+\epsilon_{i,u,a}
+\pmod{2\pi},
+\label{eq:s46_hierarchy}
+\end{equation}
+donde $\beta_{u,a}$ sería un sesgo fijo por antena, $\psi_{i,u}$ una rotación
+común a las 32 antenas de un mismo arreglo en una posición y
+$\epsilon_{i,u,a}$ un residual específico del enlace.
+La suma admite la libertad de referencia
+$(\beta_{u,a},\psi_{i,u})\mapsto(\beta_{u,a}+c_u,\psi_{i,u}-c_u)$.
+El procedimiento descrito a continuación fija una convención mediante medias
+marginales por antena; no equivale a un ajuste conjunto identificable de
+componentes físicas. Cuando la resultante marginal es casi nula, su dirección
+media es inestable y debe tratarse como parte del análisis de sensibilidad.
+
+
+En la prueba preliminar, las resultantes medianas por antena parecían moderados
+($R\approx0.198$ para Tx0 y $0.150$ para Tx1), pero esta impresión desapareció
+con el conjunto completo. Sobre 10\,000 posiciones, la concentración por arreglo es
+mínima: $R=0.00594$ para Tx0 y $0.00455$ para Tx1. Más importante, la resultante
+mediana por antena es sólo $0.01024$ para Tx0 y $0.00630$ para Tx1; incluso el
+máximo entre las 64 combinaciones arreglo--antena permanece por debajo de $0.023$.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{S4.6b: estabilidad circular por antena en el conjunto completo.}
+\label{tab:s46b_ant}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrr}
+\toprule
+Arreglo & mediana $R$ & Q25 & Q75 & Q90 & máximo\\
+\midrule
+Tx0 & 0.01024 & 0.00631 & 0.01405 & 0.01789 & 0.02029\\
+Tx1 & 0.00630 & 0.00482 & 0.00887 & 0.01422 & 0.02243\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La dirección marginal por antena se expresa como
+\begin{equation}
+\beta_{u,a}=\angle\left[\frac{1}{N}\sum_{i=1}^{N}
+e^{j\phi_{0,i,u,a}^{\star}}\right],\qquad N=10\,000.
+\end{equation}
+Después de retirar descriptivamente esa media circular de cada antena,
+el error absoluto mediano permanece en
+\begin{equation}
+\operatorname{Med}|\wrap(\phi_0-\beta)|=88.99^{\circ},
+\end{equation}
+con una resultante global $0.00905$. Por tanto, una tabla estática de desfases por
+antena no constituye una explicación útil del fenómeno.
+
+La situación cambia al analizar simultáneamente las 32 antenas de una misma
+posición y arreglo. Una vez retirado $\beta$, se define
+\begin{equation}
+\psi_{i,u}
+=
+\angle\left[
+\frac{1}{32}\sum_{a=1}^{32}
+\exp\left(j[\phi_{0,i,u,a}-\beta_{u,a}]\right)
+\right].
+\label{eq:s46_psi}
+\end{equation}
+Se denota por $R_{{\rm within},i,u}$ el módulo del promedio complejo
+que aparece dentro del argumento de esta expresión.
+La resultante circular dentro de posición presenta mediana $0.4216$, Q25
+$0.3013$, Q75 $0.5499$ y Q90 $0.6897$. Es decir, aunque la orientación absoluta
+presenta concentración global muy baja al recorrer el conjunto de datos, las antenas de una misma
+captura muestran una dirección circular común apreciable.
+
+Al sustraer esa dirección común, el residual absoluto mediano disminuye de
+$88.99^{\circ}$ a $45.97^{\circ}$ y la resultante del residual centrado aumenta a
+$0.4291$. Tx1 presenta una estructura común algo más marcada que Tx0: el error
+final es $42.49^{\circ}$ y $R=0.507$ frente a $50.42^{\circ}$ y $R=0.351$ para
+Tx0.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.6b: descomposición descriptiva completa de $\phi_0^\star$.}
+\label{tab:s46b_decomposition}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+Indicador & Resultado\\
+\midrule
+Resultante global bruta & 0.00109\\
+Error mediano tras $\beta_{u,a}$ & $88.99^{\circ}$\\
+Resultante mediana dentro de posición & 0.4216\\
+Q25 / Q75 de la resultante dentro de posición & 0.3013 / 0.5499\\
+Q90 de la resultante dentro de posición & 0.6897\\
+Error mediano tras $\beta+\psi$ & $45.97^{\circ}$\\
+Resultante residual tras $\beta+\psi$ & 0.4291\\
+Tx0 error final / resultante & $50.42^{\circ}$ / 0.351\\
+Tx1 error final / resultante & $42.49^{\circ}$ / 0.507\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Las tres particiones reproducen prácticamente el mismo patrón: resultantes
+dentro de posición medianas de 0.421--0.432 y errores finales medianos de
+44.5--46.3 grados. La estabilidad entre particiones refuerza que no se trata de una
+peculiaridad del subconjunto utilizado.
+
+Este resultado modifica la hipótesis original: $\beta_{u,a}$ no es un término
+dominante, mientras que $\psi_{i,u}$ es una dirección común estimada a posteriori dentro de
+cada arreglo. Sin embargo, como $\psi$ se estima usando las propias 32 antenas de
+la posición evaluada, S4.6b constituye una evaluación descriptiva con acceso oráculo y no demuestra
+transferibilidad.
+Además, esa dirección minimiza la pérdida de coseno sobre las propias antenas
+utilizadas para estimarla; la mejora del ajuste no es una validación fuera de muestra. Para cuantificar cuánto excede esa reducción el ajuste a
+fluctuaciones finitas se requiere un control que permute posiciones de cada
+antena, conserve sus marginales y repita todo el centrado. La baja concentración
+marginal tampoco descarta sesgos relativos estables ocultos por rotaciones
+comunes variables: esa hipótesis se evalúa con diferencias entre antenas en
+S4.7a. Las 640\,000 fases no constituyen 640\,000 capturas independientes.
+
+
+\FloatBarrier
+\subsection{S4.6c: continuidad espacial de la dirección común}
+
+La siguiente pregunta fue si $\psi_{i,u}$ puede interpretarse como un campo
+circular suave del entorno. Dado que $\psi\in\mathbb S^1$, la distancia relevante
+es
+\begin{equation}
+d_{\phi}(\psi_i,\psi_j)
+=
+\left|
+\angle\left(e^{j(\psi_i-\psi_j)}\right)
+\right|.
+\label{eq:circ_distance_psi}
+\end{equation}
+
+Se tomó para cada punto de prueba su vecino de entrenamiento espacialmente más cercano dentro
+del mismo arreglo. La mediana de distancia entre entrenamiento y prueba reproduce la auditoría de
+S4.4d: 0.04829 m. A pesar de esa proximidad, el error circular mediano de copiar
+$\psi$ del vecino es $89.75^{\circ}$ para Tx0 y $88.85^{\circ}$ para Tx1. La
+media de $\cos(\Delta\psi)$ es 0.0071 y 0.0098, respectivamente, prácticamente
+el valor nulo esperado sin alineación útil.
+
+No se observa una asociación monotónica apreciable entre distancia y error: Spearman es $-0.0093$ para Tx0
+y $0.0020$ para Tx1. Aun en el cuartil más cercano, donde la distancia mediana
+es apenas 7.8 mm, el error continúa alrededor de 90 grados. Tampoco la
+concentración dentro de posición muestra una asociación monotónica apreciable con el error del vecino espacial:
+Spearman entre $R_{\rm within}$ y error es aproximadamente 0.011--0.013.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{S4.6c: evaluación espacial de la fase común mediante el vecino próximo.}
+\label{tab:s46c_spatial}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+Métrica & Tx0 & Tx1\\
+\midrule
+Distancia NN mediana [m] & 0.04829 & 0.04829\\
+Error circular NN mediano [$^\circ$] & 89.75 & 88.85\\
+Error Q25 [$^\circ$] & 44.37 & 43.95\\
+Error Q75 [$^\circ$] & 134.37 & 134.05\\
+Media de $\cos(\Delta\psi)$ & 0.0071 & 0.0098\\
+Spearman distancia--error & -0.0093 & 0.0020\\
+$P(|\Delta\psi|\leq30^\circ)$ & 0.167 & 0.173\\
+$P(|\Delta\psi|\leq45^\circ)$ & 0.253 & 0.256\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+El control entre arreglos en la misma posición produce MedAE $82.45^{\circ}$, media
+$85.39^{\circ}$, $P(|\Delta\psi|\leq30^{\circ})=0.192$ y
+$P(|\Delta\psi|\leq45^{\circ})=0.286$. Por tanto, tampoco aparece una fase
+ambiental común fuerte compartida por ambos arreglos.
+
+El contraste con $\Delta\tau_{\rm eff}$ es notable: en S4.4d, la vecindad
+espacial era altamente informativa para el retardo efectivo, mientras que para
+$\psi$ el vecino próximo no aporta una ventaja clara incluso en el cuartil con
+distancias milimétricas. Esto permite
+separar empíricamente dos tipos de discrepancia de fase que no deberían
+representarse de la misma manera.
+
+\FloatBarrier
+\subsection{S4.6d.1: recuperación del tiempo original y auditoría de trazabilidad}
+
+La ausencia de continuidad espacial hizo plausible una hipótesis alternativa:
+$\psi$ podría estar asociado al estado temporal de adquisición o al canal de
+referencia. El TFRecord enriquecido de S1 no conservaba el campo \texttt{time},
+por lo que fue necesario recuperarlo desde el TFRecord DICHASUS original.
+
+La inspección del archivo fuente confirmó los campos \texttt{cfo},
+\texttt{csi}, \path{gt-interp-age-tachy}, \texttt{pos-tachy}, \texttt{snr} y
+\texttt{time}. La implementación de \texttt{load\_dataset()} mostró además que:
+(i) la calibración modifica únicamente CSI; (ii) la posición se transforma al
+sistema de coordenadas de la escena; (iii) el filtro utilizado para S1 es
+$-15<y<25$; y (iv) la generación de los 10\,000 registros de caminos trazados ocurre antes
+del \texttt{shuffle} utilizado posteriormente para entrenamiento, validación y prueba.
+
+Se reprodujo el parser y el filtro originales para extraer las primeras 10\,000
+posiciones filtradas junto con su marca temporal. La comparación contra el TFRecord
+S1 produjo error máximo de coordenadas exactamente 0 m. Las 10\,000 posiciones
+físicas son únicas y cada una aparece exactamente dos veces en S4.6, una por arreglo.
+Esto permitió resolver el tiempo por correspondencia exacta de coordenadas, sin depender de
+reconstruir retrospectivamente la permutación de TensorFlow.
+
+Durante una primera prueba se intentó reproducir la permutación aleatoria mediante un conjunto
+artificial de índices con semilla 42. Aunque el conjunto cubría 0--9999 exactamente
+una vez, la primera fila no coincidió con la asignación histórica y apareció una
+discrepancia de 13.26 m. Ese intento fue descartado. No indica un problema en las
+particiones anteriores; únicamente demuestra que reconstruir a posteriori el orden
+del procesamiento mediante un conjunto artificial de índices no era una estrategia de trazabilidad
+suficientemente fuerte. La correspondencia exacta por posición eliminó esa ambigüedad.
+
+El manifiesto temporal definitivo contiene 20\,000 filas posición--arreglo, sin
+marcas temporales faltantes y con error máximo XYZ de 0 m. Las 10\,000 posiciones
+abarcan
+\begin{equation}
+8287.224\;{\rm s}\leq t\leq9972.360\;{\rm s},
+\end{equation}
+con una duración reportada de 1685.137 s ($\approx28.09$ min). Los extremos redondeados dan una diferencia 0.001 s menor, compatible con su precisión de presentación.
+Ordenadas cronológicamente las 10\,000 capturas únicas, la
+separación mediana entre observaciones es 0.04785 s. El orden del TFRecord no es
+cronológico: se detectaron 2192 diferencias no positivas y un salto mínimo de
+$-1635.744$ s. Por ello todos los análisis temporales posteriores usan
+\texttt{time} explícito y nunca el índice del archivo como sustituto del tiempo físico.
+
+\begin{table}[!htbp]
+\centering
+\caption{S4.6d.1: auditoría de trazabilidad temporal.}
+\label{tab:s46d1_time}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+Indicador & Resultado\\
+\midrule
+Posiciones fuente únicas & 10\,000\\
+Filas del manifiesto posición--arreglo & 20\,000\\
+Marcas temporales faltantes & 0\\
+Error máximo XYZ fuente--S4.6 & 0 m\\
+Tiempo mínimo & 8287.224 s\\
+Tiempo máximo & 9972.360 s\\
+Duración cubierta & 1685.137 s\\
+$\Delta t$ cronológico mediano & 0.04785 s\\
+Diferencias no positivas en orden de archivo & 2192\\
+Mayor salto negativo en orden de archivo & -1635.744 s\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Las tres particiones cubren prácticamente toda la ventana temporal: prueba
+8292.4--9971.2 s, entrenamiento 8287.2--9972.4 s y validación 8336.0--9967.3 s. Esto
+debilita una explicación trivial basada en que cada partición pertenezca a una época
+diferente de la campaña.
+
+\FloatBarrier
+\subsection{S4.6d.2: continuidad temporal de la dirección común}
+
+Con la marca temporal real disponible se compararon tres predictores diagnósticos:
+vecino de entrenamiento más cercano en el tiempo, vecino de entrenamiento más cercano en el espacio y
+una muestra aleatoria de entrenamiento. El objetivo no fue proponer un predictor de
+despliegue, sino determinar si $\psi$ conserva estructura temporal local.
+
+Para Tx0, el vecino temporal está a una separación mediana de 0.624 s y produce
+error circular mediano $90.34^{\circ}$. Para Tx1 el resultado es
+$90.56^{\circ}$. Las medianas son próximas a las del vecino espacial y de la referencia
+aleatoria; sin intervalos pareados ni un margen de equivalencia prefijado, esta
+proximidad no constituye una prueba formal de equivalencia. La media de $\cos(\Delta\psi)$ es $-0.0054$ y $-0.0034$,
+y la resultante de la diferencia es sólo 0.0141 y 0.0043.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{S4.6d.2: comparación temporal, espacial y aleatoria.}
+\label{tab:s46d2_nn}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrr}
+\toprule
+Arreglo & Referencia & MedAE [$^\circ$] & MAE [$^\circ$] & Media cos.\\
+\midrule
+Tx0 & Vecino temporal & 90.34 & 90.49 & -0.0054\\
+Tx0 & Vecino espacial & 89.75 & 89.39 & 0.0071\\
+Tx0 & Aleatorio & 90.84 & 90.35 & -0.0048\\
+\midrule
+Tx1 & Vecino temporal & 90.56 & 90.34 & -0.0034\\
+Tx1 & Vecino espacial & 88.85 & 89.33 & 0.0098\\
+Tx1 & Aleatorio & 89.18 & 89.00 & 0.0126\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+La falta de alineación útil también aparece en el intervalo temporal más
+corto examinado. Esta escala no excluye dependencia a separaciones menores
+que las representadas en los pares analizados. Para pares separados alrededor de 47.9 ms, el error
+circular mediano es $88.29^{\circ}$ para Tx0 y $88.26^{\circ}$ para Tx1, con media del
+coseno 0.008 en ambos casos. Aumentar la separación temporal desde decenas de milisegundos hasta
+centenas de segundos no produce una tendencia sistemática: los errores se
+mantienen aproximadamente entre 87 y 91 grados y las medias del coseno oscilan
+alrededor de cero.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{S4.6d.2: función temporal de estructura de la fase común. Los errores angulares se expresan en grados; la media del coseno es adimensional.}
+\label{tab:s46d2_structure}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
+\toprule
+Intervalo [s] & Tx0 MedAE & Tx0 media cos. & Tx1 MedAE & Tx1 media cos.\\
+\midrule
+0--0.075 & 88.29 & 0.008 & 88.26 & 0.008\\
+0.075--0.150 & 89.73 & 0.001 & 88.85 & 0.006\\
+0.150--0.300 & 91.10 & -0.011 & 88.80 & 0.011\\
+0.300--0.600 & 90.47 & -0.003 & 91.24 & -0.008\\
+0.600--1.200 & 89.33 & 0.012 & 90.43 & -0.009\\
+1.200--2.500 & 87.22 & 0.021 & 89.03 & 0.008\\
+2.500--5 & 89.54 & 0.002 & 88.51 & 0.010\\
+5--10 & 89.73 & 0.000 & 90.24 & 0.002\\
+10--30 & 91.11 & -0.005 & 88.87 & 0.011\\
+30--60 & 89.99 & 0.005 & 89.70 & -0.002\\
+60--180 & 90.42 & -0.002 & 89.93 & -0.005\\
+180--600 & 87.12 & 0.023 & 89.29 & 0.006\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Tampoco se detecta relación monotónica entre separación temporal y error:
+Spearman es 0.021 para Tx0 y -0.018 para Tx1. Para descartar que una aparente
+continuidad temporal estuviera en realidad inducida por movimiento espacial, se
+repitió el análisis restringiendo el vecino temporal a pares separados al menos
+0.25 m o 0.5 m. Los errores permanecen alrededor o por encima de 90 grados. Por
+ejemplo, con separación $\geq0.5$ m se obtienen medianas de $93.52^{\circ}$ para
+Tx0 y $99.63^{\circ}$ para Tx1.
+
+Finalmente, el control simultáneo entre Tx0 y Tx1 produce error circular mediano
+$82.45^{\circ}$, media $85.39^{\circ}$, media del coseno 0.0632 y resultante de la
+diferencia 0.1044. Los indicadores muestran una alineación media débil entre arreglos. Sin un
+contraste distribucional no se atribuye a este resultado una conclusión formal
+sobre uniformidad o independencia.
+
+\FloatBarrier
+\subsection{Conclusión de S4.6: fase común sin predictibilidad local demostrada}
+
+Los resultados S4.6a--d.2 documentan una concentración absoluta baja por antena,
+una dirección común descriptiva dentro de cada arreglo y la ausencia de una
+ventaja clara de copiar esa dirección desde vecinos espaciales o temporales.
+Estos controles no identifican su causa física, no prueban independencia
+estadística y no excluyen predictores basados en metadatos adicionales o en
+una referencia de adquisición diferente.
+
+Bajo la referencia espectral adoptada, la discrepancia admite la organización
+\begin{equation}
+\begin{aligned}
+\angle\left(H^{\rm real}_{i,u,a,k}H^{{\rm RT}*}_{i,u,a,k}\right)
+&\simeq -2\pi\nu_k\Delta\tau_{{\rm eff},i,u}
++\psi_{i,u}+r^{\rm rel}_{i,u,a,k}\pmod{2\pi},\\
+r^{\rm rel}_{i,u,a,k}&=\beta_{u,a}+\epsilon_{i,u,a}+r_{\phi,i,u,a,k}
+\pmod{2\pi}.
+\end{aligned}
+\label{eq:s46_final_factorization}
+\end{equation}
+El residual relativo incluye las fases específicas de antena y el residual
+espectral de S4.3; no puede atribuirse íntegramente a trayectorias individuales
+sin un análisis adicional. Omitir $\beta$ como predictor dominante no significa
+que todos los sesgos de antena sean físicamente nulos.
+
+El retardo efectivo mostró transferencia espacial parcial. Para $\psi$, en
+cambio, las referencias locales ensayadas no justifican todavía entrenar un
+modelo de alta capacidad con posición o tiempo como únicas entradas. La
+clasificación de $\psi$ como parámetro perturbador es una decisión operacional
+para el siguiente experimento, condicionada al modelo, la referencia de fase
+y las variables observadas. No constituye una demostración de impredecibilidad
+para cualquier representación o sistema de adquisición.
+
+S4.6 también modifica la interpretación de $Z_\phi$. En lugar de tratar todos
+los grados de libertad de fase como latentes predictibles, se propone
+\begin{equation}
+Z_\phi
+=
+\left[
+Z_\phi^{\rm pred},
+Z_\phi^{\rm nuisance},
+Z_\phi^{\rm residual}
+\right],
+\end{equation}
+con $\Delta\tau_{\rm eff}\in Z_\phi^{\rm pred}$,
+$\psi_{i,u}\in Z_\phi^{\rm nuisance}$ y la estructura por trayectoria o enlace de S4.3
+dentro de $Z_\phi^{\rm residual}$.
+
+Este resultado es metodológicamente relevante para comparar representaciones
+como NeRF$^2$ \cite{Zhao2023NeRF2}, Learnable WDT
+\cite{Jiang2025LearnableWDT} o RadTwin \cite{Zhang2026RadTwin}. Un modelo del
+entorno no debería penalizarse exclusivamente mediante una fase absoluta cuya
+predictibilidad no se ha demostrado mediante los controles de posición y tiempo
+ejecutados. El benchmark deberá distinguir fidelidad compleja bruta de fidelidad
+compleja respecto de una clase de equivalencia declarada.
+
+
+% ----------------------------------------------------------------------
+
+\section{Síntesis científica de S1--S4.6}
+\label{sec:synthesis}
+% ----------------------------------------------------------------------
+
+\textbf{El resultado principal de S4 es una mejora comprobada de la concordancia
+de fase mediante una corrección parcialmente predecible.} El retardo efectivo
+predicho reduce el error angular del canal y aumenta su coherencia en posiciones
+reservadas. La rotación constante continúa estimándose con la medición evaluada;
+por tanto, el alcance demostrado es una corrección transferible condicionada,
+y no la predicción completa de la fase absoluta.
+
+\subsection{Tres preguntas que delimitan el aporte}
+
+\begin{enumerate}
+\item \textbf{¿Existe concordancia de fase en bruto?} B0--B2 presentan errores
+angulares próximos a 90 grados, pese a las mejoras de potencia, magnitud y
+RMS-DS de B1/B2. La calibración macroscópica no resuelve esa discrepancia.
+\item \textbf{¿Puede alinearse el canal con la medición?} Sí. Una pendiente
+espectral común al arreglo, junto con rotaciones constantes por enlace,
+reduce sustancialmente el error. Es una referencia diagnóstica obtenida
+utilizando el canal real, que revela una estructura de corrección de baja dimensión.
+\item \textbf{¿Puede predecirse esa corrección sin consultar el canal objetivo?}
+Parcialmente. S4.4 predice el retardo desde posición y descriptores RT; S4.5
+comprueba que ese retardo mejora el canal. La fase constante aún se ajusta
+con la medición de prueba y su dirección común no mostró transferencia útil
+mediante los vecinos de posición o tiempo de S4.6.
+\end{enumerate}
+
+La respuesta a la segunda pregunta no sustituye a la tercera. A su vez,
+la falta de predicción completa de fase no invalida la mejora conseguida
+mediante el retardo predicho. Son niveles distintos de evidencia.
+
+\subsection{Mejora de fase alcanzada y condiciones de acceso a datos}
+
+El \cref{tab:phase_contribution_summary} reúne las comparaciones que permiten
+cuantificar el aporte predictivo. En cada protocolo se mantiene el mismo
+tratamiento del desfase constante por enlace, denominado CPO en los evaluadores;
+el cambio entre referencia y predictor es la incorporación del retardo predicho.
+Los indicadores son medianas de errores angulares por enlace y de coherencias,
+según la \cref{sec:metricas_avances}.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{Mejora de fase en S4.5 y origen de la corrección. El desfase constante
+por enlace se ajusta con la medición evaluada en todas las filas.}
+\label{tab:phase_contribution_summary}
+\begin{tabularx}{\textwidth}{P{2.4cm}Lrr}
+\toprule
+Protocolo & Corrección & Error [$^\circ$] & Coherencia\\
+\midrule
+Denso & Sólo CPO & 81.42 & 0.156\\
+Denso & Retardo predicho + CPO & \textbf{45.59} & \textbf{0.634}\\
+Denso & Retardo oráculo + CPO & 31.63 & 0.745\\
+\midrule
+Por bloques & Sólo CPO & 81.49 & 0.157\\
+Por bloques & Retardo predicho + CPO & \textbf{64.08} & \textbf{0.448}\\
+Por bloques & Retardo oráculo + CPO & 31.46 & 0.746\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+En interpolación densa, el predictor reduce la mediana angular en 35.83 grados
+respecto de la referencia con CPO y recupera aproximadamente el 72\% del
+beneficio angular oráculo y el 81\% del beneficio de coherencia. Bajo los cinco
+bloques espaciales, la reducción es de 17.41 grados y las fracciones recuperadas
+son 34.8\% y 49.3\%, respectivamente. Estas fracciones comparan diferencias de
+indicadores agregados; no son probabilidades de éxito por enlace ni porcentajes
+de fase física recuperada. La magnitud de la mejora es sustancial en esos
+indicadores, sin atribuirle una significación estadística no contrastada.
+
+La condición predictiva se refiere a $\widehat{\Delta\tau}_{\rm eff}$:
+su cálculo en prueba no utiliza $H_{\rm real,test}$. El canal corregido completo
+sí utiliza esa medición para estimar el CPO. La coherencia normalizada es
+invariante a una rotación constante por enlace; por ello su aumento confirma
+el efecto de la corrección espectral y no puede atribuirse al ajuste de CPO.
+La mediana de 45.59 grados de S4.5 y la de 45.97 grados de S4.6 describen
+objetos distintos: la primera resume errores del CFR corregido, mientras que
+la segunda resume fases constantes después del centrado circular entre antenas.
+No forman una secuencia de mejoras acumulativas sobre una misma métrica.
+
+\subsection{De la alineación a una estructura parcialmente transferible}
+
+S4.1 motiva caracterizar el error de fase antes de utilizarlo para ajustar
+materiales: los ensayos de PEOC/UPEC/PEAC muestran sensibilidad al tratamiento
+de esa incertidumbre y a la optimización. Su función es diagnóstica, coherente
+con la calibración estudiada por Ruah et al.\ \citep{Ruah2024Phase}; no establecen
+un ganador universal para dc01.
+
+S4.2 aporta evidencia complementaria de una pendiente espectral reutilizable.
+Los retardos estimados correlacionan entre B0/B1/B2 (0.886, 0.834 y 0.819).
+El retardo ajustado con 16 antenas mejora las otras 16 hasta 35.52 grados en
+B0, conservando CPO libre en las antenas evaluadas. En la prueba espectral
+más estricta, retardo e intercepto se transfieren juntos: pares a impares
+alcanzan 31.65 grados, iguales al oráculo a la precisión reportada. Esto
+acredita interpolación espectral intercalada; la transferencia entre medias
+bandas presenta errores mayores. Un error de retardo de 2.5 ns induce 22.5
+grados a 25 MHz de separación, explicando la sensibilidad a esa extrapolación.
+
+S4.4 añade la evidencia predictiva. La proximidad mediana de 4.83 cm en la
+partición original identifica un régimen de interpolación densa. Con regiones
+reservadas, el MAE medio pasa de 27.56 ns usando posición a 19.29 ns usando
+RT y a 18.69 ns combinando ambos. En el bloque 0, con separación mediana de
+7.33 m, posición y RT alcanzan 48.66 y 21.76 ns. Estos resultados muestran
+utilidad de los descriptores del trazado fuera de la vecindad inmediata de
+calibración, dentro de dc01; no equivalen a transferencia entre edificios.
+S4.5 completa la evidencia al vincular esa predicción auxiliar con la mejora
+del canal descrita en el \cref{tab:phase_contribution_summary}.
+
+\subsection{Naturaleza diferenciada de los componentes de fase}
+
+La discrepancia se organiza operacionalmente como
+\begin{equation}
+\begin{aligned}
+\Delta\phi_{i,u,a,k}\simeq{}&
+\underbrace{-2\pi\nu_k\Delta\tau_{{\rm eff},i,u}}
+_{\text{parcialmente predecible}}
++\underbrace{\psi_{i,u}}_{\text{estimada con la captura}}\\
+&+\underbrace{r^{\rm rel}_{i,u,a,k}}
+_{\text{estructura relativa aún no modelada por completo}}
+\pmod{2\pi}.
+\end{aligned}
+\label{eq:phase_contribution_factorization}
+\end{equation}
+Esta ecuación resume funciones inferenciales, no identifica tres causas físicas
+independientes. Conforme a la \cref{eq:s46_final_factorization},
+$r^{\rm rel}=\beta+\epsilon+r_\phi$ incluye las fases relativas por antena y el
+residual espectral. Así se evita confundir el residual de S4.3, obtenido tras
+ajustar interceptos por enlace, con el que queda al retirar sólo una rotación
+común al arreglo.
+
+S4.3 caracteriza estructura espectral considerable: la resultante de incrementos
+es aproximadamente 0.997 a una subportadora, 0.939 a 16, 0.838 a 64 y 0.738 a
+256. Las asociaciones con distribución energética son más informativas que el
+conteo bruto de caminos. Sin embargo, concentración y asociación no prueban
+por sí solas ausencia de ruido, rechazo de independencia o causalidad física.
+Ese residual sigue siendo un objeto de modelado, motivando S4.7b.
+
+S4.6 estima una dirección común dentro de cada captura, con concentración
+mediana 0.4216. Su copia desde vecinos espaciales o temporales produce errores
+cercanos a 90 grados, sin ventaja clara frente al control aleatorio. La decisión
+actual es tratar $\psi$ como parámetro perturbador respecto del predictor del
+entorno. Esto no identifica el CPO físico del hardware ni demuestra imposibilidad
+universal de predicción. S4.7a evaluará fidelidad relativa sin exigir reproducir
+esa referencia angular, controlando qué información útil se pierde al eliminarla.
+
+\FloatBarrier
+\subsection{Balance de hipótesis y resultados}
+
+El \cref{tab:phase_hypotheses_summary} resume el papel de cada experimento.
+Se distingue evidencia favorable, alcance limitado y contraste aún pendiente;
+la palabra rechazo se reserva para hipótesis con un procedimiento estadístico
+explícito, no para la sola inspección de indicadores.
+
+\begingroup\small
+\begin{longtable}{P{4.1cm}P{1.6cm}P{7.9cm}}
+\caption{Hipótesis de fase, experimentos y alcance de la evidencia.}
+\label{tab:phase_hypotheses_summary}\\
+\toprule
+Hipótesis o pregunta & Bloque & Resultado y alcance\\
+\midrule
+\endfirsthead
+\toprule
+Hipótesis o pregunta & Bloque & Resultado y alcance\\
+\midrule
+\endhead
+La discrepancia carece de estructura aprovechable & S4.2--3 &
+La alineación y la estructura espectral muestran organización aprovechable;
+no se excluyen componentes aleatorias.\\
+Un desfase constante basta & S4.2 &
+Insuficiente: el error de B0 permanece alrededor de 81.4 grados; añadir retardo
+reduce sustancialmente la discrepancia.\\
+Una pendiente espectral explica una fracción importante & S4.2b &
+Apoyada por alineación oráculo; no es todavía predicción en una consulta nueva.\\
+El retardo tiene estructura compartida entre modelos & S4.2c &
+Correlaciones de 0.819--0.886; no implican identidad ni una causa física única.\\
+El retardo se comparte entre antenas & S4.2d &
+Transferencia parcial entre grupos de antenas, con CPO libre en evaluación.\\
+La corrección se transfiere entre frecuencias & S4.2e &
+Retardo e intercepto se transfieren sin reajuste; interpolación intercalada
+más favorable que extrapolación entre medias bandas.\\
+El residual es independiente e idénticamente distribuido & S4.3a &
+La estructura observada motiva un contraste que preserve marginales y ajuste;
+el rechazo formal de independencia no está establecido.\\
+El número bruto de caminos explica el error & S4.3b &
+Escasa capacidad explicativa en los indicadores examinados.\\
+La distribución de energía está asociada al residual & S4.3c--e &
+Asociaciones documentadas, dependientes del nivel de agregación;
+no acreditan causalidad.\\
+El retardo puede predecirse con variables disponibles & S4.4 &
+Sí, desde posición y/o RT; el protocolo espacial determina el alcance.\\
+El rendimiento denso representa generalización regional & S4.4d &
+La proximidad de entrenamiento y prueba delimita ese rendimiento como
+interpolación densa.\\
+Los descriptores RT aportan fuera de la vecindad inmediata & S4.4f &
+Reducción del MAE medio respecto de posición, en los cinco bloques de dc01.\\
+El retardo predicho mejora el canal complejo & S4.5 &
+Menor error angular y mayor coherencia; fase constante todavía ajustada
+con la medición evaluada.\\
+La mejora se conserva íntegramente al separar regiones & S4.5b &
+La mejora persiste, pero disminuye: 64.08 grados y coherencia 0.448.\\
+Una fase absoluta fija por antena explica la discrepancia & S4.6b &
+Baja concentración marginal; no excluye sesgos relativos estables ocultos
+por rotaciones comunes.\\
+Existe una dirección común estimable dentro del arreglo & S4.6b &
+Concentración descriptiva 0.4216; falta cuantificar el efecto del ajuste
+sobre las mismas antenas mediante controles específicos.\\
+Copiar la dirección común desde vecinos espaciales es útil & S4.6c &
+No se observa una ventaja clara con las distancias y la regla evaluadas.\\
+Copiarla desde vecinos temporales es útil & S4.6d.2 &
+No se observa una ventaja clara en los intervalos examinados; no es una prueba
+de impredecibilidad para cualquier modelo.\\
+\bottomrule
+\end{longtable}
+\endgroup
+
+La contribución consolidada es, por tanto, identificar una componente de
+retardo de baja dimensión, parcialmente transferible y útil para mejorar el
+CFR complejo; distinguirla de una dirección común condicionada a la captura;
+y caracterizar la estructura relativa restante. Este avance establece qué
+parte de la fase puede corregirse con información predictiva y qué parte
+requiere otro tratamiento. La fidelidad diferencial ante movimiento humano
+continúa pendiente: los avances de reconstrucción estática no la sustituyen.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Cómo se relaciona este trabajo con las representaciones del estado del arte}
+\label{sec:sota_positioning}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{NeRF2}
+
+NeRF$^2$~\cite{Zhao2023NeRF2} introduce un campo neuronal de radiofrecuencia para
+representar de forma continua el campo de radio y predecir señales en
+posiciones no observadas. Su papel en esta tesis debe ser el de un método de referencia
+\emph{campo neuronal}. No debe considerarse equivalente a B2: B2 modifica las
+propiedades electromagnéticas dentro de un trazador de rayos; NeRF$^2$ aprende una
+representación continua del campo.
+
+El protocolo espacial desarrollado en S4.4d--f proporciona ahora una forma
+mucho más rigurosa de evaluar NeRF$^2$ que una partición aleatoria. La comparación
+debe incluir, al menos, interpolación espacial, extrapolación por bloques espaciales,
+curvas de cantidad de datos y posteriormente fidelidad diferencial.
+
+\FloatBarrier
+\subsection{Learnable Wireless Digital Twins}
+
+Learnable WDT~\cite{Jiang2025LearnableWDT} propone una arquitectura modular
+que segmenta el entorno en objetos, aprende representaciones de sus
+propiedades electromagnéticas y aprende efectos de interacción. Su motivación
+incluye reutilizar conocimiento cuando cambia la disposición del entorno.
+
+Este trabajo es especialmente relevante para cuestionar B2. La función de B2
+está asociada a coordenadas globales; si un objeto se mueve, las propiedades
+aprendidas no necesariamente se trasladan con él. Por ello la comparación
+correcta debe introducir una intervención física o simulada:
+
+\begin{equation}
+E_0
+\xrightarrow{\text{mover objeto}}
+E_1.
+\end{equation}
+
+Se propone comparar B2 global, B2 con coordenadas locales al objeto y
+Learnable WDT bajo sin adaptación y adaptación con pocas mediciones.
+
+\FloatBarrier
+\subsection{RadTwin}
+
+RadTwin~\cite{Zhang2026RadTwin} condiciona explícitamente la representación en
+la geometría de la escena mediante nubes de puntos y utiliza información de trazado de rayos para limitar las contribuciones relevantes antes de un decodificador neuronal.
+Su objetivo de generalización a configuraciones dinámicos lo convierte en un método de referencia
+natural cuando la tesis pase de posiciones nuevas dentro de una escena a
+cambios del propio entorno.
+
+\FloatBarrier
+\subsection{WaveVerse}
+
+WaveVerse~\cite{Zheng2026WaveVerse} combina generación de mundos 4D con un
+simulador de RF coherente en fase y presenta experimentos de dinámica,
+conformación de haz, formación de imágenes y seguimiento respiratorio. Por ello la novedad de esta
+tesis no puede formularse simplemente como ``simular respiración mediante RT
+coherente''. La pregunta diferencial debe ser:
+
+\begin{quote}
+¿Qué fidelidad estática, de fase y diferencial debe conservar el gemelo para
+que la señal de sensado simulada concuerde con mediciones independientes y
+siga siendo utilizable bajo perturbaciones no deseadas, cambios de escena y hardware?
+\end{quote}
+
+\FloatBarrier
+\subsection{RayLoc y problemas inversos}
+
+RayLoc~\cite{Han2026RayLoc} formula localización como la inversión de un
+simulador RT diferenciable. Para esta tesis es una referencia importante al
+pasar de
+
+\begin{equation}
+\mathbf q\rightarrow H
+\end{equation}
+
+a
+
+\begin{equation}
+H\rightarrow\widehat{\mathbf q},
+\end{equation}
+
+pero no debe utilizarse todavía como método de referencia del modelo directo de B0--B2. Su relevancia
+aumentará cuando la variable desconocida sea posición/movimiento humano.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Conexión con sensado Wi-Fi y LoRa}
+\label{sec:wifi_lora}
+% ----------------------------------------------------------------------
+
+Las revisiones de sensado Wi-Fi \citep{Zhu2024Survey,Armenta2024Survey}
+identifican como observable relevante la
+variación de CFR inducida por cambios de propagación; el CSI disponible en
+dispositivos comerciales es una muestra discreta de esa CFR. Este hecho
+justifica trabajar primero con $H$ complejo antes de pasar al modelo de
+instrumentación Wi-Fi.
+
+LoRa requiere otra observación. El trabajo de Zhang et
+al.~\cite{Zhang2020LoRa} demuestra experimentalmente que el movimiento de un
+objetivo puede inducir variaciones detectables sobre señales LoRa a larga
+distancia y a través de paredes, incluyendo respiración. SenLoRa
+\cite{SenLoRa2025} formula una extracción de señal de sensado a partir de
+la diferencia temporal del canal y subraya la necesidad de compensar CFO, SFO
+y fluctuación de fase para sensado de movimientos pequeños. OpenLoRa
+\cite{Mishra2023OpenLoRa} proporciona una plataforma, muestras I/Q y escenarios
+experimentales uniformes para validar recepción/demodulación LoRa.
+
+La arquitectura multirradio conserva una escena común $\Gamma(t)$ y genera
+caminos electromagnéticos específicos de cada modalidad:
+\begin{equation}
+\Gamma(t)\longrightarrow\mathcal P_m(t)\longrightarrow H_m(t)
+\xrightarrow{\mathcal O_m}Y_m(t),\qquad m\in\{\mathrm{WiFi},\mathrm{LoRa}\}.
+\end{equation}
+El observable Wi-Fi es una estimación discreta del canal y el observable LoRa
+inicial es una secuencia I/Q. Frecuencia, antenas y propiedades dispersivas
+impiden identificar $\mathcal P_{\rm WiFi}$ con $\mathcal P_{\rm LoRa}$.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Factorización latente que emerge de los resultados}
+\label{sec:latent_model}
+
+Se mantiene la arquitectura global $Z=[Z_E,Z_\phi,Z_R,Z_H,Z_F,Z_N]$, pero
+S4.6 exige distinguir la función inferencial de cada componente de fase:
+\begin{equation}
+Z_\phi=[Z_\phi^{\rm pred},Z_\phi^{\rm nuisance},Z_\phi^{\rm residual}].
+\label{eq:phase_latent_roles}
+\end{equation}
+$Z_\phi^{\rm pred}$ contiene cantidades cuya predicción puede contrastarse con
+información disponible en una consulta, como $\Delta\tau_{\rm eff}$.
+$Z_\phi^{\rm nuisance}$ agrupa grados de libertad que, bajo los controles
+actuales, requieren calibración, marginalización o invariancia, como
+$\psi_{i,u}$. $Z_\phi^{\rm residual}$ contiene la discrepancia restante por
+enlace, frecuencia y eventualmente trayectoria. El término inglés
+\emph{nuisance} designa aquí un parámetro perturbador respecto de una tarea,
+no una atribución causal al hardware.
+
+Las categorías anteriores por escala ---componente de baja dimensión, entorno,
+enlace y trayectoria--- se conservan como descriptores auxiliares. No equivalen
+a la partición por predictibilidad: un término de baja dimensión puede carecer
+de un predictor útil, y un residual de enlace puede conservar estructura.
+$Z_E$ representa entorno; $Z_R$, configuración y referencia de radio;
+$Z_H$, dinámica humana; $Z_F$, fisiología; y $Z_N$, ruido e interferencia.
+La relación entre $Z_\phi$ y $Z_R$ exige una convención de referencia explícita
+para evitar representar dos veces la misma rotación.
+
+La clasificación no presupone independencia causal ni un codificador ya
+aprendido. Los experimentos validan descriptores y reglas de tratamiento;
+la representación latente se evaluará posteriormente por transferencia,
+intervenciones y conservación de información útil para la tarea. La decisión
+actual sobre $\psi$ podrá revisarse si nuevos metadatos o adquisiciones con
+referencia estable muestran predictibilidad fuera de muestra.
+
+\FloatBarrier
+\section{Ruta experimental inmediata y futura}
+\label{sec:future_route}
+% ----------------------------------------------------------------------
+
+\FloatBarrier
+\subsection{S4.7a: fidelidad relativa e invariancia a la fase común}
+\label{sec:s47a_protocol}
+
+El siguiente bloque evalúa B0 sin convertir $\psi$ en una nueva etiqueta para
+un predictor de alta capacidad. Las \cref{eq:spatial_gram_invariant,eq:cross_frequency_invariant,eq:phase_quotient_distance}
+definen tres observables complementarios: productos espaciales $G_u(k)$,
+productos entre frecuencias $K_u(k,l)$ y distancia del canal apilado respecto
+de una única fase común por arreglo. Se evaluarán primero en la partición
+original y luego en los bloques de S4.4f, con el predictor de retardo congelado
+y entrenado bajo el protocolo correspondiente.
+
+Para $G$, las versiones con y sin corrección de retardo común deben coincidir.
+Esta igualdad será un control numérico del procesamiento y no una mejora
+esperada. Para $K$ y para la distancia respecto de fase común, en cambio, el
+retardo modifica la estructura espectral y la comparación resulta informativa.
+El experimento se organiza como sigue:
+\begin{enumerate}
+\item cuantificar potencia, magnitud y error complejo bruto sobre un soporte común;
+\item comparar productos espaciales medidos y simulados, separando diagonales
+(potencia) y términos fuera de diagonal (estructura relativa);
+\item evaluar $K$ y la distancia respecto de fase común sin corregir retardo,
+con retardo predicho y con retardo oráculo usado sólo como referencia diagnóstica;
+\item contrastar productos relativos entre antenas antes y después de una
+calibración relativa fija, si ésta se estima exclusivamente con entrenamiento;
+\item comprobar estabilidad por arreglo, región, potencia y concentración
+interna, e informar las exclusiones y la distribución de errores.
+\end{enumerate}
+
+Una métrica propuesta para la estructura espacial es
+\begin{equation}
+E_{G,i,u}=\frac{\sum_{k\in\mathcal K}\|
+\widehat G_{i,u}(k)-G^{\rm real}_{i,u}(k)\|_F^2}
+{\sum_{k\in\mathcal K}\|G^{\rm real}_{i,u}(k)\|_F^2}.
+\label{eq:s47_gram_error}
+\end{equation}
+Se reportará también una versión con normalización de energía, distinguiendo
+el error de estructura del error de escala. Para $K$ se sustituye la suma por
+un conjunto de pares $(k,l)$ y separaciones espectrales prefijados. Las
+normalizaciones se definen sólo cuando el denominador es válido; los umbrales
+se fijan con entrenamiento y validación. Las potencias bajas requieren atención
+porque los productos de canales estimados contienen ruido y sesgo en la diagonal.
+
+La distancia de la \cref{eq:phase_quotient_distance} aplica una sola rotación
+al vector completo de cada arreglo. Es distinta del ajuste libre por enlace
+de S4.5: su valor mide concordancia en una clase de equivalencia, sin presentar
+la rotación óptima como predicción instrumental. Los errores se agregan por
+posición y se comparan de forma pareada entre métodos; las 32 antenas no se
+cuentan como réplicas independientes.
+
+Los controles mínimos son: rotación común sintética, que debe dejar invariantes
+$G$, $K$ y la distancia cociente; retardo común sintético, que debe conservar
+$G$ y transformar $K$ según la \cref{eq:cross_frequency_invariant}; y rotaciones
+independientes por antena, que deben alterar los términos relativos. Se
+examinará además la calibración de diferencias de fase entre antenas: una
+resultante marginal pequeña en S4.6b no excluye un sesgo relativo estable
+oculto por $\psi$. El criterio de cierre será una separación reproducible entre
+error de escala, error relativo y error de referencia, con incertidumbre pareada
+y sin utilizar la medición de prueba para entrenar correctores.
+
+Este bloque no demuestra todavía fidelidad de sensado. La
+\cref{sec:invariance_sensing_limit} establece qué sensibilidad puede perderse
+al eliminar fase común; S6 comparará el observable invariante y el canal con
+referencia basal fija ante una perturbación mecánica conocida.
+
+\FloatBarrier
+\paragraph{Ampliación operacional de la comparación.}
+El protocolo se implementará con $\mathsf V_0$--$\mathsf V_7$ de la
+\cref{sec:representation_v_family}. El canal canónico sólo se considerará desplegable
+cuando su referencia sea causalmente disponible; en ausencia de ella se conservará
+como diagnóstico. Las 4900 posiciones de prueba densa y los cinco bloques de 2000
+posiciones tendrán agregaciones separadas. La incorporación de CAEZ será una validación
+adicional propuesta tras auditar su adquisición, no una extensión ya ejecutada de dc01.
+E0--E2 compararán estabilidad y sensibilidad para decidir qué representación integra
+cada rama. Así, el cierre estático de S4.7a no se confundirá con validación de sensado.
+
+\subsection{S4.7b: incertidumbre circular y por trayectoria}
+
+Después de retirar los componentes de baja dimensión, se comparará primero la
+incertidumbre circular de la fase común o residual agregada y, posteriormente, la
+incertidumbre por trayectoria de PEAC. No se confundirá una distribución posterior
+estimada con el canal evaluado con una predicción disponible en despliegue. La
+comparación distinguirá dos escenarios:
+
+\begin{enumerate}
+\item inferencia posterior de errores de trayectoria usando la medición
+evaluada;
+\item predicción transferible de una distribución de error desde descriptores
+físicos del camino.
+\end{enumerate}
+
+Una extensión posible es
+
+\begin{equation}
+(\mu_\ell,\kappa_\ell)
+=
+g_\theta(
+d_\ell,
+\theta_\ell,
+\text{tipo de interacción},
+\text{material},
+\text{contexto}
+),
+\end{equation}
+
+evaluada sobre posiciones que no participaron en el ajuste.
+
+Para una variable circular $\psi$, los baselines serán uniforme, media circular
+global, von Mises global, von Mises condicionada y mezcla condicionada:
+\begin{equation}
+p(\psi\mid x)=\sum_{m=1}^{M}\pi_m(x)
+\frac{\exp\{\kappa_m(x)\cos[\psi-\mu_m(x)]\}}
+{2\pi I_0(\kappa_m(x))},
+\qquad \sum_m\pi_m(x)=1.
+\label{eq:s47b_von_mises_mixture}
+\end{equation}
+Las entradas candidatas incluirán potencia RT, dispersión de retardos, número efectivo
+de trayectorias, fracción dominante, longitudes, interacciones, diferencias B0--B2,
+posición y arreglo. Toda selección se ajustará dentro del entrenamiento de cada bloque.
+
+Se reportarán log-verosimilitud circular negativa, error angular, calibración de
+regiones predictivas y riesgo frente a cobertura al abstenerse. La cobertura se medirá
+en posiciones o sesiones independientes, no sobre las muestras usadas para ajustar
+$\kappa$. Se contrastará el modelo condicionado contra los baselines mediante diferencias
+pareadas e intervalos agrupados. Si no mejora de forma reproducible, la conclusión será
+que esos descriptores no identifican la fase residual bajo el protocolo, sin extrapolar
+una imposibilidad universal ni forzar una estimación puntual sobreconfiante.
+
+\FloatBarrier
+\subsection{S5: comparación sistemática de representaciones}
+
+El siguiente bloque mayor debe comparar:
+
+\begin{equation}
+\text{B0/B1/B2}
+\;\;{\rm vs}\;\;
+\text{NeRF}^2
+\;\;{\rm vs}\;\;
+\text{Learnable WDT}
+\;\;{\rm vs}\;\;
+\text{RadTwin}.
+\end{equation}
+
+Debe conservar un protocolo común:
+\begin{enumerate}
+\item mismo conjunto físico y mismas posiciones;
+\item partición espacial densa;
+\item reserva por bloques espaciales;
+\item curvas de eficiencia de datos;
+\item potencia, dispersión de retardos, magnitud, NMSE complejo y métricas de fase;
+\item coste de entrenamiento/inferencia;
+\item adaptación ante cambio de objetos;
+\item posteriormente, fidelidad de $\Delta H$.
+\end{enumerate}
+
+NeRF$^2$ debe entrar primero, porque su contribución se puede evaluar en la
+misma escena estática. Learnable WDT y RadTwin son más informativos cuando se
+introducen cambios de disposición u objetos.
+
+\FloatBarrier
+\subsection{S6: fidelidad diferencial y movimiento controlado}
+
+La hipótesis central de sensado se formulará mediante
+
+\begin{equation}
+\Delta H
+=
+H(\mathbf x_H+\Delta\mathbf x_H)
+-
+H(\mathbf x_H),
+\end{equation}
+
+y localmente
+
+\begin{equation}
+\Delta H
+\simeq
+J_H
+\Delta\mathbf x_H,
+\qquad
+J_H=
+\frac{\partial H}{\partial\mathbf x_H}.
+\label{eq:jacobian_sensing}
+\end{equation}
+
+La secuencia experimental recomendada es:
+\begin{enumerate}
+\item reflector estático;
+\item desplazamiento conocido;
+\item movimiento sinusoidal conocido;
+\item movimiento humano grueso con Tx/Rx fijos;
+\item respiración de una persona;
+\item respiración con movimientos corporales no asociados a la respiración;
+\item múltiples personas.
+\end{enumerate}
+
+La calibración debe fijarse en el estado basal. Recalibrar libremente el gemelo
+en cada instante podría absorber la perturbación física que se desea detectar.
+
+\FloatBarrier
+\subsection{S7: operador LoRa y validación multirradio}
+
+La capa LoRa debe validarse inicialmente contra IQ real, aprovechando
+OpenLoRa y conjuntos de datos con condiciones LOS/NLOS, interferencia y colisiones.
+El módulo de síntesis debe aplicar el canal físico a chirps CSS y añadir explícitamente
+CFO, STO/SFO, fluctuación de fase, SNR e interferencia. SenLoRa ofrece una referencia
+directa sobre la necesidad de eliminar offsets antes de utilizar continuidad de
+fase para sensado de movimientos pequeños.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Criterios de cierre}
+% ----------------------------------------------------------------------
+
+\begingroup
+\small
+\begin{longtable}{P{2.0cm}P{4.5cm}P{7.1cm}}
+\caption{Criterios propuestos para cerrar cada bloque experimental.}
+\label{tab:closure_criteria}\\
+\toprule
+Etapa & Pregunta & Criterio de cierre\\
+\midrule
+\endfirsthead
+\toprule
+Etapa & Pregunta & Criterio de cierre\\
+\midrule
+\endhead
+B0--B2 &
+¿Mejora la reconstrucción del entorno? &
+Métricas macro y de magnitud estables con artefactos reproducibles.\\
+S4.1 &
+¿La calibración es sensible a errores de fase? &
+Reproducción estable de PEOC/UPEC/PEAC y caracterización de fallos.\\
+S4.2 &
+¿Existe una componente de baja dimensión de fase? &
+Transferencia demostrada entre antenas y frecuencia, separando oráculo de
+predicción.\\
+S4.3 &
+¿Qué estructura estadística conserva el residual? &
+Asociaciones multitrayecto robustas, con controles de dependencia y remuestreo agrupado.\\
+S4.4--S4.5 &
+¿Puede predecirse $\Delta\tau_{\rm eff}$? &
+Predicción del retardo sin usar su medición objetivo y beneficio en el canal
+condicionado al CPO ajustado, bajo particiones densa y por bloques.\\
+S4.6 &
+¿Qué estructura conserva la fase constante? &
+Diagnóstico circular y temporal documentado; alcance limitado a los controles ejecutados.\\
+S4.7a &
+¿Qué fidelidad conserva un observable invariante? &
+Separar escala y estructura relativa; validar invariancia común y sensibilidad al retardo entre frecuencias.\\
+S4.7b &
+¿Hace falta incertidumbre por trayectoria? &
+Mejora estable en datos reservados frente a PEOC/UPEC, sin usar la medición de prueba para ajustar la predicción.\\
+S5 &
+¿Qué representación generaliza mejor? &
+Comparación común con NeRF$^2$, WDT y RadTwin.\\
+S6 &
+¿Se preserva $\Delta H$? &
+Movimiento conocido reproducido sin recalibrar la señal objetivo.\\
+S7 &
+¿Se transfiere a radios de sensado reales? &
+Wi-Fi/LoRa validados con operadores y perturbaciones instrumentales específicos.\\
+\bottomrule
+\end{longtable}
+\endgroup
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Programas y artefactos experimentales}
+\label{sec:artifacts}
+\label{sec:trazabilidad_avances}
+% ----------------------------------------------------------------------
+
+El cuadro siguiente conserva los identificadores del registro experimental. Para S4.6 se identifican los productos descritos en el documento de resultados; sus nombres de archivo y versiones de programa no se especifican en el material recibido y deberán vincularse al manifiesto de ejecución.
+Las rutas corresponden al entorno de ejecución de los experimentos; su inclusión
+documenta la procedencia de los resultados y permite localizar los artefactos
+necesarios para una reproducción independiente.
+
+\begingroup
+\small
+\begin{longtable}{P{2.6cm}P{11.0cm}}
+\caption{Trazabilidad resumida de programas y artefactos.}
+\label{tab:artifacts}\\
+\toprule
+Bloque & Programas y artefactos principales\\
+\midrule
+\endfirsthead
+\toprule
+Bloque & Programas y artefactos principales\\
+\midrule
+\endhead
+S1 &
+\path{s1_01_check_dc01.py},
+\path{s1_02_trace_real_point.py},
+\path{gen_dataset.py};
+TFRecord final de 10\,000 posiciones en
+\path{/mnt/c/rf-sensing-data/S1_dc01/traced_paths/}.\\
+B0 &
+\path{/itu_baseline/test_eval_full/}; escala congelada y métricas por
+enlace.\\
+B1 &
+\path{s2_01_fit_learned_materials.py},
+\path{s2_02_evaluate_learned_materials_test.py};
+estado entrenado \path{/learned_materials/final/learned_materials}.\\
+B2 &
+\path{neural_materials.py};
+estado entrenado \path{/neural_materials/final/neural_materials}.\\
+S4.2b &
+\path{s4_02b_coherence_optimal_delay_dc01.py}.\\
+S4.2e &
+\path{s4_02e_frequency_heldout_delay_dc01.py}.\\
+S4.3a &
+\path{s4_03a_residual_phase_diagnostics_dc01.py}.\\
+S4.3c &
+\path{s4_03c_inspect_path_cir_dc01.py}.\\
+S4.3d &
+\path{s4_03d_multilevel_phase_analysis_dc01.py}.\\
+S4.3e &
+\path{s4_03e_cluster_bootstrap_dc01.py}.\\
+S4.4a &
+\path{s4_04a_build_tau_prediction_dataset_dc01.py};
+\path{/s4_4a_tau_prediction_dataset/B0/}.\\
+S4.4b &
+\path{s4_04b_tau_prediction_baselines_dc01.py}.\\
+S4.4c &
+\path{s4_04c_tau_nonlinear_ablation_dc01.py}.\\
+S4.4d &
+\path{s4_04d_spatial_generalization_audit_dc01.py}.\\
+S4.4e &
+\path{s4_04e_prepare_spatial_blocks_dc01.py}.\\
+S4.4f &
+\path{s4_04f_spatial_blocked_prediction_dc01.py};
+60\,000 filas de predicción, sin identificadores ausentes ni claves duplicadas.\\
+S4.5a &
+\path{s4_05a_end_to_end_predicted_tau_dc01.py}.\\
+S4.5b &
+\path{s4_05b_spatial_blocked_end_to_end_dc01.py};
+\path{/s4_5b_spatial_blocked_end_to_end/B0/}.\\
+S4.6a--b &
+Registro de 640\,000 fases por posición, arreglo y antena; agregados circulares
+por partición y descomposición de la dirección común.\\
+S4.6c &
+Correspondencias entre vecinos de entrenamiento y prueba, errores angulares y
+control entre arreglos.\\
+S4.6d.1 &
+Manifiesto de 20\,000 filas posición--arreglo, con tiempo recuperado y
+correspondencia XYZ exacta; permutación retrospectiva descartada.\\
+S4.6d.2 &
+Comparaciones temporal, espacial y aleatoria; estructura por intervalos de tiempo
+y controles con separación espacial mínima.\\
+\bottomrule
+\end{longtable}
+\endgroup
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Hipótesis doctoral consolidada}
+% ----------------------------------------------------------------------
+
+La evidencia acumulada conduce a una hipótesis más precisa que
+``construir un gemelo inalámbrico neuronal'':
+
+\begin{quote}
+Una representación útil para sensado por radiofrecuencia debe separar la estructura
+electromagnética del entorno de los grados de libertad de fase y hardware,
+generalizar fuera de los puntos de calibración y preservar la respuesta
+diferencial del canal frente a perturbaciones humanas. La fidelidad de reconstrucción estática y la fidelidad de las perturbaciones
+se evalúan por separado; ninguna sustituye la validación del observable
+utilizado para sensado.
+\end{quote}
+
+Formalmente, dos modelos pueden satisfacer
+
+\begin{equation}
+{\rm NMSE}(H_{M_1},H_{\rm real})
+<
+{\rm NMSE}(H_{M_2},H_{\rm real}),
+\end{equation}
+
+pero invertir el orden en
+
+\begin{equation}
+\left\|
+\frac{\partial H_{M_1}}{\partial x_H}
+-
+\frac{\partial H_{\rm real}}{\partial x_H}
+\right\|
+>
+\left\|
+\frac{\partial H_{M_2}}{\partial x_H}
+-
+\frac{\partial H_{\rm real}}{\partial x_H}
+\right\|.
+\end{equation}
+
+Demostrar o refutar esa separación entre \emph{fidelidad de reconstrucción del canal} y \emph{fidelidad de sensado} constituye uno de los ejes más prometedores
+de la tesis.
+
+% ----------------------------------------------------------------------
+\FloatBarrier
+\section{Estado actual del programa}
+
+El registro documenta B0--B2 y S4.1--S4.6d.2. S4.6 completa la caracterización
+descriptiva y los controles locales previstos para el desfase constante:
+la fase común al arreglo se estima a posteriori, pero su transferencia mediante
+vecinos espaciales o temporales no muestra una ventaja clara en dc01. El cierre
+es operacional respecto de esas preguntas, no una identificación definitiva
+del origen de la fase ni una prueba de impredecibilidad universal.
+
+El siguiente bloque es S4.7a, seguido del estudio residual por trayectoria
+S4.7b y la comparación de representaciones S5:
+\begin{equation}
+\begin{aligned}
+\mathrm{S4.7a}&\longrightarrow\mathrm{S4.7b}
+\longrightarrow\mathrm{S5}\;\text{(representaciones)},\\
+\mathrm{S6}&:\;\Delta H\text{ y observables invariantes con movimiento conocido},\\
+\mathrm{S7}&:\;\text{operadores Wi-Fi y LoRa}.
+\end{aligned}
+\end{equation}
+La preparación mecánica S6 puede avanzar una vez fijadas las convenciones de
+fase, la calibración basal y el observable; no depende de completar todas las
+arquitecturas de S5. El programa conserva la incorporación gradual de
+complejidad, guiada por una limitación experimental concreta.
+
+La actualización del programa se concreta en la \cref{tab:scenario_program_map}:
+S4.7 avanza junto con diseño de referencia y Esc. E0; S6 se materializa en reflector
+y fantoma E1--E2, y S7 compara operadores sobre esas perturbaciones. G0--G4 evaluará
+la contribución geométrica en datos propios. E3--E5 añaden personas y transferencia
+cuando exista evidencia suficiente. Ninguno de estos identificadores amplía el conjunto
+de resultados ejecutados que se reporta en este capítulo.

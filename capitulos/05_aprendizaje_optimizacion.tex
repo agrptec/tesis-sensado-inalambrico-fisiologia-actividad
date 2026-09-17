@@ -1,0 +1,349 @@
+\chapter{Fundamentos estadísticos, aprendizaje y optimización del gemelo}
+\label{ch:learning_foundations}
+
+La calibración electromagnética y la predicción de sus discrepancias constituyen problemas
+inversos relacionados, pero distintos. En el primero se ajustan parámetros del simulador;
+en el segundo se aprende una función que aproxima un descriptor de error a partir de
+información disponible en una consulta nueva. Este capítulo establece los fundamentos
+necesarios para interpretar las regresiones de S4.4, los análisis agrupados de S4.3, la caracterización circular de S4.6 y la
+extensión posterior a representaciones profundas. La formulación probabilística sigue
+la distinción entre modelo, inferencia y decisión de Bishop, mientras el tratamiento de
+redes profundas y regularización se apoya en Goodfellow et al.\ \citep{Bishop2006PRML,Goodfellow2016DL}.
+
+\section{Aprendizaje supervisado y objetivo de generalización}
+
+Sea $\vect z_i$ un descriptor disponible en inferencia y $y_i$ una variable objetivo.
+Para S4.4, $\vect z_i$ contiene posición y/o descriptores del trazado nominal, mientras
+$y_i$ es un retardo efectivo obtenido durante la construcción de las etiquetas a partir
+del canal medido. Una función $g_\theta$ se estima mediante
+\begin{equation}
+\widehat\theta=\arg\min_\theta
+\frac{1}{N_{\rm ent}}\sum_{i\in\mathcal I_{\rm ent}}
+\ell\bigl(y_i,g_\theta(\vect z_i)\bigr)+\lambda\Omega(\theta).
+\label{eq:empirical_risk}
+\end{equation}
+El riesgo de interés es, en cambio,
+\begin{equation}
+\mathcal R_Q(g)=\mathbb E_{(\vect z,y)\sim Q}
+\left[\ell\bigl(y,g(\vect z)\bigr)\right],
+\end{equation}
+donde $Q$ representa la distribución de despliegue. Una partición aleatoria estima
+principalmente un riesgo bajo condiciones semejantes a las observadas. Una región
+reservada modifica la distribución de consultas y exige estudiar extrapolación espacial.
+La separación entre ambos riesgos es central para interpretar S4.4d--f.
+
+Construir las etiquetas con mediciones es compatible con aprendizaje supervisado.
+La restricción consiste en impedir que el descriptor, la normalización o la selección
+de hiperparámetros utilicen las mediciones de prueba. Cuando el descriptor proviene
+de un simulador calibrado, sus parámetros también deben entrenarse sin las regiones
+reservadas; alternativamente, debe declararse un protocolo con calibración previa común
+y una afirmación de generalización condicionada a ella.
+
+\section{Referencias de regresión y complejidad del predictor}
+
+\subsection{Constante, vecino próximo y regresión regularizada}
+
+Una constante ajustada por error absoluto utiliza la mediana de entrenamiento; por error
+cuadrático utiliza la media. Esta elección debe distinguirse del uso arbitrario de cero.
+El vecino próximo predice
+\begin{equation}
+\widehat y(\vect p)=y_{i^\star},\qquad
+i^\star=\arg\min_{i\in\mathcal I_{\rm ent}}\|\vect p-\vect p_i\|_2.
+\end{equation}
+Es una referencia necesaria para determinar cuánto aporta un predictor frente a la
+proximidad espacial. No estima un mecanismo electromagnético: interpola una etiqueta
+en la geometría observada.
+
+Para descriptores centrados y escalados con estadísticos de entrenamiento, la regresión
+ridge resuelve
+\begin{equation}
+(\widehat b,\widehat{\vect w})=
+\arg\min_{b,\vect w}\frac{1}{N_{\rm ent}}
+\|\vect y-b\vect 1-\mat Z\vect w\|_2^2+\lambda\|\vect w\|_2^2.
+\label{eq:ridge_model}
+\end{equation}
+Con datos centrados, $\widehat{\vect w}=(\mat Z^T\mat Z+
+N_{\rm ent}\lambda\mat I)^{-1}\mat Z^T\vect y$ para $\lambda>0$.
+El intercepto no se penaliza. La regularización estabiliza direcciones correlacionadas;
+no corrige por sí sola una relación no lineal ni un cambio de dominio
+\citep{Bishop2006PRML,Boyd2004Convex}.
+
+\subsection{Bosques aleatorios y redes neuronales}
+
+Un bosque de regresión combina árboles entrenados con aleatorización de muestras y
+variables \citep{Breiman2001RandomForests}:
+\begin{equation}
+g_{\rm bosque}(\vect z)=\frac{1}{B}\sum_{b=1}^{B}T_b(\vect z).
+\end{equation}
+En las tablas experimentales se conserva la abreviatura RF del registro de ejecución
+para \emph{Random Forest}; fuera de esas tablas RF designa radiofrecuencia. El método
+puede representar interacciones no lineales entre descriptores sin exigir un modelo
+paramétrico de su dependencia. En regresión convencional sus predicciones promedian
+valores de las hojas, por lo que no debe suponerse extrapolación funcional ilimitada
+fuera del soporte de entrenamiento. La importancia de una variable tampoco identifica
+su efecto causal, especialmente cuando varios descriptores están correlacionados.
+
+Una red multicapa compone transformaciones afines y no linealidades. Para materiales,
+la salida puede parametrizarse mediante
+\begin{equation}
+\epsilon_r(\vect x)=1+\operatorname{softplus}(a_\psi(\vect x)),\qquad
+\sigma(\vect x)=\operatorname{softplus}(b_\psi(\vect x)),
+\label{eq:material_constraints}
+\end{equation}
+como una restricción suficiente para una clase de dieléctricos pasivos no magnéticos
+considerados en el modelo. La cota $\epsilon_r\geq1$ es una elección de esa clase,
+no una propiedad universal de todo medio electromagnético. Estas expresiones describen
+una parametrización admisible; no atribuyen retrospectivamente esa implementación a B2.
+Para una representación con frecuencia variable deben comprobarse además dispersión,
+validez del modelo material y consistencia entre bandas.
+
+La codificación posicional amplía las escalas espaciales representables, pero puede
+facilitar la memorización. La capacidad, regularización y distribución de las mediciones
+deben evaluarse conjuntamente. El número de parámetros, por sí solo, no determina la
+fidelidad física ni la generalización \citep{Goodfellow2016DL}.
+
+\section{Optimización diferenciable, restricciones e identificabilidad}
+
+Para un objetivo real sobre canales complejos puede trabajarse con
+$\vect u=[\Re H;\Im H]$. La regla de la cadena del \cref{ch:wdt} produce gradientes
+respecto de parámetros reales sin tratar una pérdida no holomorfa como función analítica
+compleja. La optimización del trazado se efectúa sobre un conjunto de caminos válido
+en una región de parámetros; cambios de visibilidad pueden introducir discontinuidades.
+
+Ridge con penalización positiva constituye un problema convexo; calibrar materiales,
+geometría y redes neuronales conjuntamente no lo es en general. Por ello deben
+distinguirse convergencia numérica, unicidad del mínimo e identificabilidad física
+\citep{Boyd2004Convex,KaipioSomersalo2005}. Una pérdida pequeña puede coexistir con
+parámetros diferentes que producen canales casi indistinguibles. Las múltiples
+inicializaciones y la evaluación reservada caracterizan estabilidad empírica, pero no
+demuestran unicidad global.
+
+La pérdida de ganancia y dispersión de retardos de la calibración de referencia puede
+formularse con un error relativo simétrico para cantidades no negativas,
+\begin{equation}
+\ell_{\rm sym}(a,b)=\frac{2|a-b|}{a+b+\varepsilon_a},\qquad
+\mathcal L_{\rm cal}=\lambda_P\ell_{\rm sym}(P,\widehat P)
++\lambda_\tau\ell_{\rm sym}(\tau_{\rm RMS},\widehat\tau_{\rm RMS}).
+\label{eq:calibration_macro_loss}
+\end{equation}
+Cada estabilizador debe tener las unidades de su denominador. Esta familia de objetivos
+explica por qué mejorar magnitudes macroscópicas no impone concordancia de fase;
+la forma y pesos exactos de una ejecución deben proceder de su configuración
+\citep{Hoydis2024DiffRT}. Añadir términos complejos o diferenciales modifica el problema
+de estimación y requiere una nueva comparación, con acceso a datos equivalente.
+
+En optimización multiobjetivo, GradNorm ajusta pesos según magnitudes de gradiente y
+ritmos de aprendizaje; PCGrad modifica componentes de gradientes conflictivos
+\citep{Chen2018GradNorm,Yu2020PCGrad}. Ninguno garantiza una solución global, una
+frontera de Pareto completa ni corrección del modelo físico. Su aplicación se condiciona
+a observar un conflicto relevante entre objetivos previamente definidos.
+
+\section{Estadística circular de los errores de fase}
+\label{sec:circular_foundations}
+
+Las diferencias angulares se definen en el círculo y no sobre una recta. Para residuos
+$r_k=\wrap_{(-\pi,\pi]}(\phi_k-\widehat\phi_k)$, se consideran
+\begin{equation}
+\overline z=\frac{1}{K}\sum_k e^{jr_k},\qquad
+\overline R=|\overline z|,\qquad V_{\rm circ}=1-\overline R.
+\end{equation}
+La dirección media es $\angle\overline z$ cuando la resultante permite definirla de
+forma estable. Una media aritmética de ángulos próximos a $-\pi$ y $\pi$ puede ser
+engañosa; las cantidades circulares evitan esa discontinuidad
+\citep{Mardia2000Directional}.
+
+La estructura espectral puede describirse mediante
+\begin{equation}
+C_\phi(L)=\left|\frac{1}{|\mathcal K_L|}
+\sum_{k\in\mathcal K_L}e^{j(r_{k+L}-r_k)}\right|,
+\label{eq:circular_lag}
+\end{equation}
+donde $\mathcal K_L$ contiene pares válidos separados por $L$ índices de frecuencia.
+Esta resultante de incrementos no es una correlación de Pearson centrada: una fase
+residual independiente pero concentrada también puede producir un valor positivo.
+Para contrastar independencia se compara con un control de permutación que conserve
+la distribución marginal y las máscaras. La concentración elevada a retardos cortos
+indica regularidad local; no demuestra que el residual sea determinista ni identifica
+su causa física. El ajuste previo de retardo y CPO puede introducir dependencia y
+debe aplicarse igualmente al control.
+
+La distribución de von Mises,
+\begin{equation}
+p(r\mid\mu,\kappa)=\frac{e^{\kappa\cos(r-\mu)}}{2\pi I_0(\kappa)},
+\end{equation}
+permite representar concentración circular. En una predicción de fase, las salidas
+seno y coseno, o una distribución circular completa, evitan una pérdida euclídea
+inadecuada cerca del corte angular. La concentración no se interpreta como incertidumbre
+calibrada sin comprobar su cobertura sobre observaciones reservadas.
+
+\section{Descriptores de trayectorias y dependencia entre niveles}
+\label{sec:multilevel_foundations}
+
+Para energías no negativas $e_\ell$ de caminos activos se define
+$p_\ell=e_\ell/\sum_r e_r$ si la suma es positiva. La concentración de energía se
+caracteriza con $D_1=\max p_\ell$, fracciones de los caminos dominantes,
+$N_{\rm eff}=1/\sum p_\ell^2$ y entropía normalizada
+$\mathcal H_p=-\sum p_\ell\log p_\ell/\log L$ para $L>1$.
+Se usa $0\log0=0$; para un único camino se adopta entropía cero, y sin energía válida
+el descriptor se marca como no definido. Estas probabilidades describen energías
+individuales y no eliminan los términos de interferencia coherente del canal total.
+
+Sean $x_{i,a}$ y $y_{i,a}$ descriptores de una posición $i$ y enlace $a$.
+La asociación entre agregados $\overline x_i,\overline y_i$, la asociación de variables
+centradas $x_{i,a}-\overline x_i$ y $y_{i,a}-\overline y_i$, y la distribución de
+correlaciones calculadas por posición son estimandos distintos. Sus signos pueden
+divergir sin contradicción. En S4.3 deben conservarse por separado las reducciones
+utilizadas en cada tabla; agruparlas bajo un único coeficiente ocultaría la jerarquía.
+
+El remuestreo agrupado selecciona posiciones con reemplazo y conserva conjuntamente
+sus enlaces, volviendo a calcular el estadístico en cada réplica. Este procedimiento
+respeta la dependencia interna del grupo \citep{Efron1993Bootstrap}; si posiciones
+vecinas siguen correlacionadas, no elimina la dependencia entre grupos. La extensión
+espacial requiere bloques o sesiones de remuestreo y un análisis de sensibilidad a
+su tamaño. Un intervalo estrecho no transforma una asociación observacional en
+identificación causal.
+
+\section{Métricas, agregación y validación espacial}
+
+Para errores escalares $e_i=\widehat y_i-y_i$ se distinguen
+\begin{equation}
+\mathrm{MAE}=N^{-1}\sum_i|e_i|,\quad
+\mathrm{MedAE}=\operatorname{mediana}_i|e_i|,\quad
+\mathrm{RMSE}=\sqrt{N^{-1}\sum_i e_i^2}.
+\end{equation}
+El coeficiente $R^2=1-\sum_i e_i^2/\sum_i(y_i-\overline y)^2$ puede ser negativo
+y no está definido para una respuesta constante. Pearson mide asociación lineal y
+Spearman asociación por rangos; ninguno garantiza acuerdo sin sesgo. La media de
+medianas entre particiones difiere, en general, de la mediana de las predicciones
+agrupadas. Esta diferencia explica reducciones distintas entre S4.4f y S4.5b.
+
+En validación espacial, todos los enlaces de una posición pertenecen a la misma
+partición. Los conjuntos de ajuste y prueba se separan mediante una región de exclusión
+de anchura declarada. La selección de hiperparámetros utiliza sólo entrenamiento y
+validación, preferiblemente con una separación interior compatible con la evaluación
+exterior. Los cinco bloques de S4.4f caracterizan regiones de una escena; no constituyen
+cinco edificios independientes ni demuestran transferencia entre dispositivos.
+
+La predicción de un retardo auxiliar debe evaluarse también en la respuesta compleja
+que modifica. Esa evaluación debe registrar qué parte de la corrección se predice
+y cuál se estima con una medición disponible. Esta separación fundamenta el alcance
+condicionado de S4.5 y prepara la posterior validación del operador de observación.
+
+
+\section{Predictibilidad circular y alcance de los controles negativos}
+\label{sec:circular_predictability}
+
+Para una fase $\psi\in\mathbb S^1$ y variables disponibles $\vect z$, la pérdida
+circular $\ell(\psi,g)=1-\cos(\psi-g)$ tiene riesgo condicional
+\begin{equation}
+\mathbb E[\ell(\psi,g)\mid\vect z]
+=1-\Re\{e^{-jg}m(\vect z)\},\qquad
+m(\vect z)=\mathbb E[e^{j\psi}\mid\vect z].
+\end{equation}
+Si $m(\vect z)\ne0$, el predictor óptimo para esta pérdida es
+$g^\star(\vect z)=\angle m(\vect z)$ y el riesgo mínimo es $1-|m(\vect z)|$.
+Si $m=0$, ninguna dirección puntual mejora ese riesgo condicional. Esta propiedad
+no identifica automáticamente el predictor óptimo bajo distancia angular absoluta,
+cuya solución corresponde a una mediana circular. Tampoco la resultante marginal
+$|\mathbb E e^{j\psi}|$ determina la resultante condicional: fases predecibles desde
+$\vect z$ pueden cancelarse al agregarlas \citep{Mardia2000Directional,Bishop2006PRML}.
+
+Bajo el control específico $\Delta\psi\sim\mathcal U(-\pi,\pi]$, se cumple
+\begin{equation}
+\mathbb E|\Delta\psi|=\operatorname{Med}|\Delta\psi|=\frac{\pi}{2},\qquad
+\mathbb E\cos\Delta\psi=0,\qquad
+P(|\Delta\psi|\leq\alpha)=\frac{\alpha}{\pi},\quad 0\leq\alpha\leq\pi.
+\label{eq:uniform_phase_control}
+\end{equation}
+Así, 90 grados, $1/6$ para 30 grados y $1/4$ para 45 grados son referencias
+analíticas útiles para S4.6. Su proximidad empírica no prueba que el error sea
+uniforme o independiente. El fracaso del vecino próximo descarta una ventaja
+práctica clara de esa regla en el soporte evaluado; no establece que
+$m(\vect z)=0$ para cualquier conjunto de descriptores.
+
+La concentración finita también requiere cautela. Para $A$ fases independientes
+uniformes, $\mathbb E\overline R^2=1/A$, aunque la resultante poblacional sea
+nula. Por tanto, una dirección común obtenida de $A=32$ antenas puede aparecer
+por ajuste a fluctuaciones. La comparación pertinente repite el estimador de
+$\beta$, el centrado por arreglo y las máscaras sobre controles que conserven
+las marginales, o estima la dirección con unas antenas y evalúa las restantes.
+Las antenas reales no se suponen independientes por esta identidad de referencia.
+
+\section{Estructura temporal con muestreo irregular y trazabilidad}
+\label{sec:temporal_circular_protocol}
+
+Para marcas temporales físicas $t_i$, un intervalo $B$ define los pares válidos
+$\mathcal I_B=\{(i,j):i<j,\ |t_j-t_i|\in B\}$ dentro de un mismo arreglo.
+Se separan tres estadísticos:
+\begin{align}
+D_\psi(B)&=\operatorname{Med}_{(i,j)\in\mathcal I_B}
+\left|\wrap(\psi_j-\psi_i)\right|,\\
+C_\psi(B)&=\frac{1}{|\mathcal I_B|}\sum_{(i,j)\in\mathcal I_B}
+\cos(\psi_j-\psi_i),\\
+R_\psi(B)&=\left|\frac{1}{|\mathcal I_B|}\sum_{(i,j)\in\mathcal I_B}
+e^{j(\psi_j-\psi_i)}\right|.
+\label{eq:temporal_phase_structure}
+\end{align}
+Una rotación determinista no nula puede producir $C_\psi$ pequeño y $R_\psi$
+elevado; ambos indicadores responden a preguntas diferentes. Los intervalos
+sin pares válidos no se rellenan con cero. Cada curva debe especificar número
+de pares, separación efectiva, regla de selección y posibles restricciones
+espaciales; usar todos los pares o una muestra de ellos define ponderaciones
+diferentes. En S4.6d.2 se conserva la tabla reportada, sin atribuirle conteos
+por intervalo que el registro suministrado no especifica.
+
+Los pares que comparten una captura son dependientes. Los intervalos y las
+comparaciones entre vecinos temporales, espaciales y aleatorios requieren
+remuestreo por capturas, bloques o sesiones y réplicas del control aleatorio.
+Se debe informar incertidumbre de la diferencia pareada; proximidad de medianas
+sin un margen prefijado no constituye equivalencia estadística. La elección de
+bloques temporales debe considerar el desplazamiento espacial del transmisor:
+una campaña móvil no identifica por sí sola un proceso de deriva a posición fija.
+
+Recuperar una marca temporal mediante igualdad de coordenadas es válido para
+el subconjunto auditado sólo si la clave es única y la transformación de
+coordenadas está documentada. En campañas con posiciones repetidas se necesita
+un identificador original de captura. Deben preservarse archivo, índice de
+origen, marca temporal, partición y versión de calibración; reproducir únicamente
+una semilla de permutación no reconstruye necesariamente la secuencia histórica.
+
+\section{Aprendizaje condicionado por repetibilidad y sensibilidad física}
+\label{sec:repeatability_sensitivity_learning}
+
+La función de aprendizaje se elegirá después de caracterizar la adquisición. Para una
+representación $\mathcal V$, se compararán pares con estado físico fijo y distinta
+realización instrumental, y pares con una perturbación física conocida:
+\begin{align}
+D_{\rm rep}&=d\bigl(\mathcal V(Y(\mathbf q,\eta_1)),
+\mathcal V(Y(\mathbf q,\eta_2))\bigr),\nonumber\\
+D_{\rm fis}(\delta\mathbf q)&=d\bigl(\mathcal V(Y(\mathbf q+\delta\mathbf q,\eta)),
+\mathcal V(Y(\mathbf q,\eta))\bigr),\label{eq:repeat_physical_distances}\\
+Q(\delta\mathbf q)&=\frac{\operatorname{med}D_{\rm fis}(\delta\mathbf q)}
+{\operatorname{med}D_{\rm rep}+\epsilon_d}.
+\label{eq:physical_repeatability_ratio}
+\end{align}
+Las condiciones instrumentales idénticas de la segunda expresión son un ideal
+experimental; su discrepancia residual se medirá con referencias y repeticiones.
+$Q$ es descriptivo y depende de la escala y de $\epsilon_d$. Un codificador constante
+colapsa ambas distancias; por ello no se optimizará únicamente este cociente.
+Se exigirán respuesta física no degenerada, incertidumbre y capacidad de discriminar
+perturbaciones frente a pares nulos. Se informarán curvas de detección a falsa alarma
+fijada con validación, errores de desplazamiento y resultados por orientación.
+
+Las comparaciones iniciales incluirán magnitud, canal complejo, productos relativos,
+autocodificador complejo, reconstrucción enmascarada y aprendizaje contrastivo temporal.
+La rama latente física añadirá supervisión de desplazamiento, respuesta diferencial
+y consistencia entre modalidades cuando estas referencias existan. Las pérdidas de
+reconstrucción y de tarea se evaluarán por separado: reducir una no implica reducir
+la otra. Las regularizaciones de varianza y las pruebas de recuperación del estado
+permitirán detectar colapso, sin atribuir significado causal a coordenadas latentes
+por inspección visual.
+
+WiFi-JEPA proporciona una comparación específica de aprendizaje autosupervisado de
+CSI para postura 3D \citep{Kim2026WiFiJEPA}; su objetivo publicado no demuestra
+preservación de fase respiratoria. Se incorporará una vez validadas las entradas,
+con presupuesto de datos y cómputo comparable y sin incluir sesiones de prueba en el
+preentrenamiento. GradNorm o PCGrad se utilizarán sólo si el diagnóstico de gradientes
+muestra desequilibrio o conflicto relevante; su incorporación no sustituirá una
+hipótesis física. Las restricciones de Maxwell se limitarán inicialmente a casos
+canónicos verificables, antes de considerar una PINN de habitación completa.

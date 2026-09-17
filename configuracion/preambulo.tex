@@ -1,0 +1,173 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+
+\usepackage{microtype}
+\usepackage[a4paper,margin=2.8cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{bm}
+\usepackage{siunitx}
+\sisetup{detect-all}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{array}
+\newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{C}{>{\Centering\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage[table]{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage{xurl}
+\urlstyle{tt}
+\usepackage[spanish,nameinlink,noabbrev]{cleveref}
+\crefname{chapter}{capítulo}{capítulos}
+\Crefname{chapter}{Capítulo}{Capítulos}
+\crefname{section}{sección}{secciones}
+\Crefname{section}{Sección}{Secciones}
+\crefname{subsection}{sección}{secciones}
+\Crefname{subsection}{Sección}{Secciones}
+\crefname{equation}{ecuación}{ecuaciones}
+\Crefname{equation}{Ecuación}{Ecuaciones}
+\crefname{table}{cuadro}{cuadros}
+\Crefname{table}{Cuadro}{Cuadros}
+\crefname{figure}{figura}{figuras}
+\Crefname{figure}{Figura}{Figuras}
+\usepackage{tikz}
+\usepackage[titles]{tocloft}
+% Espacio para números como 12.14.3 en el índice del manuscrito ampliado.
+\setlength{\cftchapnumwidth}{2.3em}
+\setlength{\cftsecindent}{2.3em}
+\setlength{\cftsecnumwidth}{3.3em}
+\setlength{\cftsubsecindent}{5.6em}
+\setlength{\cftsubsecnumwidth}{4.2em}
+
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,babel}
+
+\definecolor{azulacademico}{RGB}{45,73,104}
+\definecolor{azulclaro}{RGB}{220,229,238}
+\definecolor{griscronograma}{RGB}{225,225,225}
+
+% ======================================================
+%                   ACRÓNIMOS
+% ======================================================
+\usepackage[acronym,nogroupskip]{glossaries-extra}
+\setabbreviationstyle[acronym]{long-short}
+\makeglossaries
+\newcommand{\ac}{\gls}
+\newcommand{\acp}{\glspl}
+\newcommand{\acs}{\glsentryshort}
+\newcommand{\acf}{\glsfirst}
+
+% RF / Comms / Sensing
+\newacronym{RF}{RF}{radiofrecuencia}
+\newacronym{WiFi}{Wi-Fi}{tecnología de redes inalámbricas basada en IEEE 802.11}
+\newacronym{LoRa}{LoRa}{radio de largo alcance}
+\newacronym{LoRaWAN}{LoRaWAN}{red de área amplia y largo alcance}
+\newacronym{LPWAN}{LPWAN}{red de área amplia y bajo consumo}
+\newacronym{OFDM}{OFDM}{multiplexación por división de frecuencias ortogonales}
+\newacronym{CSI}{CSI}{información del estado del canal}
+\newacronym{CFR}{CFR}{respuesta en frecuencia del canal}
+\newacronym{CIR}{CIR}{respuesta al impulso del canal}
+\newacronym{MIMO}{MIMO}{múltiples entradas y múltiples salidas}
+\newacronym{SISO}{SISO}{una entrada y una salida}
+\newacronym{RT}{RT}{trazado de rayos}
+\newacronym{DRT}{DRT}{trazado de rayos diferenciable}
+\newacronym{WDT}{WDT}{gemelo digital inalámbrico}
+\newacronym{ISAC}{ISAC}{comunicación y sensado integrados}
+\newacronym{SDR}{SDR}{radio definida por software}
+\newacronym{IQ}{I/Q}{componentes en fase y cuadratura}
+\newacronym{AoA}{AoA}{ángulo de llegada}
+\newacronym{AoD}{AoD}{ángulo de salida}
+\newacronym{ToF}{ToF}{tiempo de vuelo}
+\newacronym{PDP}{PDP}{perfil de potencia en función del retardo}
+\newacronym{RMSDS}{RMS-DS}{dispersión cuadrática media del retardo}
+\newacronym{SNR}{SNR}{relación señal a ruido}
+\newacronym{SSNR}{SSNR}{relación señal a ruido para sensado}
+\newacronym{CFO}{CFO}{desajuste de frecuencia de portadora}
+\newacronym{SFO}{SFO}{desajuste de frecuencia de muestreo}
+\newacronym{STO}{STO}{desajuste temporal de muestreo}
+\newacronym{CPO}{CPO}{desajuste de fase de portadora}
+\newacronym{PEOC}{PEOC}{calibración que ignora el error de fase}
+\newacronym{UPEC}{UPEC}{calibración con error de fase uniforme}
+\newacronym{PEAC}{PEAC}{calibración que considera el error de fase}
+\newacronym{PHY}{PHY}{capa física}
+\newacronym{CSS}{CSS}{espectro ensanchado mediante chirridos}
+\newacronym{FFT}{FFT}{transformada rápida de Fourier}
+\newacronym{IFFT}{IFFT}{transformada rápida inversa de Fourier}
+\newacronym{FIM}{FIM}{matriz de información de Fisher}
+\newacronym{CRLB}{CRLB}{cota inferior de Cramér--Rao}
+\newacronym{LOS}{LOS}{línea de vista}
+\newacronym{NLOS}{NLOS}{sin línea de vista}
+\newacronym{AWGN}{AWGN}{ruido gaussiano blanco aditivo}
+\newacronym{LTI}{LTI}{lineal e invariante en el tiempo}
+\newacronym{LTV}{LTV}{lineal y variante en el tiempo}
+\newacronym{WSSUS}{WSSUS}{estacionario en sentido amplio con dispersión no correlacionada}
+\newacronym{CP}{CP}{prefijo cíclico}
+\newacronym{PSD}{PSD}{densidad espectral de potencia}
+
+% ML / Representation Learning
+\newacronym{DL}{DL}{aprendizaje profundo}
+\newacronym{ML}{ML}{aprendizaje automático}
+\newacronym{SSL}{SSL}{aprendizaje autosupervisado}
+\newacronym{JEPA}{JEPA}{Joint-Embedding Predictive Architecture}
+\newacronym{PINN}{PINN}{red neuronal informada por la física}
+\newacronym{BSS}{BSS}{separación ciega de fuentes}
+\newacronym{PCA}{PCA}{análisis de componentes principales}
+\newacronym{ICA}{ICA}{análisis de componentes independientes}
+\newacronym{NMF}{NMF}{factorización matricial no negativa}
+\newacronym{NMSE}{NMSE}{error cuadrático medio normalizado}
+\newacronym{MAE}{MAE}{error absoluto medio}
+\newacronym{RMSE}{RMSE}{raíz del error cuadrático medio}
+\newacronym{OOD}{OOD}{fuera de distribución}
+\newacronym{SMPL}{SMPL}{Skinned Multi-Person Linear Model}
+
+% Health / Human sensing
+\newacronym{RR}{RR}{frecuencia respiratoria}
+\newacronym{HR}{HR}{frecuencia cardiaca}
+\newacronym{ECG}{ECG}{electrocardiograma}
+\newacronym{PPG}{PPG}{fotopletismograma}
+\newacronym{GT}{GT}{valor de referencia}
+
+% ======================================================
+%                COMANDOS ÚTILES
+% ======================================================
+\newcommand{\cpx}{\mathbb{C}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\jj}{\mathrm{j}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\DeclareMathOperator{\wrap}{wrap}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\tr}{tr}
+
+% ======================================================
+%                    DOCUMENTO
+% ======================================================
+
+% Evita estirar verticalmente las páginas con tablas extensas.
+\raggedbottom
