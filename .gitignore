@@ -1,0 +1,27 @@
+# Directorio de compilacion configurado en .latexmkrc
+.build/
+
+# Archivos auxiliares de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.ist
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Archivos locales del sistema y del editor
+.DS_Store
+*~
+*.bak
+
