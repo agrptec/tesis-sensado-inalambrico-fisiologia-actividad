@@ -1,2 +1,85 @@
 \chapter{Canal multitrayecto, diversidad y sistemas de banda ancha}
-% El contenido se integra en el siguiente commit editorial.
+\label{ch:multitrayectoria}
+
+\section{Representación multitrayecto, CIR y CFR}
+
+Para una escena y una modalidad de radio dadas, una aproximación de alta frecuencia expresa el canal como
+\begin{equation}
+H_m(f,t)=\sum_{\ell=1}^{L_m(t)}\alpha_{m,\ell}(f,t)
+\exp\{-j2\pi f\tau_{m,\ell}(t)\},
+\label{eq:multipath}
+\end{equation}
+donde $\alpha_{m,\ell}$ reúne pérdidas, diagramas e interacciones, y $\tau_{m,\ell}=d_{m,\ell}/c$. El subíndice $m$ impide suponer que dos radios observan el mismo conjunto efectivo de caminos.
+
+Cuando cada ganancia es aproximadamente plana en la banda,
+\begin{equation}
+h_m(t,\tau)=\sum_{\ell=1}^{L_m(t)}\alpha_{m,\ell}(t)
+\delta(\tau-\tau_{m,\ell}(t)),
+\end{equation}
+y la \ac{CFR} es la transformada de Fourier de la \ac{CIR}. Si la interacción es dispersiva, su contribución requiere una respuesta extendida. La potencia coherente contiene términos cruzados,
+\begin{equation}
+|H(f)|^2=\sum_\ell|\alpha_\ell|^2+2\Re\sum_{\ell<r}
+\alpha_\ell\alpha_r^*e^{-j2\pi f(\tau_\ell-\tau_r)},
+\label{eq:coherent_power}
+\end{equation}
+por lo que sumar energías de caminos no reproduce, en general, la potencia del canal complejo.
+
+\section{Dispersión, coherencia y resolución en retardo}
+
+El \ac{PDP} $P_h(\tau)=\E[|h(t,\tau)|^2]$ permite definir
+\begin{align}
+\bar\tau&=\frac{\int \tau P_h(\tau)d\tau}{\int P_h(\tau)d\tau},\\
+\tau_{\rm rms}&=\left[\frac{\int(\tau-\bar\tau)^2P_h(\tau)d\tau}
+{\int P_h(\tau)d\tau}\right]^{1/2}.
+\label{eq:rms_delay}
+\end{align}
+El ancho de coherencia es inversamente proporcional a la dispersión, con una constante dependiente del umbral de correlación. Debe distinguirse de la resolución nominal impuesta por el ancho de banda ocupado:
+\begin{equation}
+\Delta\tau\sim\frac{1}{B},\qquad
+\Delta d_{\rm path}\sim\frac{c}{B}.
+\label{eq:delay_resolution}
+\end{equation}
+Para rango monostático aparece $c/(2B)$. Dos caminos con separación menor que esta escala pueden inducir columnas casi colineales en un problema inverso. Esta relación reaparecerá al analizar condición numérica e identificabilidad \citep{Molisch2022,Goldsmith2005}.
+
+Una transformación $H'(\nu)=e^{j\phi_0}e^{-j2\pi\nu\delta\tau}H(\nu)$ desplaza la respuesta ideal a $h'(\tau)=e^{j\phi_0}h(\tau-\delta\tau)$. Conserva magnitud y dispersión RMS cuando se observa el soporte completo, pero cambia la referencia de retardo. En una IFFT finita deben controlarse ventana, máscara y plegado.
+
+\section{Doppler y coherencia temporal}
+
+El movimiento modifica longitud, ganancia y visibilidad de las trayectorias. El espectro Doppler describe la variación temporal y el tiempo de coherencia es inversamente proporcional a su extensión bajo una convención declarada. Esta cantidad caracteriza correlación del canal; no es por sí sola un teorema de muestreo para respiración o actividad. La recuperabilidad depende además del espectro del estado, los intervalos de observación, los huecos de tráfico y el ruido \citep{Bello1963,Molisch2022}.
+
+\section{Diversidad espacial, MIMO y OFDM}
+
+Con $N_t$ antenas transmisoras y $N_r$ receptoras, $\mat H(f,t)\in\cpx^{N_r\times N_t}$. Sus entradas comparten dispersores y no son réplicas independientes. En comunicación, la estructura espacial determina diversidad y multiplexación; en sensado, proporciona proyecciones biestáticas distintas del mismo estado. La información adicional depende de apertura, polarización, diagramas y geometría \citep{TseViswanath2005,Molisch2022}.
+
+Para una subportadora $k$ y captura $n$,
+\begin{equation}
+Y_n[k]=H_n[k]X_n[k]+W_n[k],\qquad
+\widehat H_n[k]=\frac{Y_n[k]}{X_n[k]}
+\end{equation}
+cuando $X_n[k]$ es conocido. Si el prefijo cíclico cubre la memoria significativa, \ac{OFDM} aproxima la convolución por ganancias escalares en frecuencia \citep{ProakisSalehi2008}. La \ac{CSI} es una estimación condicionada por el receptor y su procesamiento, no una lectura directa del campo.
+
+\section{Instrumentación, sincronización y fase}
+\label{sec:phase_taxonomy}
+
+Una observación práctica admite el modelo local
+\begin{equation}
+\widetilde H_n[k]=g_n[k]H_n[k]\exp\!\left\{j\left[\varphi_{0,n}
++2\pi\Delta f_{\rm CFO}t_n-2\pi\nu_k\Delta\tau_n\right]\right\}+w_n[k],
+\label{eq:hardware_model}
+\end{equation}
+donde $g_n[k]$ incluye la respuesta de cadena, $\varphi_{0,n}$ una referencia común, el \ac{CFO} induce rotación temporal y $\Delta\tau_n$ resume errores compatibles con \ac{STO}/\ac{SFO}. También intervienen ruido de fase, muestreo, reinicios y reloj. Una pendiente espectral no identifica de forma única un error de reloj, porque una discrepancia de longitud produce la misma forma.
+
+La fase observada puede mezclar propagación física, discrepancia geométrica, adquisición y procesamiento. Su separación exige metadatos, una referencia o intervenciones. Esta taxonomía conecta las correcciones locales estudiadas por Ruah y colaboradores con los contrastes posteriores, sin interpretar cada variable latente como una causa física recuperada \citep{Ruah2024Phase}.
+
+\section{Convención espectral y retardo efectivo}
+\label{sec:phase_conventions}
+\label{sec:delay_gauge}
+
+Con $f=f_{\rm ref}+\nu$,
+\begin{equation}
+H(f)=\sum_\ell\widetilde\alpha_\ell(f)e^{-j2\pi f\tau_\ell}
+=\sum_\ell\alpha_\ell(f;f_{\rm ref})e^{-j2\pi\nu\tau_\ell},
+\end{equation}
+donde $\alpha_\ell=\widetilde\alpha_\ell e^{-j2\pi f_{\rm ref}\tau_\ell}$. Aplicar la fase de portadora dos veces produce un error de síntesis. Un retardo ajustado entre medición y simulación puede reunir referencia, registro e interferencia; los resultados experimentales lo denominan \emph{retardo efectivo} y no estimación identificada del reloj.
+
+Este capítulo fija la interfaz entre propagación y medición. El siguiente formula cómo un estado físico modifica ese canal y qué parte de la modificación permanece en el observable de sensado.

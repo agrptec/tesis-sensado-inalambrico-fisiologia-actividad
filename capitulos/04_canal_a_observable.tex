@@ -1,2 +1,112 @@
 \chapter{Del canal de comunicaciones al observable para sensado}
-% El contenido se integra en el siguiente commit editorial.
+\label{ch:canal_observable}
+
+\section{Estado físico, canal y operador de observación}
+
+Sea $q(t)$ el estado físico de interés y $H(q,t)$ el canal condicionado por la escena. La radio no entrega $H$ de forma directa, sino
+\begin{equation}
+Y_m=\mathcal O_m\!\left(H(q),s_{R,m},s_{N,m}\right)+\eta_m,
+\label{eq:observation_operator}
+\end{equation}
+donde $\mathcal O_m$ reúne forma de onda, ancho de banda, antenas, muestreo y procesamiento; $s_R$ describe la configuración de radio y $s_N$ las perturbaciones instrumentales. La inferencia busca información sobre $q$ a través de esta composición.
+
+Para una perturbación pequeña,
+\begin{equation}
+H(q+\Delta q)\simeq H(q)+J_H(q)\Delta q,
+\qquad J_H(q)=\frac{\partial H}{\partial q}.
+\label{eq:local_channel_jacobian}
+\end{equation}
+La linealización es local y requiere una familia de trayectorias estable. Oclusiones, cambios de visibilidad y nulos por interferencia exigen diferencias finitas o simulación de perturbaciones.
+
+\section{Sensibilidad geométrica de una trayectoria}
+\label{sec:geometry_phase_scales}
+
+Para un punto móvil $\vect p_H$ en una trayectoria Tx--objeto--Rx,
+\begin{equation}
+L_H=\|\vect p_T-\vect p_H\|_2+\|\vect p_H-\vect p_R\|_2,
+\end{equation}
+y $\phi_H=-2\pi L_H/\lambda$. Si el objeto se desplaza una cantidad $x$ en dirección $\vect n$,
+\begin{equation}
+\frac{\partial\phi_H}{\partial x}=-\frac{2\pi}{\lambda}
+\left(\widehat{\vect u}_{TH}+\widehat{\vect u}_{RH}\right)^T\vect n.
+\label{eq:bistatic_sensitivity}
+\end{equation}
+El factor $4\pi/\lambda$ corresponde al caso radial monostático y no debe trasladarse sin geometría a un enlace biestático. La orientación puede anular la sensibilidad de primer orden aun con potencia elevada.
+
+Para $H_p=\alpha(q,f)e^{-j2\pi d(q)/\lambda}$,
+\begin{equation}
+\nabla_qH_p=e^{-j2\pi d/\lambda}
+\left(\nabla_q\alpha-j\frac{2\pi}{\lambda}\alpha\nabla_qd\right),
+\label{eq:geometry_phase_jacobian}
+\end{equation}
+lo cual muestra que el movimiento afecta longitud, amplitud y fase de interacción. Si $\delta q$ posee covarianza $\Sigma_q$ y se fija la fase de $\alpha$,
+\begin{equation}
+\sigma_{\phi_p}^2\simeq\left(\frac{2\pi}{\lambda}\right)^2
+\nabla d^{\mathsf T}\Sigma_q\nabla d.
+\label{eq:geometric_phase_uncertainty}
+\end{equation}
+
+\section{Escalas de fase y metrología}
+
+La conversión
+\begin{equation}
+\lambda=\frac{c}{f},\qquad
+|\delta\phi_p|_{\rm deg}=360^\circ\frac{|\delta d|}{\lambda}
+\label{eq:phase_length_conversion}
+\end{equation}
+origina el \cref{tab:wavelength_metrology}; no procede de un resultado medido. La frecuencia de \SI{3.438}{GHz} corresponde a dc01, \SI{5}{GHz} representa Wi-Fi y \SI{60}{GHz} la extensión milimétrica propuesta \citep{Euchner2023DICHASUSdcxx,TIIWRL6432BOOST}.
+
+\begin{table}[htbp]
+\centering
+\caption{Sensibilidad de fase calculada para cambios de longitud total de trayectoria.}
+\label{tab:wavelength_metrology}
+\begin{tabular}{rrrr}
+\toprule
+Frecuencia (GHz) & $\lambda$ (mm) & $|\delta d|$ (mm) & $|\delta\phi_p|$ (grados)\\
+\midrule
+3.438 & 87.2 & 10 & 41.3\\
+5 & 60.0 & 10 & 60.0\\
+28 & 10.7 & 1 & 33.6\\
+60 & 5.0 & 1 & 72.0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La tabla explica por qué una geometría visualmente plausible puede ser insuficiente para fase. En configuración monostática a \SI{60}{GHz}, un milímetro radial duplica el cambio de longitud y produce aproximadamente $144^\circ$.
+
+\section{Interferencia, Fresnel y dinámica humana}
+
+Respecto de un estado basal puede escribirse $H(t)=H_s+H_d(t)$, sin suponer que la descomposición sea física ni única. La perturbación observable depende de la relación compleja entre ambas componentes. Zonas de Fresnel, cancelaciones y cambios de visibilidad producen regiones de alta y baja sensibilidad \citep{Mosleh2022BreatheSmart,Zhu2024Survey}.
+
+La respiración se modela primero como un microdesplazamiento torácico y no como una etiqueta clínica. El movimiento corporal produce cambios de mayor amplitud, no linealidades y variación de soporte. Con varios dispersores o personas, las contribuciones se superponen coherentemente; su separación depende de ancho de banda, apertura, geometría y diversidad temporal.
+
+\section{Invariantes y sensibilidad preservada}
+\label{sec:phase_invariants}
+
+Si $\vect h_u(\nu_k)$ comparte una transformación $\vect h'_u(\nu_k)=e^{j\psi_u-j2\pi\nu_k\delta\tau_u}\vect h_u(\nu_k)$, el producto espacial
+\begin{equation}
+\mat G_u(k)=\vect h_u(\nu_k)\vect h_u(\nu_k)^H
+\label{eq:spatial_gram_invariant}
+\end{equation}
+elimina fase y retardo comunes por frecuencia. En cambio,
+\begin{equation}
+\mat K_u(k,l)=\vect h_u(\nu_k)\vect h_u(\nu_l)^H
+\label{eq:cross_frequency_invariant}
+\end{equation}
+elimina $\psi_u$ y conserva sensibilidad a $\delta\tau_u$ cuando $k\ne l$. Para vectores apilados,
+\begin{equation}
+d_{\mathrm U(1)}^2(\vect x,\vect y)=
+\min_\psi\|\vect x-e^{j\psi}\vect y\|_2^2
+=\|\vect x\|_2^2+\|\vect y\|_2^2-2|\vect x^H\vect y|.
+\label{eq:phase_quotient_distance}
+\end{equation}
+Ninguna invariancia es gratuita: su derivada respecto de $q$ debe compararse con la del canal complejo.
+
+\section{Wi-Fi y LoRa como observadores distintos}
+
+Wi-Fi ofrece típicamente CSI multicarrier, mayor ancho de banda y diversidad espacial útil para microdinámica. LoRa emplea modulación chirp de banda relativamente estrecha, mayor presupuesto de enlace y acceso al PHY dependiente de la plataforma. Por tanto,
+\begin{equation}
+Y_{\rm WiFi}=\mathcal O_{\rm WiFi}(H),\qquad
+Y_{\rm LoRa}=\mathcal O_{\rm LoRa}(H),
+\end{equation}
+son observaciones distintas del mismo estado físico, no versiones intercambiables de una señal. El \cref{ch:sensado_wifi_lora} revisará su evidencia de sensado; aquí queda establecida la cadena física desde $q$ hasta $Y$.

@@ -1,4 +1,5 @@
-\chapter{Observabilidad, información de Fisher e incertidumbre}
+\chapter{Fidelidad diferencial, invariancia, resolubilidad y observabilidad}
+\label{ch:fidelity_observability}
 \label{ch:observability}
 
 Los capítulos precedentes construyeron el modelo directo, desde la escena hasta la
@@ -6,6 +7,59 @@ medición. Este capítulo estudia su dirección inversa: bajo qué condiciones u
 del estado humano produce cambios distinguibles en los observables. La respuesta se
 formula localmente mediante sensibilidad, información estadística e incertidumbre, y
 servirá después para evaluar tanto los algoritmos como el diseño de la red.
+
+\section{Fidelidad estática y fidelidad diferencial}
+
+Sea $D_0=D(H_{\rm model},H_{\rm real})$ una distancia de campo cuya definición
+depende del observable y de las invariancias declaradas. Para una intervención
+$\Delta q$ se define
+\begin{equation}
+\Delta H(q;\Delta q)=H(q+\Delta q)-H(q),\qquad
+D_\Delta=D(\Delta H_{\rm model},\Delta H_{\rm real}).
+\end{equation}
+Localmente, $\Delta H\simeq J_q\Delta q$. La relación
+\begin{equation}
+D(H_1,H_{\rm real})<D(H_2,H_{\rm real})
+\end{equation}
+no implica
+\begin{equation}
+\|J_1-J_{\rm real}\|<\|J_2-J_{\rm real}\|.
+\label{eq:static_not_differential}
+\end{equation}
+Esta separación es el criterio central para juzgar si un gemelo calibrado para canal
+estático resulta adecuado para sensado.
+
+\section{Invariancia instrumental y costo diferencial}
+
+Para un grupo de transformaciones perturbadoras $T_g$, una representación puede
+satisfacer $V(T_gH)=V(H)$. Su respuesta a la variable física es, sin embargo,
+\begin{equation}
+\frac{\partial V(H(q))}{\partial q}
+=\frac{\partial V}{\partial H}\frac{\partial H}{\partial q}.
+\label{eq:invariance_chain_rule}
+\end{equation}
+La misma transformación que reduce deriva puede proyectar una dirección de señal.
+Por ello toda mejora de repetibilidad se acompaña de una medición de sensibilidad.
+
+\section{Resolubilidad e identificabilidad pathwise}
+
+En una síntesis lineal por trayectorias puede escribirse
+\begin{equation}
+\vect h=\mat G\vect a+\vect w,
+\label{eq:pathwise_linear_model}
+\end{equation}
+donde cada columna de $\mat G$ es la firma espectral/espacial de un camino y
+$\vect a$ contiene sus coeficientes efectivos. Se distinguirán rango algebraico,
+rango efectivo, espectro singular, coherencia de columnas e identificabilidad física.
+La condición
+\begin{equation}
+\kappa(\mat G)=\frac{\sigma_{\max}(\mat G)}{\sigma_{\min}(\mat G)}
+\label{eq:path_condition_number}
+\end{equation}
+cuantifica amplificación de perturbaciones cuando el rango es completo; no resuelve
+ambigüedades de modelo. La escala $1/B$ de la \cref{eq:delay_resolution} explica por
+qué caminos con retardos próximos pueden ser casi indistinguibles. Un sistema de rango
+completo puede seguir siendo inutilizable para estimar coeficientes individuales.
 
 \section{Problema inverso, identificabilidad y observabilidad local}
 
@@ -183,7 +237,7 @@ común también puede eliminar una variación física que actúe en esa direcci�
 Esto ocurre, por ejemplo, en la idealización de un único camino cuyo movimiento
 sólo modifica su fase común y mantiene amplitud y vector espacial.
 
-S4.7a contrastará fidelidad estática en el espacio invariante; S6 deberá evaluar
+S4.7-R contrasta fidelidad estática en el espacio invariante; S6 deberá evaluar
 además $\partial\mat G/\partial x_H$ o la derivada del observable elegido,
 comparándola con una referencia mecánica. La información de Fisher del observable
 transformado debe derivarse de su distribución: los productos de canales

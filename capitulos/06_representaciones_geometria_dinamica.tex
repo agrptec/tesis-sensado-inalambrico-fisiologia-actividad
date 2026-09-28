@@ -1,4 +1,4 @@
-\chapter{Representaciones neuronales del entorno y del campo de radiofrecuencia}
+\chapter{Representaciones aprendidas, geometría y dinámica del entorno}
 \label{ch:latent_env}
 
 Una vez definido el criterio de fidelidad del gemelo, es necesario decidir cómo representar
@@ -83,9 +83,11 @@ según la \cref{eq:phase_latent_roles}. Esta clasificación distingue cantidades
 predictivas, parámetros perturbadores y discrepancia residual; no asigna causas
 físicas únicas ni presupone independencia. La elección de un observable
 invariante debe conservar sensibilidad a la tarea. Su fundamento matemático
-se presenta en la \cref{sec:phase_invariants}, y su validación es el bloque
-propuesto S4.7a. Un codificador aprendido y la incertidumbre por trayectoria
-permanecen pendientes. La clasificación se revisará si una referencia de
+se presenta en la \cref{sec:phase_invariants}, y su validación estática corresponde
+al bloque ejecutado S4.7-R. Un codificador aprendido y la incertidumbre por trayectoria
+permanecen pendientes. Tras el cierre de S4.7-Ua, la fase común permanece en
+$Z_\phi^{\rm nuisance}$ bajo dc01/B0, las covariables y las particiones evaluadas;
+esta asignación operacional no afirma aleatoriedad universal. La clasificación se revisará si una referencia de
 adquisición o metadatos adicionales modifican la predictibilidad observada.
 
 La identificabilidad de representaciones separadas requiere restricciones e
@@ -111,10 +113,10 @@ referencias, intervenciones controladas o información adicional. La equivarianc
 física se expresará respecto de una transformación conocida del estado; no se
 supondrá que toda traslación de un objeto produce una rotación global del canal.
 
-\subsection{Familia operacional para S4.7a}
+\subsection{Familia operacional para S4.7-R}
 \label{sec:representation_v_family}
 
-Se denominarán $\mathsf V_0$--$\mathsf V_7$ las alternativas del análisis; esta
+Se denominan $\mathsf V_0$--$\mathsf V_7$ las alternativas del análisis; esta
 notación evita confundirlas con los regímenes de información $\mathcal R_i$ y los
 hitos administrativos R1--R5. Para $H\in\mathbb C^{A\times K}$, $\mathbf h_k=H_{:,k}$
 y $\epsilon>0$ con las unidades del denominador, se definen:
@@ -159,8 +161,90 @@ del experimento: cada ablación declarará componentes, dimensión, normalizaci�
 a referencia. La comparación con $\mathsf V_1$--$\mathsf V_6$ determinará si la
 complementariedad compensa el aumento de capacidad y de información auxiliar.
 
+La ejecución S4.7-R materializa esta familia mediante etiquetas de programa que se
+conservan por trazabilidad. La correspondencia de los observables principales se resume
+en la \cref{tab:s47_representation_names}. Las etiquetas auxiliares R4, R5 y R5e
+pertenecen al registro de implementación de productos relativos; no se emplean como
+sinónimos automáticos de una $\mathsf V_i$ sin declarar su fórmula y normalización.
+Esta precaución evita identificar dos objetos sólo porque ambos sean invariantes a una
+rotación común.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Correspondencia operacional entre la taxonomía del manuscrito y los nombres principales de S4.7-R.}
+\label{tab:s47_representation_names}
+\begin{tabularx}{\textwidth}{P{2.0cm}P{3.2cm}L}
+\toprule
+Taxonomía & Nombre de ejecución & Objeto comparado\\
+\midrule
+$\mathsf V_0$ & R0 complejo & Canal complejo sin cociente de fase.\\
+$\mathsf V_1$ & R1 magnitud & Magnitud del canal; control invariante a la corrección de retardo.\\
+$\mathsf V_2^{(64)}$ & R3, \emph{lag} 64 & Producto espectral normalizado entre subportadoras separadas por 64 índices.\\
+$\mathsf V_4$ & U1 global/arreglo/antena & Distancia cociente con una rotación común en la granularidad indicada.\\
+$\mathsf V_3,\mathsf V_5$ & Productos espaciales/Gram; controles R4--R5e & Estructura relativa espacial con la fórmula y la normalización declaradas por cada ejecución.\\
+$\mathsf V_6$ & Canal bruto o corregido por $\widehat\tau$ & Canal canónico sin CPO, $\psi$, $\beta$ ni fase obtenida del objetivo.\\
+$\mathsf V_7$ & Fusión fija o convexa aprendida & Combinación de distancias normalizadas, no concatenación de \emph{embeddings} ni síntesis de un canal complejo.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+En la evaluación congelada, $\mathsf V_4$ por arreglo constituye la representación
+primaria y $\mathsf V_2^{(64)}$ una componente auxiliar. La fusión aprendida usa pesos
+no negativos que suman uno, ajustados sobre distancias cuya normalización robusta se
+estima únicamente con entrenamiento. Por tanto, su ganancia evalúa complementariedad
+entre criterios de distancia estáticos; no demuestra que se haya aprendido una
+representación latente ni que exista todavía una rama coherente sensible al movimiento.
+
+\section{Dinámica, inversión y transferencia}
+
+WaveVerse amplía la simulación hacia mundos dinámicos y coherencia temporal
+\citep{Zheng2026WaveVerse}; RayLoc e InverTwin utilizan diferenciabilidad para resolver
+problemas inversos \citep{Han2026RayLoc,Chen2025InverTwin}; RFDT conecta una
+representación RF con tareas posteriores \citep{Chen2026RFDT}. Estas capacidades no
+son equivalentes. Una secuencia visualmente coherente no garantiza un Jacobiano correcto,
+y una inversión exitosa no identifica parámetros físicos cuando el modelo directo es
+no inyectivo.
+
+La transferencia se evaluará con igual información, presupuesto de adaptación y
+particiones espaciales. El preentrenamiento autosupervisado, incluida la familia JEPA
+\citep{Assran2023IJEPA,Kim2026WiFiJEPA}, se considera un mecanismo para regularizar
+la representación; su valor dependerá de preservar la respuesta a perturbaciones y de
+reducir datos reales en dominios reservados.
+
+Los insumos geométricos también forman parte de la comparación. DeepSense y CAEZ
+aportan referencias de datos inalámbricos asociados con contexto y geometría
+\citep{Alkhateeb2022DeepSense,ETHCAEZ,Zumegen2024CAEZWiFi}. WiSegRT condiciona
+trazado y segmentación semántica \citep{Zhang2023WiSegRT}, mientras el mapeo interior
+basado en radio y la identificación diferenciable de materiales investigan problemas
+inversos sobre escena y propiedades \citep{Milosheski2026IndoorMapping,Chen2026RFMatID}.
+WiInSim representa una vía industrial de simulación condicionada por escena
+\citep{QualcommWiInSim}. Estos recursos no se compararán como si ofrecieran la misma
+supervisión: se registrarán geometría, semántica, mediciones RF y parámetros materiales
+disponibles en entrenamiento e inferencia.
+
+\section{Síntesis comparativa}
+
+\begin{table}[htbp]
+\centering\scriptsize
+\caption{Comparación conceptual de representaciones RF relevantes. ``Sí'' indica una capacidad central del trabajo citado; no implica validación para sensado humano.}
+\label{tab:rf_representation_comparison}
+\begin{tabularx}{\textwidth}{P{2.1cm}CCCCC L}
+\toprule
+Trabajo & Geometría & Fase & Dinámica & Inversión & Sensing & Límite para esta investigación\\
+\midrule
+NeRF$^2$ \citep{Zhao2023NeRF2} & implícita & parcial & no & no & indirecto & Campo ligado a datos/escena.\\
+Learnable WDT \citep{Jiang2025LearnableWDT} & explícita & sí & no & parcial & indirecto & Requiere contrastar sensibilidad, no sólo campo.\\
+RFScape \citep{Chen2025RFScape} & objetos & parcial & no & no & indirecto & La editabilidad no prueba identificabilidad material.\\
+RadTwin \citep{Zhang2026RadTwin} & condicionada & sí & sí & no & indirecto & La transferencia dinámica requiere entradas iguales.\\
+WaveVerse \citep{Zheng2026WaveVerse} & explícita & coherente & sí & no & indirecto & Coherencia simulada no valida el Jacobiano real.\\
+RayLoc \citep{Han2026RayLoc} & explícita & sí & no & sí & localización & La inversión hereda discrepancia del modelo directo.\\
+RFDT \citep{Chen2026RFDT} & aprendida & parcial & parcial & sí & downstream & Desempeño de tarea no establece fidelidad diferencial.\\
+WiFi-JEPA \citep{Kim2026WiFiJEPA} & latente & no explícita & sí & no & sí & Debe auditarse la física preservada por el pretexto.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 Las representaciones anteriores conectan escena, estructura relativa y referencia de
-adquisición. El \cref{ch:learning_foundations} establece cómo aprenderlas y evaluarlas;
-el capítulo de observación especifica después qué información conserva cada radio.
-Esta separación permite controlar arquitectura, adquisición y fidelidad física como
-factores distintos de la comparación.
+adquisición. Los capítulos siguientes distinguen la evidencia de sensing y formalizan
+qué información física debe conservar una representación para que la robustez estática
+sea útil ante movimiento.
