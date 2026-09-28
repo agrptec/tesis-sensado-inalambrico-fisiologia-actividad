@@ -1,9 +1,10 @@
-\chapter{Plan de trabajo de la Etapa 1}
+\chapter{Etapa 1 del proyecto financiado}
+\label{ch:stage1}
 \label{ch:wbs_stage1}
 
 \section{Alcance y criterio rector de la Etapa 1}
 
-El plan de esta etapa se conserva como marco de actividades y entregables. Su avance científico actual se documenta en el \cref{ch:avances}: el banco dc01, B0--B2 y S4.1--S4.6d.2 desarrollan LT1 y el marco de evaluación de LT2, incluida la validación regional del predictor de retardo. Estos avances no implican que se hayan completado la instrumentación multimodal, el estudio con participantes o los hitos de vinculación comunitaria.
+El plan de esta etapa se conserva como marco de actividades y entregables. Su avance científico actual se documenta en el \cref{ch:avances}: S4.7-R está cerrado; S4.7-Ua está cerrado con un resultado negativo útil; y la auditoría de resolubilidad S4.7-Ub.0 permanece activa. OpenLoRa se audita en paralelo, mientras E0 prepara el piso instrumental y E1 constituye el siguiente contraste físico central. La comparación mínima con NeRF$^2$ puede avanzar en paralelo, pero no bloquea E0--E1. Estos avances no implican que se hayan completado la instrumentación multimodal, el estudio con participantes o la vinculación comunitaria.
 
 La Etapa 1 comprende los primeros diez meses del proyecto y corresponde a la fase de
 \emph{modelado, diseño experimental y vinculación comunitaria}. Su propósito es
@@ -34,7 +35,9 @@ justificado avanzar al entorno comunitario.
 
 \section{Organización de las líneas de trabajo}
 
-La Etapa 1 se organiza en seis líneas de trabajo (LT). La organización conserva los
+La Etapa 1 se organiza en seis líneas de trabajo (LT). La contribución doctoral se
+juzga mediante PD1--PD3 y H1--H4; la gestión, las compras y la demostración comunitaria
+habilitan la investigación, pero no se contabilizan como novedad científica. La organización conserva los
 objetivos E1-1--E1-6 del proyecto y los agrupa de acuerdo con sus dependencias científicas
 y operativas. Las líneas no son compartimentos independientes: el modelado fundamenta
 el protocolo; el protocolo determina la instrumentación; la instrumentación hace posible
@@ -79,9 +82,9 @@ LT6 & Integración, evaluación y transición a la Etapa 2
 \subsection{LT1 --- Modelado físico y gemelo inalámbrico inicial}
 \label{sec:wp1_stage1}
 
-\textbf{Periodo:} M1--M6; cierre inicial S4.7a en M1--M2 y ampliación geométrica en M4--M6.
+\textbf{Periodo:} M1--M6; cierre estático S4.7-R documentado y ampliación geométrica prevista en M4--M6.
 
-\textbf{Avance documentado:} S1 y B0--B2 cuantifican la discrepancia estática; S4.1--S4.6d.2 analizan fase, estructura residual y transferencia del retardo al canal. S4.6 caracteriza la fase común, recupera el tiempo de adquisición y evalúa continuidad local. El trabajo siguiente S4.7a estudiará fidelidad relativa; S4.7b abordará incertidumbre por trayectoria. Esto aporta evidencia a P1.2 y P1.3. P1.1 y la revisión R1 requieren vincular los registros reproducibles indicados en la \cref{sec:trazabilidad_avances}.
+\textbf{Avance documentado:} B0--B2 cuantifican la discrepancia estática; S4.1--S4.6d.2 analizan fase, estructura residual y transferencia del retardo. S4.7-R cierra la evaluación de información espacial relativa. S4.7-Ua no encuentra predictibilidad circular transferible de la fase común con los descriptores evaluados. S4.7-Ub.0 muestra que la inversión por trayectoria puede estar severamente condicionada aun con rango completo. Esto aporta evidencia a P1.2 y P1.3. P1.1 y R1 requieren consolidar los artefactos reproducibles.
 
 \textbf{Pregunta rectora:} ¿qué información sobre entorno, movimiento y micromovimiento
 puede preservar el canal Wi-Fi/LoRa bajo geometrías y configuraciones de radio
@@ -357,7 +360,7 @@ en artefactos verificables antes de cerrar especificaciones de compra:
 \toprule
 Semana & Actividad & Evidencia de cierre\\
 \midrule
-1 & Congelar versiones, manifiestos, particiones y artefactos S1--S4.6. &
+1 & Congelar versiones, manifiestos, particiones y artefactos S1--S4.7-R. &
 Correspondencia reproducible y sumas de verificación.\\
 2 & Implementar $\mathsf V_0$--$\mathsf V_7$ y $\mathsf T_1$--$\mathsf T_7$. &
 Pruebas algebraicas y matriz de respuesta a perturbaciones.\\
@@ -365,7 +368,7 @@ Pruebas algebraicas y matriz de respuesta a perturbaciones.\\
 normalización ajustada sólo en entrenamiento.\\
 4 & Auditar d010 y realizar pruebas de sensibilidad si sus metadatos lo permiten. &
 Pareto entre rechazo de perturbaciones y cambio geométrico del transmisor.\\
-5 & Implementar S4.7b. & Baselines circulares, NLL, calibración y abstención.\\
+5 & Profundizar S4.7-Ub. & Espectro singular, rango efectivo, coherencias y agrupación de modos no resolubles.\\
 6 & Integrar perturbaciones seleccionadas de RadioRange. & Vulnerabilidades por
 observable bajo rangos trazables.\\
 7 & Ejecutar un caso mínimo de Indoor Radio Mapping y WiSegRT. & Flujo de nube/malla
@@ -391,7 +394,7 @@ la evidencia disponible y las cotizaciones compatibles.
 \toprule
 Meses & Líneas & Actividad & Producto revisable\\
 \midrule
-M1--M2 & LT1/LT2 & S4.7a en dc01. & Comparación $\mathsf V_i$ y controles espaciales.\\
+M1--M2 & LT1/LT2 & S4.7-R en dc01. & Comparación estática $\mathsf V_i$, resolución y fusión congelada documentadas.\\
 M1--M3 & LT2/LT3 & Diseño del banco y compras prioritarias. & Referencia RF, metrología y captura especificadas.\\
 M2--M4 & LT3 & Esc. E0. & Deriva y repetibilidad documentadas.\\
 M3--M5 & LT3/LT4 & Esc. E1, reflector. & $\Delta H$ y Jacobiano con desplazamiento medido.\\
@@ -590,7 +593,7 @@ contra cotizaciones y reglas administrativas antes de comprometer el gasto.
 \textbf{Revisión} & \textbf{Mes} & \textbf{Evidencia requerida} & \textbf{Decisión resultante}\\
 \midrule
 R1 & M4
-& Gemelo estático y S4.7a reproducibles; discrepancia y acceso a fase declarados.
+& Gemelo estático y S4.7-R reproducibles; discrepancia y acceso a fase declarados.
 & Establecer el modelo físico de referencia.\\
 R2 & M5
 & Protocolo, metadatos, control de calidad y ética formalizados.

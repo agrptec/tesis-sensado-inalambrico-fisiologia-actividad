@@ -1,2 +1,67 @@
 \chapter{Plataforma experimental y protocolo multimodal}
-% El contenido se integra en el siguiente commit editorial.
+\label{ch:platform}
+
+\section{Arquitectura funcional}
+
+La plataforma observa una misma intervención mediante radios bajo estudio y modalidades de referencia. No todas las modalidades deben operar en cada sesión; el protocolo declara el subconjunto disponible y su función:
+\begin{equation}
+\mathcal A_{\rm lab}=\{Y_{\rm WiFi},Y_{\rm LoRa},Y_{\rm mmWave},
+Y_{\rm ref},V_{\rm RGB(D)},x_{\rm stage},x_{\rm resp},x_{\rm IMU}\}.
+\end{equation}
+$Y_{\rm ref}$ caracteriza coherencia de radio; $x_{\rm stage}$ mide el movimiento impuesto; visión registra geometría/actividad; radar, respiración e inerciales proporcionan referencias complementarias según el experimento. Ninguna modalidad auxiliar se considera necesaria durante inferencia a menos que se declare expresamente.
+
+\section{Radios y modalidades de referencia}
+
+\begin{table}[htbp]
+\centering\scriptsize
+\caption{Recursos reportados y función experimental. El estado se verificará antes de incorporarlos a una sesión.}
+\label{tab:platform_inventory}
+\begin{tabularx}{\textwidth}{P{2.7cm}P{1.8cm}L P{2.5cm}L}
+\toprule
+Recurso & Estado & Función & Observable & Limitación principal\\
+\midrule
+Routers Wi-Fi / ESP32-DevKitC-VE & reportado & CSI configurable & CSI, RSSI, metadatos & fase/acceso dependen de firmware\\
+Pluto SDR \citep{AnalogDevicesPluto} & reportado & I/Q y pruebas RF & I/Q complejo & un receptor en configuración documentada\\
+RAK2287 y nodos STM32/NUCLEO-WL55 & reportado & LoRa/LoRaWAN & telemetría, paquetes & gateway no implica I/Q coherente\\
+IWRL6432BOOST \citep{TIIWRL6432BOOST} & tres reportados & referencia mmWave & cubo radar/estimados & precisión y sincronía por caracterizar\\
+Cámaras RGB y RGB-D/estéreo & reportadas & geometría y actividad & imagen y profundidad & oclusión y registro\\
+Jetson Orin Nano/Raspberry Pi & estado mixto & adquisición local & marcas y flujos & reloj y carga variable\\
+Servidor RTX 6000 Ada & reportado & simulación/aprendizaje & artefactos de cómputo & no resuelve incertidumbre metrológica\\
+Etapa, referencia RF y metrología & por completar & E0--E2 & movimiento y referencia & selección según incertidumbre demostrable\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Antes de comprar se verificarán modelo, interfaz, firmware y estado funcional. La denominación comercial no garantiza acceso al observable requerido. La prioridad instrumental es medir movimiento, estabilidad y referencia antes de ampliar cómputo.
+
+\section{Sincronización y reloj}
+
+Cada modalidad posee reloj local. Para el evento $i$ se modela
+\begin{equation}
+t_i^{(m)}=t_i^\star+\epsilon_i^{(m)},
+\label{eq:multimodal_sync}
+\end{equation}
+o, cuando se estima escala y origen, $a_mt_i^{(m)}+b_m=t_i^\star+\epsilon_i^{(m)}$. La incertidumbre residual $\epsilon_i^{(m)}$ se mide y reporta. Reinicios, saltos o deriva no afín obligan a segmentar la sesión. Índices de cuadro iguales, PPS o un reloj de \SI{10}{MHz} no prueban simultaneidad o coherencia de fase por sí solos.
+
+Los eventos mecánicos y pulsos de sincronización se registrarán en más de una modalidad cuando sea posible. Se informarán latencia, jitter, pérdida de muestras y tolerancia usada para emparejar observaciones.
+
+\section{Geometría, registro y metrología}
+
+Se fija un marco global $W$ y, para cada sensor $s$,
+\begin{equation}
+T_{W\leftarrow s}=\begin{bmatrix}R_{Ws}&\vect t_{Ws}\\0&1\end{bmatrix}\in SE(3).
+\label{eq:platform_extrinsics}
+\end{equation}
+Se registran cámaras, radios, centros de montaje, orientación y polarización. El centro mecánico no se identifica automáticamente con el centro de fase. Marcadores rígidos, distancias reservadas y mediciones repetidas verifican el registro; un residual pequeño de ICP no establece exactitud absoluta.
+
+La geometría se evalúa en niveles: planta/primitivas verificadas, RGB-D, LiDAR regularizado para RF y calibración electromagnética. La etapa mecánica tendrá una referencia independiente, caracterización de holgura e incertidumbre compatible con los pasos utilizados.
+
+\section{Protocolo de sesión y metadatos}
+
+Cada sesión registra identificador, fecha, operador, escenario E0--E5, geometría, estado basal, radios, canal/ancho de banda, antenas, firmware, ganancia, tasa de paquetes, relojes, reinicios, temperatura disponible y modalidades de referencia. Antes y después se ejecutan controles de escena vacía, actuador inmóvil y referencia.
+
+La adquisición conserva el observable menos procesado accesible y documenta cada transformación. En Wi-Fi se almacenan CSI, RSSI, secuencia y metadatos expuestos; en LoRa se distingue I/Q, señal tras \emph{dechirp}, FFT compleja y telemetría del módem. Los descartes, máscaras y paquetes inválidos se registran mediante códigos de control de calidad.
+
+\section{Criterio de disponibilidad científica}
+
+Un subsistema se considera disponible cuando produce datos trazables, sincronizados dentro de una incertidumbre medida y repetibles bajo un control conocido. ``Reportado'', ``previsto'' y ``verificado'' son estados diferentes. La plataforma mínima para E0--E1 requiere radio bajo estudio, referencia temporal, movimiento medido, fijación mecánica y geometría suficiente; las extensiones fisiológicas y de sitio se incorporan después de cumplir ese criterio.

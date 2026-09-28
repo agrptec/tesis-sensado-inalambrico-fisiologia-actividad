@@ -1,103 +1,47 @@
-\chapter{Conclusiones provisionales}
+\chapter{Síntesis científica y perspectivas}
 \label{ch:conclusions}
 
-\textbf{La fase se mejoró mediante una corrección espectral parcialmente
-predecible, aunque no se reconstruyó de forma completamente autónoma.}
-El resultado central de S4 es distinguir una componente de retardo compartida
-y transferible, una dirección común al arreglo condicionada a la captura y un
-residual relativo con estructura espectral. Esta distinción permite interpretar
-qué se ha logrado y elegir el tratamiento adecuado de lo que permanece abierto.
+\section{Resultados establecidos}
 
+La evidencia disponible permite separar tres niveles que antes aparecían mezclados. Primero, la calibración B0--B2 mejora propiedades macroscópicas del canal: potencia, magnitud y dispersión de retardos. Segundo, la discrepancia compleja contiene una pendiente espectral de baja dimensión que puede predecirse parcialmente desde posición y descriptores de trazado. Tercero, las representaciones relativas eliminan grados de libertad no disponibles y mejoran la discriminabilidad espacial estática.
 
-La primera etapa de investigación establece un marco reproducible de comparación entre
-un canal medido y su representación electromagnética, y distingue fidelidad macroscópica,
-fidelidad de magnitud, concordancia de fase y respuesta a perturbaciones físicas. La
-cadena desde escena hasta observable permite separar calibración del entorno, tratamiento
-instrumental y aprendizaje del problema inverso.
+S4.7-R confirma este tercer nivel dentro de dc01: $U(1)$ por arreglo aumenta su victoria global de aproximadamente $0.591$ a $0.796$ después de la corrección con retardo predicho, y la fusión congelada con el producto espectral alcanza aproximadamente $0.807$. La mejora se concentra en separación regional; no aparece una ganancia local concluyente. El umbral sostenido de $1$--$2\lambda$ describe discriminabilidad del protocolo y no resolución física universal.
 
-Sobre DICHASUS dc01, la calibración B0--B2 mejora potencia, magnitud y dispersión de
-retardos, sin una mejora correspondiente de fase bruta. La comparación se sitúa en la
-línea de calibración diferenciable de materiales y no identifica por sí sola parámetros
-constitutivos verdaderos. Los resultados justifican evaluar expresamente qué propiedades
-no quedan determinadas por el objetivo macroscópico de entrenamiento.
+\section{Resultados negativos y límites identificados}
 
-S4.2 caracteriza una corrección afín de fase formada por retardo efectivo e interceptos
-por enlace. El retardo es relativo al modelo y a la referencia de procesamiento; no se
-identifica automáticamente con STO físico. La transferencia entre antenas y frecuencias
-muestra estructura compartida, con diferencias claras entre interpolación espectral y
-extrapolación entre medias bandas. La alineación oráculo conserva su función diagnóstica
-y no se interpreta como predicción autónoma.
+La fase común al arreglo se estima a posteriori, pero S4.7-Ua no encuentra una mejora robusta al modelar $p(\psi\mid x_{\rm RT})$ frente a distribuciones circulares incondicionales. Retirar $\beta$, restringir casos con $\kappa>0$ o introducir una escala oráculo RT no cambia materialmente la conclusión. El mínimo $\Delta\mathrm{NLL}$ negativo observado, del orden de $-2\times10^{-6}$, es despreciable.
 
-S4.3 documenta estructura espectral residual y asociaciones con la distribución energética
-de las trayectorias. El análisis entre posiciones, dentro de posición y mediante
-remuestreo agrupado evidencia que el nivel de agregación modifica la interpretación.
-La asociación observada no determina una causa única ni reemplaza un contraste explícito
-de independencia que conserve la distribución marginal y el procedimiento de ajuste.
+Por tanto, bajo dc01/B0, las covariables y particiones evaluadas, $\psi$ se trata como componente de $Z_\phi^{\rm nuisance}$. Esta decisión no afirma que la fase común sea universalmente aleatoria o impredecible. Una referencia estable o metadatos distintos podrían modificar su identificabilidad.
 
-S4.4 muestra que la partición original favorece interpolación densa: la distancia mediana
-al vecino de entrenamiento es 0.0483 m. La evaluación posterior mediante cinco bloques
-espaciales y exclusión de 0.5 m produce un MAE medio de retardo de 27.56 ns con posición,
-19.29 ns con descriptores RT y 18.69 ns con ambos. La información del trazado conserva
-utilidad en regiones reservadas de dc01, aunque la mejora depende de la región y no
-constituye todavía transferencia entre escenas.
+La auditoría S4.7-Ub.0 valida la suma de trayectorias con error aproximado de $2.93\times10^{-7}$, pero revela condición muy distinta entre transmisores: Tx0 tiene rango $189/189$, $\kappa\approx2.79\times10^2$ y coherencia máxima $0.997073$; Tx1, rango $178/178$, $\kappa\approx1.45\times10^6$ y coherencia $0.999974$. Las ecuaciones normales agravan Tx1 y un ridge exploratorio introduce sesgo excesivo. El rango algebraico completo no implica identificabilidad robusta de coeficientes pathwise.
 
-S4.5 vincula el retardo predicho con métricas del canal. En interpolación densa,
-el error angular mediano disminuye de 81.42 a 45.59 grados y la coherencia
-aumenta de 0.156 a 0.634. Bajo evaluación por bloques,
-el predictor combinado alcanza error angular mediano de 64.08 grados y coherencia
-mediana de 0.448, frente a 81.49 grados y 0.157 con corrección exclusiva de CPO.
-El CPO continúa ajustándose con la medición evaluada: la contribución demostrada es
-la transferencia del retardo y su utilidad condicionada, no la recuperación completa
-de fase sin acceso al canal. La degradación respecto de interpolación densa cuantifica
-la importancia del protocolo espacial.
+\section{Hipótesis revisadas por la evidencia}
 
-S4.6 amplía el diagnóstico a 640\,000 fases residuales en 10\,000 capturas.
-La resultante global de 0.001088 y las medianas por antena de 0.01024 y 0.00630
-no respaldan una fase absoluta fija fuertemente concentrada. La dirección común
-estimada con las 32 antenas reduce el error mediano de 88.99 a 45.97 grados;
-esa reducción es descriptiva y requiere controles de ajuste finito para
-cuantificar su significación. La concentración marginal baja no excluye por
-sí sola sesgos relativos estables entre antenas.
+La hipótesis de una fase absoluta directamente predecible desde geometría se ha debilitado. La evidencia favorece una estructura operacional: componente espectral parcialmente transferible, fase común tratada como perturbación bajo el protocolo actual y estructura relativa aprovechable. La factorización latente se conserva como guía conceptual, sin prometer identificación separada de todos sus bloques.
 
-La recuperación temporal produjo correspondencia XYZ exacta y un manifiesto
-sin tiempos faltantes. Con esa referencia, copiar la fase común del vecino
-espacial alcanza errores medianos de 89.75 y 88.85 grados; copiarla del vecino
-temporal produce 90.34 y 90.56 grados. La falta de una ventaja clara se observa
-también en los intervalos temporales examinados. El resultado delimita el
-alcance de esas reglas locales, sin demostrar independencia, equivalencia
-estadística o una causa instrumental única.
+La distinción entre fidelidad estática y diferencial adquiere prioridad. S4.7-R demuestra información espacial estática, pero no respuesta a movimiento. La evidencia d010 confirma que la sensibilidad depende de geometría e infraestructura distribuida; sin embargo,
+\begin{equation}
+\frac{\partial H}{\partial p_{\rm Tx}}
+\ne
+\frac{\partial H}{\partial q_{\rm humano}},
+\end{equation}
+por lo que no sustituye una intervención humana o mecánica con terminales fijos.
 
-La etapa siguiente S4.7a evaluará concordancia relativa respecto de fase común.
-Los productos espaciales $G$ eliminan además el retardo común; por ello su
-contribución predictiva debe medirse con productos entre frecuencias $K$ o con
-la distancia del canal apilado respecto de una sola rotación por arreglo.
-S4.7b comparará incertidumbre circular y por trayectoria cuando el residual lo justifique.
-S5 evaluará representaciones con entradas, invariancias y costes declarados;
-S6 contrastará tanto $\Delta H$ como la sensibilidad del observable invariante
-mediante desplazamientos conocidos y calibración basal fija; S7 validará
-operadores Wi-Fi y LoRa específicos. La recuperación respiratoria y la
-incertidumbre de la tarea permanecen hipótesis por validar con mediciones
-independientes. Una invariancia que mejora fidelidad estática puede eliminar
-parte de la sensibilidad física y, por tanto, debe evaluarse frente a la tarea.
+\section{Experimentos con mayor valor informativo}
 
-El criterio doctoral de éxito consiste en establecer qué representación y qué tratamiento
-de la discrepancia conservan información útil para sensado, bajo qué condiciones esa
-información se transfiere y cuándo el sistema debe reconocer que la evidencia disponible
-es insuficiente. La comparación entre error de reconstrucción y error diferencial
-proporciona el vínculo matemático y experimental entre los avances de canal y ese objetivo.
+La siguiente evidencia decisiva procede de E0 y E1. E0 medirá el piso instrumental, reinicios y referencia. E1 impondrá desplazamientos conocidos y comparará canal complejo, magnitud, representación relativa, descriptor espectral y rama coherente mediante $\Delta H$, $J_{\rm real}$ y $J_{\rm sim}$. E2 utilizará un fantoma sólo después de cerrar ese régimen.
 
-La propuesta actualizada convierte ese criterio en dos ramas complementarias y una
-secuencia de intervenciones físicas. La rama robusta buscará estabilidad frente a
-transformaciones instrumentales especificadas; la coherente conservará micromovimiento
-cuando exista una referencia verificable. Su separación constituye una hipótesis a
-contrastar, porque una transformación común puede contener simultáneamente deriva y
-señal física. Por ello la invariancia estática y la sensibilidad diferencial se medirán
-juntas, sin convertir una mejora de normalización en evidencia automática de sensado.
+En paralelo, S4.7-Ub debe estudiar espectros singulares, rango efectivo, coherencia, separaciones de retardo y agrupación de modos no resolubles. Con $B\approx\SI{50}{MHz}$, $1/B\approx\SI{20}{ns}$ explica por qué varias firmas pueden ser casi indistinguibles. No se presentará un posterior independiente por trayectoria hasta definir un estimando resoluble. La comparación NeRF$^2$/gemelos aprendidos y la auditoría OpenLoRa avanzan en paralelo sin bloquear la física controlada.
 
-La geometría se tratará en tres escalas: recinto, registro de antenas y desplazamiento
-local. G0--G4 permitirá medir el aporte de reconstrucción y calibración; E0--E2 establecerá
-el piso instrumental y la respuesta mecánica antes de E3--E4 con personas. E5 evaluará
-transferencia real entre condiciones independientes. El cronograma y la propuesta de
-Ciencia de Frontera priorizan referencia RF, mecánica y trazabilidad, reutilizando el
-equipo reportado. Los resultados actuales terminan en S4.6d.2; el programa restante
-expresa compromisos de validación y decisiones experimentales, no logros anticipados.
+\section{Agenda doctoral y proyecto}
+
+La tesis busca establecer qué representación preserva sensibilidad, cuándo un gemelo reproduce esa sensibilidad y cómo la observabilidad apoya transferencia. El proyecto financiado aporta plataforma, metrología, referencias, extensión multirradio y sitio piloto. Su transición sigue
+\[
+\begin{aligned}
+\text{instrumentación estable}&\rightarrow
+\text{movimiento controlado detectable}\\
+&\rightarrow\text{respiración controlada recuperable}
+\rightarrow\text{persona}\rightarrow\text{piloto}.
+\end{aligned}
+\]
+El manuscrito permanece abierto en los puntos que requieren medición. Su contribución actual es delimitar con precisión qué parte del canal estático se ha modelado, qué grados de libertad no mostraron predictibilidad y por qué la fidelidad diferencial debe gobernar la siguiente etapa.
