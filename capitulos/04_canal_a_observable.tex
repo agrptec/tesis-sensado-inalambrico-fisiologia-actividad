@@ -1,14 +1,33 @@
 \chapter{Del canal de comunicaciones al observable para sensado}
 \label{ch:canal_observable}
 
+La teoría de canal describe cómo una señal se transforma; el sensado pregunta
+qué puede inferirse de esa transformación acerca de una perturbación de la escena.
+El paso exige declarar tanto la variable física como el operador que la radio
+conserva. Este capítulo construye esa relación sin equiparar potencia recibida,
+fase observable e información sobre el movimiento.
+
 \section{Estado físico, canal y operador de observación}
 
-Sea $q(t)$ el estado físico de interés y $H(q,t)$ el canal condicionado por la escena. La radio no entrega $H$ de forma directa, sino
+Sea $q(t)$ el estado físico de interés y $\Gamma(q,t)$ la escena correspondiente.
+La cadena directa se escribe
 \begin{equation}
-Y_m=\mathcal O_m\!\left(H(q),s_{R,m},s_{N,m}\right)+\eta_m,
+q\longmapsto\Gamma(q)
+\xrightarrow{\mathcal R_{\rm EM}}H(q)
+\xrightarrow{\mathcal C_m}\widetilde H_m(q)
+\xrightarrow{\mathcal O_m}Y_m,
+\end{equation}
+donde $\mathcal C_m$ representa antenas y cadenas de radiofrecuencia, mientras
+$\mathcal O_m$ contiene forma de onda, muestreo, sincronización y procesamiento.
+De forma abreviada, la radio entrega
+\begin{equation}
+Y_m=\mathcal O_m\!\left(\widetilde H_m(q),s_{R,m},s_{N,m}\right)+\eta_m,
 \label{eq:observation_operator}
 \end{equation}
-donde $\mathcal O_m$ reúne forma de onda, ancho de banda, antenas, muestreo y procesamiento; $s_R$ describe la configuración de radio y $s_N$ las perturbaciones instrumentales. La inferencia busca información sobre $q$ a través de esta composición.
+donde $s_R$ describe configuración y $s_N$ perturbaciones instrumentales. La
+inferencia opera sobre la composición completa. Un cambio grande de $H$ puede
+quedar fuera de la banda o ser eliminado por el receptor; un cambio pequeño puede
+ser informativo si aparece en una dirección con bajo ruido.
 
 Para una perturbación pequeña,
 \begin{equation}
@@ -16,7 +35,15 @@ H(q+\Delta q)\simeq H(q)+J_H(q)\Delta q,
 \qquad J_H(q)=\frac{\partial H}{\partial q}.
 \label{eq:local_channel_jacobian}
 \end{equation}
-La linealización es local y requiere una familia de trayectorias estable. Oclusiones, cambios de visibilidad y nulos por interferencia exigen diferencias finitas o simulación de perturbaciones.
+La linealización es local y requiere una familia de trayectorias estable. Para el
+observable, la regla de la cadena produce
+\[
+J_{Y,q}=J_{\mathcal O,\widetilde H}\,
+J_{\mathcal C,H}\,J_{H,q}.
+\]
+Por ello el Jacobiano electromagnético y el Jacobiano medible no son
+intercambiables. Oclusiones, cambios de visibilidad y nulos por interferencia
+exigen diferencias finitas o simulación explícita de perturbaciones.
 
 \section{Sensibilidad geométrica de una trayectoria}
 \label{sec:geometry_phase_scales}
@@ -32,6 +59,14 @@ y $\phi_H=-2\pi L_H/\lambda$. Si el objeto se desplaza una cantidad $x$ en direc
 \label{eq:bistatic_sensitivity}
 \end{equation}
 El factor $4\pi/\lambda$ corresponde al caso radial monostático y no debe trasladarse sin geometría a un enlace biestático. La orientación puede anular la sensibilidad de primer orden aun con potencia elevada.
+
+Las superficies de nivel de $L_H$ son elipsoides con focos en Tx y Rx. Desplazarse
+normalmente a una elipse cambia fase a primer orden; desplazarse tangencialmente
+puede producir una respuesta casi nula. En el límite monostático, ambos vectores
+unitarios coinciden y la longitud de ida y vuelta cambia el doble del
+desplazamiento radial. Esta geometría explica por qué añadir enlaces con
+orientaciones complementarias puede aportar más información que aumentar SNR en
+un único enlace.
 
 Para $H_p=\alpha(q,f)e^{-j2\pi d(q)/\lambda}$,
 \begin{equation}
@@ -76,9 +111,26 @@ La tabla explica por qué una geometría visualmente plausible puede ser insufic
 
 \section{Interferencia, Fresnel y dinámica humana}
 
-Respecto de un estado basal puede escribirse $H(t)=H_s+H_d(t)$, sin suponer que la descomposición sea física ni única. La perturbación observable depende de la relación compleja entre ambas componentes. Zonas de Fresnel, cancelaciones y cambios de visibilidad producen regiones de alta y baja sensibilidad \citep{Mosleh2022BreatheSmart,Zhu2024Survey}.
+Respecto de un estado basal puede escribirse $H(t)=H_s+H_d(t)$, sin suponer que
+la descomposición sea física ni única. Entonces
+\[
+|H|^2=|H_s|^2+|H_d|^2+2\Re\{H_s^*H_d\}.
+\]
+La variación de magnitud depende de la fase relativa: un mismo movimiento puede
+atravesar regiones de gran pendiente, máximos o nulos. Las zonas de Fresnel
+ofrecen una interpretación geométrica de estas alternancias. Interrumpir o
+perturbar regiones donde la diferencia de longitud cambia alrededor de fracciones
+de $\lambda$ produce respuestas diferentes; no existe una sensibilidad uniforme
+en toda la sala \citep{Mosleh2022BreatheSmart,Zhu2024Survey}.
 
-La respiración se modela primero como un microdesplazamiento torácico y no como una etiqueta clínica. El movimiento corporal produce cambios de mayor amplitud, no linealidades y variación de soporte. Con varios dispersores o personas, las contribuciones se superponen coherentemente; su separación depende de ancho de banda, apertura, geometría y diversidad temporal.
+La dinámica humana ocupa varias escalas. La respiración se modela primero como
+microdesplazamiento torácico cuasiperiódico, no como etiqueta clínica. Gestos y
+locomoción producen cambios de longitud mayores, oclusiones y aparición o
+desaparición de trayectorias; la aproximación lineal deja de ser global. Postura,
+ropa y orientación modifican área efectiva y polarización. Con varios dispersores
+o personas, las contribuciones se superponen coherentemente; separarlas requiere
+diversidad en retardo, ángulo, enlace o evolución temporal, no sólo más muestras
+correlacionadas.
 
 \section{Invariantes y sensibilidad preservada}
 \label{sec:phase_invariants}
@@ -101,6 +153,12 @@ d_{\mathrm U(1)}^2(\vect x,\vect y)=
 \label{eq:phase_quotient_distance}
 \end{equation}
 Ninguna invariancia es gratuita: su derivada respecto de $q$ debe compararse con la del canal complejo.
+Estas tres construcciones ilustran decisiones distintas. $\mat G$ conserva
+relaciones espaciales instantáneas, $\mat K$ conserva relaciones entre frecuencias
+y $d_{\mathrm U(1)}$ compara clases equivalentes bajo una rotación común. Su
+utilidad depende de que la perturbación física no actúe principalmente en la
+dirección eliminada. El \cref{ch:fidelity_observability} formaliza este costo
+mediante Jacobianos e información equivalente.
 
 \section{Wi-Fi y LoRa como observadores distintos}
 
@@ -110,3 +168,10 @@ Y_{\rm WiFi}=\mathcal O_{\rm WiFi}(H),\qquad
 Y_{\rm LoRa}=\mathcal O_{\rm LoRa}(H),
 \end{equation}
 son observaciones distintas del mismo estado físico, no versiones intercambiables de una señal. El \cref{ch:sensado_wifi_lora} revisará su evidencia de sensado; aquí queda establecida la cadena física desde $q$ hasta $Y$.
+
+Así, el objeto de estudio no es una \emph{CSI ideal} independiente de la
+plataforma, sino la información sobre $q$ que sobrevive a
+$\Gamma\rightarrow H\rightarrow\widetilde H\rightarrow Y$. Esta interfaz permite
+examinar en los capítulos siguientes qué debe reproducir un gemelo, qué
+representación conviene aprender y bajo qué condiciones Wi-Fi o LoRa ofrecen un
+observable suficiente.

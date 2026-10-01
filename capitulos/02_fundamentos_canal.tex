@@ -1,78 +1,153 @@
 \chapter{Propagación electromagnética y canal inalámbrico}
 \label{ch:marco_canal}
 
+El sensado inalámbrico sólo puede interpretarse con rigor si se distingue la escena
+física del modelo de canal y de la medición producida por el receptor. Este capítulo
+establece esa jerarquía y fija las escalas electromagnéticas que después determinan
+sensibilidad, resolución y requisitos de metrología.
+
 \section{Jerarquía física del modelo}
 
-Un modelo de canal útil conserva los grados de libertad que determinan la pregunta experimental. La jerarquía adoptada en esta tesis es
+Sea $\Gamma$ una descripción de geometría, materiales, antenas y condiciones de
+frontera. La jerarquía adoptada es
 \[
-\begin{aligned}
-\text{campos electromagnéticos}&\longrightarrow
-\text{mecanismos y trayectorias}\\
-&\longrightarrow\text{canal equivalente en banda base}\\
-&\longrightarrow\text{muestras del receptor}.
-\end{aligned}
+\Gamma
+\longrightarrow \{\vect E,\vect H\}
+\longrightarrow \mathcal P
+\longrightarrow H
+\longrightarrow \widetilde H
+\longrightarrow Y.
 \]
-El primer nivel establece las leyes y condiciones de frontera; el segundo aproxima cómo la escena transforma el campo; el tercero representa la relación entrada--salida; el cuarto incorpora forma de onda, sincronización y hardware. Esta separación evita atribuir significado material a un parámetro efectivo y permite elegir la resolución necesaria para cobertura, calibración o sensado \citep{Molisch2022,TseViswanath2005}.
+Los campos satisfacen las leyes de Maxwell; $\mathcal P$ resume interacciones o
+trayectorias efectivas; $H$ es el operador de canal equivalente; $\widetilde H$
+incluye la respuesta de las cadenas de radiofrecuencia; y $Y$ es la observación
+digital después de forma de onda, muestreo y procesamiento. Cada flecha introduce
+una aproximación. Por ello, concordancia en potencia recibida no acredita
+concordancia de campo complejo, y concordancia de $H$ no acredita concordancia de
+$Y$ si los operadores de adquisición son distintos \citep{Molisch2022,TseViswanath2005}.
 
-\section{Campos, materiales y mecanismos de propagación}
+La resolución apropiada depende de la pregunta. Un modelo de cobertura puede
+promediar interferencia de pequeña escala; un gemelo para fase debe preservar
+longitudes de trayectoria y referencias; un modelo para sensado debe preservar,
+además, cómo esos términos cambian con el estado físico. Esta distinción impide
+atribuir significado constitutivo a todo parámetro aprendido y anticipa la
+separación entre fidelidad estática y diferencial.
 
-En un medio lineal, isotrópico y local, los campos satisfacen
+\section{Campos, materiales e interacciones}
+
+En un medio lineal, isotrópico y local,
 \begin{align}
-\nabla\times\vect E&=-\frac{\partial\vect B}{\partial t}, &
+\nabla\times\vect E&=-\frac{\partial\vect B}{\partial t},&
 \nabla\times\vect H&=\vect J+\frac{\partial\vect D}{\partial t},\\
-\nabla\cdot\vect D&=\rho, & \nabla\cdot\vect B&=0,
+\nabla\cdot\vect D&=\rho,&
+\nabla\cdot\vect B&=0,
 \end{align}
-con $\vect D=\epsilon\vect E$, $\vect B=\mu\vect H$ y $\vect J=\sigma\vect E$. La permitividad, permeabilidad y conductividad determinan almacenamiento, propagación y pérdida. Sus discontinuidades producen reflexión y transmisión; aristas y objetos finitos introducen difracción y dispersión. En interiores, la señal recibida es la superposición coherente de esas interacciones \citep{Molisch2022,Rappaport2002}.
+con $\vect D=\epsilon\vect E$, $\vect B=\mu\vect H$ y
+$\vect J=\sigma\vect E$. Para la convención $e^{j\omega t}$, un dieléctrico
+conductor admite $\epsilon_c(\omega)=\epsilon(\omega)-j\sigma(\omega)/\omega$.
+La dependencia en frecuencia es material: trasladar una calibración entre bandas
+sin modelarla modifica amplitud, fase y penetración.
+
+En una interfaz plana, continuidad de los campos tangenciales conduce a
+coeficientes de reflexión y transmisión dependientes de polarización, ángulo e
+impedancia. Para polarización TE,
+\begin{equation}
+\Gamma_{\rm TE}=
+\frac{\eta_2\cos\theta_i-\eta_1\cos\theta_t}
+{\eta_2\cos\theta_i+\eta_1\cos\theta_t},\qquad
+\eta_m=\sqrt{\frac{j\omega\mu_m}{\sigma_m+j\omega\epsilon_m}}.
+\end{equation}
+Superficies finitas, rugosas o curvadas requieren además difracción y dispersión;
+objetos penetrables introducen transmisión y pérdidas internas. La orientación
+de las antenas, sus diagramas complejos y la polarización forman parte de la
+geometría electromagnética, no una ganancia escalar intercambiable
+\citep{Molisch2022,Rappaport2002}.
 
 La longitud de onda
 \begin{equation}
 \lambda=\frac{c}{f_c}
 \label{eq:wavelength}
 \end{equation}
-fija simultáneamente una escala geométrica y una escala de fase. Un error milimétrico puede ser despreciable para cobertura y decisivo para un observable coherente.
+relaciona escala geométrica y fase. Una discrepancia de longitud $\delta d$
+produce, para un camino, una rotación $2\pi\delta d/\lambda$. Una representación
+geométrica visualmente plausible puede ser suficiente para potencia media y,
+sin embargo, insuficiente para una predicción coherente. A la inversa, parámetros
+de material ajustados desde un canal finito suelen ser \emph{efectivos}: pueden
+compensar errores de malla, antena, rugosidad o mecanismos omitidos y no se
+identifican automáticamente con propiedades constitutivas.
 
-Para la convención temporal $e^{j\omega t}$, un dieléctrico conductor puede representarse mediante $\epsilon_c=\epsilon_0\epsilon_r-j\sigma/\omega$. En incidencia plana, los coeficientes de Fresnel dependen de polarización, ángulo e impedancia; por ejemplo,
+\section{Gran escala, sombreado y pequeña escala}
+
+En espacio libre y campo lejano, Friis establece \citep{Friis1946}
 \begin{equation}
-\Gamma_{\rm TE}=\frac{\eta_2\cos\theta_i-\eta_1\cos\theta_t}
-{\eta_2\cos\theta_i+\eta_1\cos\theta_t},\qquad
-\eta_m=\sqrt{\frac{j\omega\mu_m}{\sigma_m+j\omega\epsilon_m}}.
-\end{equation}
-Los parámetros recuperados desde un canal finito pueden ser efectivos si compensan geometría, rugosidad o mecanismos omitidos; no se identificarán automáticamente con propiedades constitutivas verdaderas.
-
-\section{Pérdida de propagación y escalas espaciales}
-
-En espacio libre y campo lejano, la ecuación de Friis expresa
-\begin{equation}
-P_r=P_tG_tG_r\left(\frac{\lambda}{4\pi d}\right)^2,
+P_r=P_tG_tG_r\left(\frac{\lambda}{4\pi d}\right)^2.
 \label{eq:friis}
 \end{equation}
-mientras un modelo log-distancia resume la tendencia de gran escala mediante
+En una familia de ubicaciones, el modelo log-distancia resume la tendencia
 \begin{equation}
-PL(d)=PL(d_0)+10n\log_{10}\!\left(\frac{d}{d_0}\right)+X_\sigma.
+PL(d)=PL(d_0)+10n\log_{10}\!\left(\frac{d}{d_0}\right)+X_\sigma,
 \label{eq:logdistance}
 \end{equation}
-El término $X_\sigma$ representa sombreado sobre una población de ubicaciones; no sustituye la interferencia multitrayecto en una posición concreta \citep{Friis1946,Molisch2022}. Potencia y \ac{SNR} describen condiciones de comunicación, pero no garantizan sensibilidad frente a una perturbación humana.
+donde $X_\sigma$ representa variación lenta por obstrucciones. La pérdida de
+trayecto es una tendencia de gran escala; el sombreado es una desviación local
+correlacionada espacialmente; y el desvanecimiento de pequeña escala resulta de
+la suma coherente de contribuciones. Confundir estos niveles puede producir un
+modelo preciso en promedio que falle exactamente en los gradientes espaciales
+usados para sensado.
+
+Potencia, \ac{SNR} y cobertura siguen siendo necesarias: fijan el régimen de ruido
+y la disponibilidad del enlace. No son suficientes para afirmar sensibilidad a
+una perturbación. En un máximo o mínimo de interferencia, un enlace con potencia
+alta puede tener derivada pequeña en la dirección de movimiento, mientras otro
+con menor potencia puede responder con mayor pendiente.
 
 \section{Modelos deterministas, estadísticos e híbridos}
 
-Los modelos estadísticos describen distribuciones de pérdida, desvanecimiento, retardo y Doppler sobre clases de entornos. Permiten analizar desempeño promedio y robustez, pero no determinan qué objeto originó una componente. Los modelos deterministas, incluido el trazado de rayos, condicionan el canal a una escena explícita y conservan correspondencia geométrica a costa de información sobre materiales, antenas y registro. Los modelos híbridos retienen estructura geométrica y aprenden o estocastizan los mecanismos no resueltos \citep{SalehValenzuela1987,Molisch2022}.
+Los modelos estadísticos describen distribuciones de pérdida, desvanecimiento,
+retardo y Doppler sobre clases de entornos. Son apropiados para desempeño promedio
+y variabilidad poblacional, pero no determinan qué interacción causó una muestra.
+Los modelos deterministas condicionan el campo o las trayectorias a una escena
+explícita. El trazado de rayos aproxima propagación mediante óptica geométrica y
+teoría uniforme de la difracción; conserva correspondencia espacial, pero depende
+de registro, materiales, antenas y orden de interacción.
 
-En esta investigación, el gemelo condicionado por la escena proporciona intervenciones y derivadas; los modelos estadísticos describen error residual, instrumentación y condiciones fuera de distribución. Un buen ajuste estadístico no constituye por sí mismo una reconstrucción causal del entorno.
+Los modelos híbridos mantienen estructura física y aprenden la discrepancia no
+resuelta. Esta combinación puede mejorar predicción sin convertir por ello cada
+variable latente en una causa identificada. En esta tesis, el componente
+determinista permite intervenciones sobre $\Gamma$ y cálculo de derivadas; el
+componente estadístico representa residuos, instrumentación e incertidumbre fuera
+de distribución \citep{SalehValenzuela1987,Molisch2022}.
 
-\section{Representación equivalente en banda base}
+\section{Canal equivalente en banda base}
 
-Sea
+Sea la señal paso banda real
 \begin{equation}
 x_{\rm RF}(t)=\sqrt{2}\,\Re\{x(t)e^{j2\pi f_ct}\},
 \label{eq:complex_envelope}
 \end{equation}
-donde $x(t)$ es la envolvente compleja. Para un canal lineal variante en el tiempo,
+donde $x(t)$ es la envolvente compleja. Tras retirar la portadora, un canal lineal
+variante en el tiempo se representa mediante
 \begin{equation}
-y(t)=\int h(t,\tau)x(t-\tau)\,d\tau+n(t),
+y(t)=\int h(t,\tau)x(t-\tau)\,d\tau+n(t).
 \label{eq:ltv_channel}
 \end{equation}
-con $h(t,\tau)$ la respuesta al impulso y $n(t)$ ruido e interferencia. Si el canal cambia poco durante una ventana declarada, puede aproximarse como \ac{LTI}; en sensado, el movimiento de interés es precisamente una fuente de variación, por lo que esta aproximación nunca se adopta sin especificar su escala temporal \citep{Bello1963,Molisch2022}.
+La representación conserva amplitud y fase relativas dentro de la convención de
+referencia y evita simular cada ciclo de la portadora. Si $h(t,\tau)$ cambia poco
+durante un símbolo o bloque, el canal puede tratarse como cuasiestático en esa
+ventana. Esa aproximación no elimina la dinámica: establece dos escalas, una
+rápida para adquisición y otra sobre la cual evoluciona el estado humano
+\citep{Bello1963,Molisch2022}.
 
-\section{Transición al canal resoluble}
+El canal equivalente es una relación entrada--salida condicionada por banda,
+antenas y puertos. No es el campo completo de la escena. Dos tecnologías pueden
+compartir $\Gamma$ y observar operadores $H_m$ distintos por frecuencia,
+polarización, ancho de banda y forma de onda. Este punto será esencial al comparar
+Wi-Fi y LoRa sin trasladar trayectorias o ganancias de manera automática.
 
-Las ecuaciones anteriores establecen la física y la relación entrada--salida, pero aún no indican qué componentes pueden distinguirse con ancho de banda, apertura y tiempo de observación finitos. El capítulo siguiente introduce la representación multitrayecto, la diversidad espacial y las distorsiones de adquisición. La existencia física de dos caminos no implica que sus coeficientes sean identificables a partir de las muestras disponibles.
+\section{Del canal físico al canal resoluble}
+
+La física puede contener más interacciones de las que una observación finita
+permite distinguir. Ancho de banda, apertura, duración y cadencia determinan qué
+combinaciones de trayectorias son resolubles; ruido y perturbaciones determinan
+cuáles son estimables. El capítulo siguiente desarrolla esta interfaz mediante
+CIR, CFR, MIMO, OFDM y una taxonomía explícita de errores de sincronización.
