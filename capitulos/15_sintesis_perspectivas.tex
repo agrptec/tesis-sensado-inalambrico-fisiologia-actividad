@@ -1,19 +1,36 @@
 \chapter{Síntesis científica y perspectivas}
 \label{ch:conclusions}
 
+La tesis se encuentra en una transición metodológica: existe evidencia estática
+suficiente para descartar algunas interpretaciones de la fase y seleccionar
+observables candidatos, pero la fidelidad ante perturbaciones físicas sigue abierta.
+Esta síntesis separa resultados establecidos, límites y trabajo pendiente sin
+convertir el programa experimental en conclusiones.
+
 \section{Resultados establecidos}
 
 La evidencia disponible permite separar tres niveles que antes aparecían mezclados. Primero, la calibración B0--B2 mejora propiedades macroscópicas del canal: potencia, magnitud y dispersión de retardos. Segundo, la discrepancia compleja contiene una pendiente espectral de baja dimensión que puede predecirse parcialmente desde posición y descriptores de trazado. Tercero, las representaciones relativas eliminan grados de libertad no disponibles y mejoran la discriminabilidad espacial estática.
 
-S4.7-R confirma este tercer nivel dentro de dc01: $U(1)$ por arreglo aumenta su victoria global de aproximadamente $0.591$ a $0.796$ después de la corrección con retardo predicho, y la fusión congelada con el producto espectral alcanza aproximadamente $0.807$. La mejora se concentra en separación regional; no aparece una ganancia local concluyente. El umbral sostenido de $1$--$2\lambda$ describe discriminabilidad del protocolo y no resolución física universal.
+La comparación de representaciones confirma este tercer nivel dentro de dc01: la
+mejora se concentra en separación regional y no aparece una ganancia local
+concluyente. Las cifras, particiones e intervalos se conservan en el
+\cref{sec:s47r_results}; aquí interesa su alcance: se ha demostrado discriminabilidad
+estática bajo el protocolo, no resolución física universal ni sensibilidad humana.
 
 \section{Resultados negativos y límites identificados}
 
-La fase común al arreglo se estima a posteriori, pero S4.7-Ua no encuentra una mejora robusta al modelar $p(\psi\mid x_{\rm RT})$ frente a distribuciones circulares incondicionales. Retirar $\beta$, restringir casos con $\kappa>0$ o introducir una escala oráculo RT no cambia materialmente la conclusión. El mínimo $\Delta\mathrm{NLL}$ negativo observado, del orden de $-2\times10^{-6}$, es despreciable.
+La fase común al arreglo se estima a posteriori, pero el análisis condicionado no
+encuentra una mejora robusta frente a distribuciones circulares incondicionales.
+Los controles descritos en el \cref{ch:avances} no cambian materialmente la
+conclusión.
 
 Por tanto, bajo dc01/B0, las covariables y particiones evaluadas, $\psi$ se trata como componente de $Z_\phi^{\rm nuisance}$. Esta decisión no afirma que la fase común sea universalmente aleatoria o impredecible. Una referencia estable o metadatos distintos podrían modificar su identificabilidad.
 
-La auditoría S4.7-Ub.0 valida la suma de trayectorias con error aproximado de $2.93\times10^{-7}$, pero revela condición muy distinta entre transmisores: Tx0 tiene rango $189/189$, $\kappa\approx2.79\times10^2$ y coherencia máxima $0.997073$; Tx1, rango $178/178$, $\kappa\approx1.45\times10^6$ y coherencia $0.999974$. Las ecuaciones normales agravan Tx1 y un ridge exploratorio introduce sesgo excesivo. El rango algebraico completo no implica identificabilidad robusta de coeficientes pathwise.
+La auditoría por trayectorias verifica la síntesis, pero revela condicionamientos muy
+distintos entre transmisores. Las ecuaciones normales agravan el caso mal condicionado
+y la regularización exploratoria introduce sesgo. El resultado estable es conceptual:
+el rango algebraico completo no implica identificabilidad robusta de coeficientes
+individuales.
 
 \section{Hipótesis revisadas por la evidencia}
 
@@ -31,7 +48,12 @@ por lo que no sustituye una intervención humana o mecánica con terminales fijo
 
 La siguiente evidencia decisiva procede de E0 y E1. E0 medirá el piso instrumental, reinicios y referencia. E1 impondrá desplazamientos conocidos y comparará canal complejo, magnitud, representación relativa, descriptor espectral y rama coherente mediante $\Delta H$, $J_{\rm real}$ y $J_{\rm sim}$. E2 utilizará un fantoma sólo después de cerrar ese régimen.
 
-En paralelo, S4.7-Ub debe estudiar espectros singulares, rango efectivo, coherencia, separaciones de retardo y agrupación de modos no resolubles. Con $B\approx\SI{50}{MHz}$, $1/B\approx\SI{20}{ns}$ explica por qué varias firmas pueden ser casi indistinguibles. No se presentará un posterior independiente por trayectoria hasta definir un estimando resoluble. La comparación NeRF$^2$/gemelos aprendidos y la auditoría OpenLoRa avanzan en paralelo sin bloquear la física controlada.
+En paralelo, la auditoría por trayectorias debe estudiar espectros singulares, rango
+efectivo, coherencia, separaciones de retardo y agrupación de modos no resolubles.
+La escala $1/B$ explica por qué varias firmas pueden ser casi indistinguibles. No
+se presentará un posterior independiente por trayectoria hasta definir un estimando
+resoluble. La comparación de gemelos aprendidos y la auditoría OpenLoRa pueden avanzar
+sin bloquear la física controlada.
 
 \section{Agenda doctoral y proyecto}
 

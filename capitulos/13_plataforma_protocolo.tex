@@ -1,6 +1,10 @@
 \chapter{Plataforma experimental y protocolo multimodal}
 \label{ch:platform}
 
+La plataforma no se define por acumular sensores, sino por cerrar la cadena entre
+intervención, observable y referencia. Cada subsistema debe justificar qué
+incertidumbre reduce y con qué sincronización y metrología lo hace.
+
 \section{Arquitectura funcional}
 
 La plataforma observa una misma intervención mediante radios bajo estudio y modalidades de referencia. No todas las modalidades deben operar en cada sesión; el protocolo declara el subconjunto disponible y su función:
@@ -65,3 +69,8 @@ La adquisición conserva el observable menos procesado accesible y documenta cad
 \section{Criterio de disponibilidad científica}
 
 Un subsistema se considera disponible cuando produce datos trazables, sincronizados dentro de una incertidumbre medida y repetibles bajo un control conocido. ``Reportado'', ``previsto'' y ``verificado'' son estados diferentes. La plataforma mínima para E0--E1 requiere radio bajo estudio, referencia temporal, movimiento medido, fijación mecánica y geometría suficiente; las extensiones fisiológicas y de sitio se incorporan después de cumplir ese criterio.
+
+Esta definición funcional evita que disponibilidad de inventario se interprete como
+capacidad experimental. El \cref{ch:stage1} sitúa la construcción del banco dentro
+del proyecto, conserva sus dependencias y separa las decisiones científicas de la
+logística operativa.

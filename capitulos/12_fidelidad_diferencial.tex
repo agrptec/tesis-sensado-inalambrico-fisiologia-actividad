@@ -63,3 +63,7 @@ Una forma de onda mecánica recuperada no valida respiración humana ni apnea cl
 Antes de la adquisición se podrán simular perturbaciones conocidas en Sionna RT, WaveVerse u otra plataforma para detectar representaciones que anulan el movimiento por construcción \citep{Hoydis2023SionnaRT,Zheng2026WaveVerse}. Este preflight es un diagnóstico de diseño y no validación del mundo real.
 
 El paso E0$\rightarrow$E1 requiere instrumentación estable y trazabilidad; E1$\rightarrow$E2, detección reproducible de movimiento y un régimen de diferencias finitas interpretable; E2$\rightarrow$E3, recuperación de forma de onda y evaluación de incertidumbre en datos reservados. Los fallos se documentarán como límites de observabilidad, referencia o modelo.
+
+La validez de esta secuencia depende de que radio, actuador y referencias compartan
+una geometría y una escala temporal cuantificadas. El capítulo siguiente traduce
+esas condiciones en una arquitectura de medición y un protocolo de sesión.
