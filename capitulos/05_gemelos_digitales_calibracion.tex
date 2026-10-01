@@ -60,52 +60,51 @@ H_{\rm real}-H_{\rm gemelo}=
 \end{equation}
 Esta suma es una contabilidad conceptual o una linealización local, no una descomposición identificable a partir de $H$ por sí solo. Un modelo flexible todavía puede usar materiales para compensar coordenadas. Por ello la calibración será jerárquica: registro y sincronización; antenas y escala; materiales y scattering; y sólo al final residuales de fase/modelo. Priors, mediciones auxiliares e intervenciones separadas anclarán cada bloque.
 
-\section{Jerarquía de la literatura y de la evidencia}
+\section{Qué resuelve la calibración diferenciable}
 \label{sec:literature_evidence_hierarchy}
 
-Los trabajos revisados no se tratarán como soluciones intercambiables. La tesis los
-ordena por el operador que modelan, la información que reciben y la evidencia con que
-se validan:
-\begin{table}[htbp]
-\centering\small
-\caption{Función científica de la literatura en la cadena metodológica.}
-\label{tab:literature_evidence_hierarchy}
-\begin{tabularx}{\textwidth}{P{2.6cm}L L}
-\toprule
-Bloque & Referencias y uso en la tesis & Límite de inferencia\\
-\midrule
-Calibración estática & Sionna RT, calibración diferenciable y error local de fase
-\citep{Hoydis2023SionnaRT,Hoydis2024DiffRT,Ruah2024Phase}. & Mejorar potencia o una
-verosimilitud con fase latente no prueba geometría verdadera ni sensado dinámico.\\
-Campo y objetos & NeRF$^2$, Learnable WDT, RFScape y RadTwin
-\citep{Zhao2023NeRF2,Jiang2025LearnableWDT,Chen2025RFScape,Zhang2026RadTwin}. &
-Interpolación de campo, edición de objetos y generalización geométrica son tareas
-distintas y requieren entradas equivalentes para compararse.\\
-Dinámica simulada & WaveVerse \citep{Zheng2026WaveVerse}. & La coherencia de una
-simulación y sus contrastes externos no validan el Jacobiano de nuestro banco ni una
-forma de onda respiratoria propia.\\
-Inversión & RayLoc, RFDT e InverTwin
-\citep{Han2026RayLoc,Chen2026RFDT,Chen2025InverTwin}. & La inversión se evaluará
-después de validar el modelo directo, su referencia y sus discontinuidades relevantes.\\
-Adquisición y robustez & FarSense, HiSAC, RadioRange y OpenLoRa
-\citep{Zeng2019FarSense,Pegoraro2024HiSAC,Lyu2026RadioRange,Mishra2023OpenLoRa}. &
-Cocientes, anclas o perturbaciones simuladas dependen de sus supuestos de hardware;
-no acreditan coherencia del equipo propio.\\
-Representación humana & BreatheSmart, WiMANS, WiMUSE, MURAL-Fi, MM-Fi y WiFi-JEPA
-\citep{Mosleh2022BreatheSmart,Huang2024WiMANS,Yi2025WiMUSE,Li2026MURALFI,
-Yang2023MMFi,Kim2026WiFiJEPA}. & Una tarea humana bien resuelta no valida por sí
-misma la geometría, la fase absoluta ni el gemelo electromagnético.\\
-\bottomrule
-\end{tabularx}
-\end{table}
+Sionna RT proporciona un trazador de rayos diferenciable y una interfaz entre escena,
+antenas y canal \citep{Hoydis2023SionnaRT}. Sobre esa base, la calibración de Hoydis
+y colaboradores trata materiales y dispersión como parámetros optimizables frente a
+mediciones \citep{Hoydis2024DiffRT}. Su contribución metodológica es hacer explícito
+el modelo directo y propagar gradientes a parámetros de la escena. El observable,
+la función de pérdida y la regularización determinan, sin embargo, qué se recupera:
+un mínimo de potencia no identifica por sí solo permitividad, rugosidad y error de
+registro.
 
-Esta jerarquía determina el orden de ejecución. DICHASUS, Hoydis y Ruah fijan el
-problema del modelo estático; los invariantes y las referencias instrumentales delimitan
-el observable; las representaciones de escena se comparan después bajo regímenes de
-información comunes; el reflector y el fantoma contrastan fidelidad diferencial; y
-la inversión y el aprendizaje humano se activan cuando el observable ha demostrado
-sensibilidad. La secuencia no resta valor a los métodos pospuestos: evita usar éxito
-en una tarea como evidencia de otra.
+Ruah y colaboradores introducen variables locales de error de fase para absorber
+discrepancias geométricas pequeñas \citep{Ruah2024Phase}. Esta familia responde a
+un problema que la calibración exclusiva de materiales no puede resolver con
+facilidad: errores sublongitud de onda producen rotaciones grandes aunque potencia
+y retardos gruesos sean razonables. La ventaja tiene un costo de identificabilidad.
+Una corrección flexible puede reunir desplazamiento de interacción, error de reloj
+y mecanismos ausentes; debe probarse fuera de las observaciones que la estimaron.
+
+Estas obras motivan una calibración escalonada. Primero se fijan convención,
+registro y respuesta de cadena; después se ajustan parámetros globales o compartidos
+de materiales y antenas; finalmente se estudia discrepancia local con priors y
+particiones espaciales. La evidencia necesaria aumenta en el mismo orden:
+correspondencia macroscópica, generalización estática y, para esta tesis, respuesta
+diferencial ante una intervención. Que $H_{\rm model}$ sea preciso en los puntos de
+calibración no implica que su derivada respecto de $q$ sea correcta.
+
+\section{Gemelos aprendidos y alcance de la comparación}
+
+Los campos implícitos, gemelos aprendibles y representaciones centradas en objetos
+amplían el conjunto de funciones con las que puede aproximarse un entorno
+\citep{Zhao2023NeRF2,Jiang2025LearnableWDT,Chen2025RFScape,Zhang2026RadTwin}.
+Resuelven problemas relacionados, pero no equivalentes: interpolación del campo,
+reconstrucción electromagnética, edición de objetos y transferencia entre escenas.
+Su comparación requiere igualar entradas disponibles, posiciones de entrenamiento,
+observable y partición. El \cref{ch:latent_env} desarrolla estas familias sin
+presentarlas como sustitutos directos de la calibración física.
+
+La literatura de simulación dinámica e inversión
+\citep{Zheng2026WaveVerse,Han2026RayLoc,Chen2026RFDT,Chen2025InverTwin}
+demuestra que un modelo directo estructurado puede apoyar tareas posteriores.
+Para el argumento de esta tesis, esos resultados establecen plausibilidad
+metodológica, no evidencia de que el Jacobiano del banco propio sea correcto.
+El reflector y el fantoma se introducen precisamente para cerrar esa brecha.
 
 \section{DICHASUS dc01 como banco de pruebas del gemelo estático}
 
@@ -163,22 +162,12 @@ permitirán verificar el registro. Un residual pequeño de ICP mide concordancia
 nubes, pero no garantiza exactitud absoluta. Se reservarán, cuando el recinto lo permita,
 10--20 distancias de control que no se hayan utilizado para ajustar la reconstrucción.
 
-La comparación propuesta distinguirá cinco condiciones:
-\begin{description}
-\item[G0.] Planta manual y primitivas geométricas con dimensiones verificadas.
-\item[G1.] Reconstrucción RGB-D, con registro y simplificación documentados.
-\item[G2.] Reconstrucción LiDAR con las mismas referencias globales.
-\item[G3.] Geometría LiDAR regularizada para RF: superficies, espesores, huecos y
-objetos relevantes corregidos; materiales nominales y presupuesto RT controlados.
-\item[G4.] Geometría anterior con calibración RF de materiales y, si se justifica,
-parámetros geométricos restringidos por su incertidumbre metrológica.
-\end{description}
-G4 cambia más factores que la geometría. Por ello se añadirá una ablación factorial
-con materiales nominales/calibrados para separar el efecto del registro, la regularización
-y el ajuste electromagnético. Todos los ajustes utilizarán sólo entrenamiento y
-validación; los puntos reservados medirán generalización, no servirán para corregir
-la escena a posteriori. Se mantendrán mecanismos RT, frecuencias y presupuesto de
-muestreo comparables, o se informará explícitamente su coste.
+La comparación geométrica avanzará desde primitivas medidas hasta RGB-D, LiDAR
+regularizado para RF y calibración electromagnética, siempre en el mismo marco global.
+Como el último nivel modifica geometría y materiales, se requiere una ablación
+factorial que separe registro, regularización y ajuste electromagnético. Los puntos
+de control reservados medirán generalización y no se utilizarán para corregir la
+escena. El \cref{ch:platform} especifica la realización metrológica de estos niveles.
 
 RFDT-Channel ofrece una referencia reciente para construir escenas RF a partir de
 RGB y LiDAR y simular canales interiores a 28 GHz \citep{Yao2026RFDTChannel}.

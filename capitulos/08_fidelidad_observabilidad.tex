@@ -8,7 +8,9 @@ del estado humano produce cambios distinguibles en los observables. La respuesta
 formula localmente mediante sensibilidad, información estadística e incertidumbre, y
 servirá después para evaluar tanto los algoritmos como el diseño de la red.
 
-\section{Fidelidad estática y fidelidad diferencial}
+\section{Fidelidad, invariancia y resolubilidad}
+
+\subsection{Fidelidad estática y fidelidad diferencial}
 
 Sea $D_0=D(H_{\rm model},H_{\rm real})$ una distancia de campo cuya definición
 depende del observable y de las invariancias declaradas. Para una intervención
@@ -29,7 +31,7 @@ no implica
 Esta separación es el criterio central para juzgar si un gemelo calibrado para canal
 estático resulta adecuado para sensado.
 
-\section{Invariancia instrumental y costo diferencial}
+\subsection{Invariancia instrumental y costo diferencial}
 
 Para un grupo de transformaciones perturbadoras $T_g$, una representación puede
 satisfacer $V(T_gH)=V(H)$. Su respuesta a la variable física es, sin embargo,
@@ -41,7 +43,7 @@ satisfacer $V(T_gH)=V(H)$. Su respuesta a la variable física es, sin embargo,
 La misma transformación que reduce deriva puede proyectar una dirección de señal.
 Por ello toda mejora de repetibilidad se acompaña de una medición de sensibilidad.
 
-\section{Resolubilidad e identificabilidad pathwise}
+\subsection{Resolubilidad e identificabilidad por trayectorias}
 
 En una síntesis lineal por trayectorias puede escribirse
 \begin{equation}
@@ -61,7 +63,9 @@ ambigüedades de modelo. La escala $1/B$ de la \cref{eq:delay_resolution} explic
 qué caminos con retardos próximos pueden ser casi indistinguibles. Un sistema de rango
 completo puede seguir siendo inutilizable para estimar coeficientes individuales.
 
-\section{Problema inverso, identificabilidad y observabilidad local}
+\section{Observabilidad local en presencia de perturbaciones}
+
+\subsection{Problema inverso e identificabilidad}
 
 El modelo directo lleva un estado $\vect q$ a una distribución de observaciones $p(\vect y\mid\vect q)$. La inversión pregunta qué estados son compatibles con una medición. La \emph{identificabilidad global} exige que estados distintos no induzcan la misma distribución; la \emph{identificabilidad local} estudia esa unicidad en una vecindad; y la \emph{estimabilidad práctica} incorpora ruido, número finito de muestras y error del modelo \citep{KaipioSomersalo2005,Kay1993}. En este manuscrito, \emph{observabilidad} denota información estadística local sobre variables físicas, no el criterio clásico de observabilidad de un sistema dinámico lineal.
 
@@ -95,7 +99,7 @@ asigna incertidumbre nula a una dirección invisible y no garantiza la existenci
 de un estimador insesgado del vector completo. La cota tampoco equivale a un
 intervalo posterior ni incorpora automáticamente discrepancia del gemelo.
 
-\section{Perturbaciones e información equivalente}
+\subsection{Perturbaciones e información equivalente}
 
 Sea $\vect\zeta$ un vector de perturbaciones que contiene, por ejemplo, la fase común, la ganancia o la incertidumbre geométrica. La FIM conjunta se particiona como
 \begin{equation}
@@ -115,7 +119,7 @@ Cuando $\vect\zeta$ debe estimarse junto con $\vect q$, la información equivale
 \end{equation}
 Esta expresión formaliza por qué un canal sensible al movimiento puede ser poco informativo si el mismo cambio puede explicarse mediante CFO, fase desconocida o movimiento de otro sujeto.
 
-\section{Escala, rango y criterios espectrales}
+\subsection{Escala, rango y criterios espectrales}
 
 Los autovalores de una FIM dependen de las unidades de $\vect q$. Antes de comparar posición en metros, orientación en radianes y desplazamiento torácico en milímetros, se define
 \begin{equation}
@@ -142,7 +146,9 @@ el rango puede favorecer una configuración que pierde una variable.
 
 El rango identifica el subespacio localmente visible; un valor propio pequeño indica una dirección mal condicionada, no necesariamente una variable individual invisible. Estos criterios provienen del diseño óptimo de experimentos y se reutilizarán para determinar la ubicación de los nodos \citep{Pukelsheim2006}.
 
-\section{Respiración como ejemplo conductor}
+\section{Información física a escala de tarea y red}
+
+\subsection{Respiración como ejemplo conductor}
 
 Para $q=x_{\rm chest}$, y bajo las condiciones de la \cref{eq:fim}, el índice escalar
 \begin{equation}
@@ -160,7 +166,7 @@ información equivalente de la \cref{eq:equivalent_fim}. Su derivada hereda la g
 
 Presencia requiere un tratamiento diferente porque es una hipótesis discreta. Para $\mathcal H_0$ (ausencia) y $\mathcal H_1$ (presencia) se utilizarán razón de verosimilitudes, curvas ROC y separaciones distribucionales como KL o Chernoff, no una FIM ordinaria salvo que se introduzca y justifique una relajación continua.
 
-\section{Redes distribuidas y dependencia estadística}
+\subsection{Redes distribuidas y dependencia estadística}
 
 Si $N_{\rm link}$ enlaces son condicionalmente independientes dado $\vect q$, la información se suma:
 \begin{equation}
@@ -173,7 +179,7 @@ Si los enlaces comparten una incógnita instrumental, se construye primero
 la información conjunta y después se elimina esa incógnita; sumar
 complementos de Schur independientes describe en general otro modelo.
 
-\section{Observabilidad física y disponibilidad temporal}
+\subsection{Disponibilidad temporal}
 
 En LoRa, la información puede existir físicamente pero no muestrearse con densidad suficiente. Para un estado aproximadamente constante y muestras condicionalmente independientes en $\mathcal T_{\rm obs}$,
 \begin{equation}
@@ -182,11 +188,13 @@ En LoRa, la información puede existir físicamente pero no muestrearse con dens
 \end{equation}
 Para respiración dinámica se empleará, en cambio, un modelo de estado y una FIM Bayesiana o posterior que incorpore correlación temporal. SenLoRa introduce métricas de disponibilidad en tráfico ambiente y estrategias para aumentar los símbolos útiles sin abandonar comunicación \citep{SenLoRa2025}. La tesis separará así \emph{información física por muestra}, \emph{cadencia disponible} e \emph{información acumulada}.
 
-\section{Incertidumbre y abstención}
+\section{Incertidumbre y validación de la información preservada}
+
+\subsection{Incertidumbre y abstención}
 
 Se distinguirán el ruido aleatorio, la incertidumbre epistémica del estimador y la discrepancia del gemelo. La FIM caracteriza un límite local bajo un modelo supuesto; no cubre por sí sola el error de escena ni el cambio de dominio. El sistema informará una estimación, un intervalo calibrado y un índice de observabilidad, y podrá abstenerse cuando la evidencia sea insuficiente. La calibración se verificará mediante cobertura empírica y curvas de riesgo frente a cobertura, especialmente antes de interpretar una salida fisiológica.
 
-\section{Información de la forma de onda y de la frecuencia respiratoria}
+\subsection{Forma de onda y frecuencia respiratoria}
 
 Para $x(t)=A\sin(2\pi f_rt+\varphi)$, la sensibilidad respecto de la tasa se
 obtiene combinando la derivada del canal con
@@ -204,7 +212,7 @@ con errores y fallos de estimadores sobre mediciones reservadas. Se distinguirá
 el índice calculado con estado verdadero, utilizado como referencia explicativa,
 del disponible con posición u orientación inciertas en inferencia.
 
-\section{Efecto de eliminar perturbaciones sobre la sensibilidad útil}
+\subsection{Eliminación de perturbaciones y sensibilidad útil}
 
 Tras blanquear y apilar partes real e imaginaria de los jacobianos, sean
 $A_q=\sqrt{2}[\Re(\Sigma_w^{-1/2}J_q)^T,
@@ -217,11 +225,11 @@ La información útil corresponde a la sensibilidad que no puede explicarse
 mediante esas perturbaciones. En particular, una fase instrumental arbitraria
 por instante puede confundirse con el desplazamiento de un único camino.
 La calibración basal o una referencia independiente permiten estudiar otra
-condición de identificabilidad. Esta formulación fundamenta la prueba S6 de
+condición de identificabilidad. Esta formulación fundamenta la prueba E1 de
 preservación de movimiento después del procesamiento instrumental.
 
 
-\section{Invariancia de fase y pérdida de sensibilidad física}
+\subsection{Invariancia de fase y pérdida de sensibilidad física}
 \label{sec:invariance_sensing_limit}
 
 Para el observable espacial de la \cref{eq:spatial_gram_invariant}, una
@@ -237,7 +245,7 @@ común también puede eliminar una variación física que actúe en esa direcci�
 Esto ocurre, por ejemplo, en la idealización de un único camino cuyo movimiento
 sólo modifica su fase común y mantiene amplitud y vector espacial.
 
-S4.7-R contrasta fidelidad estática en el espacio invariante; S6 deberá evaluar
+S4.7-R contrasta fidelidad estática en el espacio invariante; E1 deberá evaluar
 además $\partial\mat G/\partial x_H$ o la derivada del observable elegido,
 comparándola con una referencia mecánica. La información de Fisher del observable
 transformado debe derivarse de su distribución: los productos de canales
@@ -247,7 +255,7 @@ información suficiente para recuperar respiración. Esta limitación conecta
 la evaluación de invariantes con la proyección de perturbaciones y justifica
 mantener una referencia de fase estable cuando la tarea física la requiera.
 
-\section{Contraste experimental de la información preservada}
+\subsection{Contraste experimental de la información preservada}
 \label{sec:observable_jacobian_test}
 
 La observabilidad se contrastará después de aplicar el operador realmente utilizado.

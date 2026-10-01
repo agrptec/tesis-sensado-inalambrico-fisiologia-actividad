@@ -34,7 +34,7 @@ Un campo neural continuo puede aproximarse como
 \begin{equation}
 \widehat H=F_\theta(\vect p_T,\vect p_R,f).
 \end{equation}
-La ventaja es una representación continua y compacta; el riesgo es que la geometría y los materiales queden absorbidos en los pesos, lo que dificulta la edición y la transferencia. NeRF$^2$ representa una línea importante en esta dirección y se propone en S5 como método de referencia para campos implícitos \citep{Zhao2023NeRF2}.
+La ventaja es una representación continua y compacta; el riesgo es que la geometría y los materiales queden absorbidos en los pesos, lo que dificulta la edición y la transferencia. NeRF$^2$ representa una línea importante en esta dirección y se adopta como referencia metodológica para campos implícitos \citep{Zhao2023NeRF2}.
 
 \section{Representaciones centradas en objetos e informadas por la geometría}
 
@@ -74,21 +74,13 @@ Z=\{Z_E,Z_\phi,Z_R,Z_H,Z_F,Z_N\},
 \end{equation}
 con $Z_E$ asociado al entorno, $Z_\phi$ a la estructura e incertidumbre de fase, $Z_R$ a la configuración de radio, $Z_H$ al macroestado humano, $Z_F$ a la fisiología y $Z_N$ a perturbaciones residuales. La factorización no supone independencia absoluta; busca que la información relevante sea manipulable y que el codificador no confunda la identidad del dispositivo con el estado humano.
 
-La inclusión de $Z_\phi$ está motivada por los diagnósticos del
-\cref{ch:avances}. S4.4--S4.5 muestran predictibilidad parcial del retardo;
-S4.6 encuentra una dirección común al arreglo cuya predicción mediante vecinos
-no resulta útil bajo los controles realizados. En consecuencia se propone
-$Z_\phi=[Z_\phi^{\rm pred},Z_\phi^{\rm nuisance},Z_\phi^{\rm residual}]$,
-según la \cref{eq:phase_latent_roles}. Esta clasificación distingue cantidades
-predictivas, parámetros perturbadores y discrepancia residual; no asigna causas
-físicas únicas ni presupone independencia. La elección de un observable
-invariante debe conservar sensibilidad a la tarea. Su fundamento matemático
-se presenta en la \cref{sec:phase_invariants}, y su validación estática corresponde
-al bloque ejecutado S4.7-R. Un codificador aprendido y la incertidumbre por trayectoria
-permanecen pendientes. Tras el cierre de S4.7-Ua, la fase común permanece en
-$Z_\phi^{\rm nuisance}$ bajo dc01/B0, las covariables y las particiones evaluadas;
-esta asignación operacional no afirma aleatoriedad universal. La clasificación se revisará si una referencia de
-adquisición o metadatos adicionales modifican la predictibilidad observada.
+El bloque $Z_\phi$ puede dividirse operacionalmente en estructura predecible,
+perturbaciones que deben estimarse o eliminarse y discrepancia residual, según la
+\cref{eq:phase_latent_roles}. Esta clasificación no asigna una causa física única.
+En particular, una pendiente espectral puede reunir retardo geométrico y error de
+sincronización. Los diagnósticos propios que motivan la asignación de cada componente
+se reservan al \cref{ch:avances}; aquí sólo se establece que la clasificación debe
+revisarse cuando cambia la referencia de adquisición o la información auxiliar.
 
 La identificabilidad de representaciones separadas requiere restricciones e
 información adicional \citep{Locatello2019Identifiability}. Esta partición no es identificable
@@ -113,13 +105,12 @@ referencias, intervenciones controladas o información adicional. La equivarianc
 física se expresará respecto de una transformación conocida del estado; no se
 supondrá que toda traslación de un objeto produce una rotación global del canal.
 
-\subsection{Familia operacional para S4.7-R}
+\subsection{Familia de observables relativos}
 \label{sec:representation_v_family}
 
-Se denominan $\mathsf V_0$--$\mathsf V_7$ las alternativas del análisis; esta
-notación evita confundirlas con los regímenes de información $\mathcal R_i$ y los
-hitos administrativos R1--R5. Para $H\in\mathbb C^{A\times K}$, $\mathbf h_k=H_{:,k}$
-y $\epsilon>0$ con las unidades del denominador, se definen:
+La rama robusta puede construirse mediante observables con invariancias conocidas.
+Para $H\in\mathbb C^{A\times K}$, $\mathbf h_k=H_{:,k}$ y $\epsilon>0$ con las
+unidades del denominador, ejemplos representativos son
 \begin{align}
 \mathsf V_0(H)&=H, &\mathsf V_1(H)&=|H|,\nonumber\\
 [\mathsf V_2^{(\ell)}(H)]_{a,k}&=\frac{H_{a,k+\ell}H_{a,k}^{*}}
@@ -134,66 +125,20 @@ y $\epsilon>0$ con las unidades del denominador, se definen:
 \end{align}
 $\mathsf V_4$ designa la comparación en el cociente por $U(1)$, mediante
 $d_{U(1)}^2(x,y)=\|x\|^2+\|y\|^2-2|x^Hy|$, para el canal apilado de un arreglo.
-Es una distancia entre clases de equivalencia, no un codificador unario ni una
-predicción del desfase óptimo. La rotación es única para todas sus antenas y frecuencias.
+Es una distancia entre clases de equivalencia, no un codificador unario. Los
+productos espectrales conservan diferencias entre frecuencias y eliminan una fase
+común; los productos espaciales eliminan fase común por frecuencia; el canal
+canónico intenta estimar y retirar los parámetros en lugar de descartarlos. Estas
+operaciones suponen grupos de perturbación diferentes y no deben agruparse bajo la
+etiqueta genérica de fase robusta.
 
-$\mathsf V_2$ conserva diferencias espectrales y elimina una fase común constante;
-$\mathcal L$ comenzará con $\{1,4,16,64\}$ cuando el soporte espectral lo permita,
-pero su selección y las máscaras de borde se fijarán con entrenamiento/validación.
-$\mathsf V_3$ y $\mathsf V_5$ eliminan además retardo común, pero no desfases
-relativos independientes entre cadenas. El producto instantáneo de
-\cref{eq:v_spatial_gram} es una matriz de Gram, no una covarianza temporal estimada.
-La normalización con $\epsilon$ mantiene invariancia exacta a fase, pero sólo
-aproxima invariancia a escala. Se declararán máscaras de desvanecimiento y pares
-seleccionados antes de evaluar; el número de características y su coste también
-forman parte de la comparación.
-
-$\mathsf V_6$ requiere que $\widehat\psi$ y $\widehat\tau$ se obtengan de una
-referencia disponible causalmente, metadatos o un predictor congelado. En dc01,
-la corrección de fase común ajustada frente al canal objetivo sigue siendo oráculo.
-Calcular productos del CSI recibido como entrada de un sensor es admisible;
-alinear una predicción RT con su objetivo de prueba y llamarla predicción autónoma
-no lo es. Ambas operaciones deben distinguirse también al entrenar modelos latentes.
-
-$\mathsf V_7$ designará la fusión de magnitud, productos espectrales, productos
-espaciales y canal canónico disponibles. No se definirá como concatenación fija antes
-del experimento: cada ablación declarará componentes, dimensión, normalización y acceso
-a referencia. La comparación con $\mathsf V_1$--$\mathsf V_6$ determinará si la
-complementariedad compensa el aumento de capacidad y de información auxiliar.
-
-La ejecución S4.7-R materializa esta familia mediante etiquetas de programa que se
-conservan por trazabilidad. La correspondencia de los observables principales se resume
-en la \cref{tab:s47_representation_names}. Las etiquetas auxiliares R4, R5 y R5e
-pertenecen al registro de implementación de productos relativos; no se emplean como
-sinónimos automáticos de una $\mathsf V_i$ sin declarar su fórmula y normalización.
-Esta precaución evita identificar dos objetos sólo porque ambos sean invariantes a una
-rotación común.
-
-\begin{table}[htbp]
-\centering\small
-\caption{Correspondencia operacional entre la taxonomía del manuscrito y los nombres principales de S4.7-R.}
-\label{tab:s47_representation_names}
-\begin{tabularx}{\textwidth}{P{2.0cm}P{3.2cm}L}
-\toprule
-Taxonomía & Nombre de ejecución & Objeto comparado\\
-\midrule
-$\mathsf V_0$ & R0 complejo & Canal complejo sin cociente de fase.\\
-$\mathsf V_1$ & R1 magnitud & Magnitud del canal; control invariante a la corrección de retardo.\\
-$\mathsf V_2^{(64)}$ & R3, \emph{lag} 64 & Producto espectral normalizado entre subportadoras separadas por 64 índices.\\
-$\mathsf V_4$ & U1 global/arreglo/antena & Distancia cociente con una rotación común en la granularidad indicada.\\
-$\mathsf V_3,\mathsf V_5$ & Productos espaciales/Gram; controles R4--R5e & Estructura relativa espacial con la fórmula y la normalización declaradas por cada ejecución.\\
-$\mathsf V_6$ & Canal bruto o corregido por $\widehat\tau$ & Canal canónico sin CPO, $\psi$, $\beta$ ni fase obtenida del objetivo.\\
-$\mathsf V_7$ & Fusión fija o convexa aprendida & Combinación de distancias normalizadas, no concatenación de \emph{embeddings} ni síntesis de un canal complejo.\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-En la evaluación congelada, $\mathsf V_4$ por arreglo constituye la representación
-primaria y $\mathsf V_2^{(64)}$ una componente auxiliar. La fusión aprendida usa pesos
-no negativos que suman uno, ajustados sobre distancias cuya normalización robusta se
-estima únicamente con entrenamiento. Por tanto, su ganancia evalúa complementariedad
-entre criterios de distancia estáticos; no demuestra que se haya aprendido una
-representación latente ni que exista todavía una rama coherente sensible al movimiento.
+La selección de retardos espectrales, pares de antena, máscaras de desvanecimiento,
+$\epsilon$ y normalización se realiza con entrenamiento y validación. Además,
+$\widehat\psi$ y $\widehat\tau$ sólo son entradas legítimas en prueba si proceden
+de una referencia disponible, metadatos o un predictor congelado. Alinear una
+predicción con el canal objetivo define un límite oráculo. Los nombres de ejecución
+y las comparaciones numéricas pertenecen al \cref{ch:avances}; la función de esta
+sección es fijar el objeto matemático que allí se evalúa.
 
 \section{Dinámica, inversión y transferencia}
 
@@ -222,29 +167,39 @@ WiInSim representa una vía industrial de simulación condicionada por escena
 supervisión: se registrarán geometría, semántica, mediciones RF y parámetros materiales
 disponibles en entrenamiento e inferencia.
 
-\section{Síntesis comparativa}
+\section{Comparación por familias de representación}
 
 \begin{table}[htbp]
 \centering\scriptsize
-\caption{Comparación conceptual de representaciones RF relevantes. ``Sí'' indica una capacidad central del trabajo citado; no implica validación para sensado humano.}
+\caption{Familias de representación y función dentro de la tesis.}
 \label{tab:rf_representation_comparison}
-\begin{tabularx}{\textwidth}{P{2.1cm}CCCCC L}
+\begin{tabularx}{\textwidth}{P{3.2cm}P{2.0cm}L L}
 \toprule
-Trabajo & Geometría & Fase & Dinámica & Inversión & Sensing & Límite para esta investigación\\
+Familia & Estructura conservada & Ventaja buscada & Riesgo o contraste necesario\\
 \midrule
-NeRF$^2$ \citep{Zhao2023NeRF2} & implícita & parcial & no & no & indirecto & Campo ligado a datos/escena.\\
-Learnable WDT \citep{Jiang2025LearnableWDT} & explícita & sí & no & parcial & indirecto & Requiere contrastar sensibilidad, no sólo campo.\\
-RFScape \citep{Chen2025RFScape} & objetos & parcial & no & no & indirecto & La editabilidad no prueba identificabilidad material.\\
-RadTwin \citep{Zhang2026RadTwin} & condicionada & sí & sí & no & indirecto & La transferencia dinámica requiere entradas iguales.\\
-WaveVerse \citep{Zheng2026WaveVerse} & explícita & coherente & sí & no & indirecto & Coherencia simulada no valida el Jacobiano real.\\
-RayLoc \citep{Han2026RayLoc} & explícita & sí & no & sí & localización & La inversión hereda discrepancia del modelo directo.\\
-RFDT \citep{Chen2026RFDT} & aprendida & parcial & parcial & sí & downstream & Desempeño de tarea no establece fidelidad diferencial.\\
-WiFi-JEPA \citep{Kim2026WiFiJEPA} & latente & no explícita & sí & no & sí & Debe auditarse la física preservada por el pretexto.\\
+Campo implícito \citep{Zhao2023NeRF2} & Continuidad espacial aprendida. &
+Interpolación compacta del campo. & Ligazón a escena y datos; derivadas no
+validadas por el error estático.\\
+Geometría y objetos \citep{Jiang2025LearnableWDT,Chen2025RFScape,Zhang2026RadTwin}
+& Escena, objetos y condición de radio. & Edición y transferencia estructurada. &
+Más información de entrada; material y geometría pueden confundirse.\\
+Trayectorias/conjuntos \citep{Zaheer2017DeepSets} & Retardos, ángulos,
+interacciones y simetría de permutación. & Interfaz física de dimensión variable. &
+Caminos no resolubles y correspondencias discontinuas.\\
+Latente autosupervisada \citep{Assran2023IJEPA,Kim2026WiFiJEPA} & Regularidades
+definidas por la tarea de preentrenamiento. & Menor supervisión y adaptación. &
+El pretexto puede descartar sensibilidad física.\\
+Relativa/invariante & Relaciones espaciales o espectrales. & Rechazo de
+perturbaciones especificadas. & La dirección eliminada puede contener movimiento.\\
+Coherentemente referenciada & Fase y amplitud respecto de una referencia. &
+Micromovimiento e interpretación diferencial. & Dependencia de sincronización,
+deriva y disponibilidad de referencia.\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Las representaciones anteriores conectan escena, estructura relativa y referencia de
-adquisición. Los capítulos siguientes distinguen la evidencia de sensing y formalizan
-qué información física debe conservar una representación para que la robustez estática
-sea útil ante movimiento.
+Ninguna familia domina por definición. La comparación debe igualar información,
+presupuesto de adaptación y particiones, y debe medir tanto error estático como
+respuesta a perturbaciones. El capítulo siguiente examina qué tareas humanas han
+sido demostradas por Wi-Fi y LoRa; el \cref{ch:fidelity_observability} convierte el
+requisito de preservar sensibilidad en un criterio matemático.

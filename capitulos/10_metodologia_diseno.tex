@@ -1,6 +1,11 @@
 \chapter{Metodología, conjuntos de datos y diseño experimental}
 \label{ch:methodology}
 
+La metodología se diseña para distinguir tres fuentes de éxito aparente: ajuste a
+una escena, rechazo de perturbaciones instrumentales y sensibilidad al estado físico.
+Cada experimento declara su intervención, unidad experimental, información disponible
+y afirmación admisible antes de seleccionar modelos.
+
 \section{Incorporación gradual de complejidad}
 
 La metodología avanza desde condiciones identificables hacia escenarios realistas. Cada etapa añade un solo grupo dominante de incertidumbres y conserva controles de la etapa anterior:
@@ -28,6 +33,12 @@ Una verificación de suma de trayectorias no valida sus coeficientes individuale
 \section{Conjuntos de datos y función metodológica}
 
 Los conjuntos no forman un catálogo. Cada uno resuelve una pregunta específica y posee una limitación explícita.
+
+RadioRange se incorpora como generador de perturbaciones y condiciones de ranging
+para UWB, Wi-Fi y 5G, útil para someter observables a fallas controladas
+\citep{Lyu2026RadioRange}. Al ser un simulador basado en gemelo, sus salidas sirven
+para verificación y análisis de vulnerabilidad; no sustituyen la distribución de
+errores ni la sensibilidad medidas en la plataforma propia.
 
 \begin{table}[htbp]
 \centering\scriptsize
@@ -89,6 +100,21 @@ se apoya en principios estándar de reconocimiento de patrones y aprendizaje pro
 \citep{Bishop2006PRML,Breiman2001RandomForests,Goodfellow2016DL}; la arquitectura se
 seleccionará con validación y no por inspección del test.
 
+La comparación responde a la afirmación de cada etapa. En E0 se modela la distribución
+basal y la tasa de falsas perturbaciones; en E1, la salida principal es una respuesta
+diferencial y no una etiqueta; en E2, se evalúa la forma de onda completa; en E3--E5,
+los predictores downstream se comparan con igual información, partición y presupuesto
+de adaptación. Una red con menor error medio no se considera mejor explicación física
+si falla en geometrías previstas como ciegas o si su ventaja desaparece al reservar la
+sesión, el sujeto o la escena.
+
+Las comparaciones entre representaciones serán pareadas sobre las mismas unidades.
+La selección incluye la métrica primaria y el régimen de generalización; métricas
+secundarias diagnostican mecanismo y fallas. Cuando se prueben varias arquitecturas,
+subportadoras o enlaces, esa búsqueda pertenece al procedimiento de selección y no
+genera réplicas adicionales. El conjunto de prueba se consulta una vez para la
+comparación confirmatoria.
+
 La calibración y las pérdidas multiobjetivo se formularán con restricciones y
 regularización explícitas \citep{Boyd2004Convex}. Cuando existan gradientes en conflicto,
 GradNorm y PCGrad serán referencias algorítmicas, no garantías de identificabilidad
@@ -106,3 +132,8 @@ Un resultado negativo es informativo cuando excluye una hipótesis bajo covariab
 \section{Trazabilidad y reproducibilidad}
 
 El cuerpo científico registra definición del experimento, particiones, métricas y procedencia. Nombres de scripts, hashes, parámetros completos y estructura de artefactos se documentarán en el repositorio o en un apéndice de reproducibilidad. No se utilizarán rutas locales dependientes de una computadora como parte de la argumentación científica.
+
+Con estas reglas, la evidencia existente puede leerse sin extrapolar más allá de su
+dominio. El \cref{ch:avances} presenta el corte estático y sus resultados negativos;
+los capítulos posteriores especifican las intervenciones necesarias para evaluar la
+fidelidad diferencial.
