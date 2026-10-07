@@ -46,7 +46,78 @@ medición.}
 
 \section{Fidelidad estática B0--B2}
 
-B0 utiliza geometría y materiales nominales. B1 optimiza parámetros globales de materiales siguiendo calibración diferenciable \citep{Hoydis2024DiffRT}. B2 conserva el soporte de trazado y aprende parámetros efectivos dependientes de la posición de interacción; no es un campo RF implícito como NeRF$^2$ \citep{Zhao2023NeRF2}.
+La comparación incrementa capacidad de forma controlada sobre un mismo modelo
+directo. Para una consulta $i$, las tres variantes pueden escribirse como
+\begin{equation}
+H_i^{(b)}=\mathcal S\!\left(
+\mathcal P_i^{\rm RT},\Theta_b;f_k
+\right),\qquad b\in\{0,1,2\},
+\label{eq:b012_common_synthesis}
+\end{equation}
+donde $\mathcal P_i^{\rm RT}$ contiene las trayectorias trazadas y $\mathcal S$
+suma sus campos sobre las subportadoras. La geometría, las posiciones, los caminos
+almacenados y el operador de síntesis permanecen fijos; cambia $\Theta_b$, es decir,
+la forma de asignar propiedades electromagnéticas en cada interacción. Así, las
+diferencias no deben interpretarse como tres simuladores inconmensurables.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Definición operacional de las configuraciones B0--B2.}
+\label{tab:b012_models}
+\begin{tabularx}{\textwidth}{P{1.4cm}P{3.0cm}P{3.8cm}L}
+\toprule
+Modelo & Representación & Componentes ajustados & Papel experimental\\
+\midrule
+B0 & Materiales ITU nominales, constantes por superficie & Sólo una escala global
+de potencia; sin red neuronal & Referencia determinista del error antes de calibrar
+el entorno.\\
+B1 & Material aprendido, constante dentro de cada objeto & $\epsilon_r$ y $\sigma$
+por objeto mediante trazado diferenciable; sin MLP espacial & Determina cuánto
+explica una calibración paramétrica compartida.\\
+B2 & Material neuronal continuo en coordenadas globales & Codificación posicional
+y MLP para $\epsilon_r(\vect x)$ y $\sigma(\vect x)$ & Evalúa si mayor capacidad
+espacial mejora la correspondencia estática.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+B0 conserva la geometría y los materiales nominales. B1 asigna a cada objeto una
+permitividad y una conductividad entrenables, constantes sobre su superficie. No
+utiliza un predictor espacial: el gradiente de la pérdida atraviesa el cálculo de
+los coeficientes de reflexión y difracción hasta esos parámetros. B2 evalúa la
+posición de interacción $\vect x$, normalizada por la caja de la escena, mediante
+una codificación posicional de diez frecuencias. Las $60$ componentes resultantes
+alimentan un \ac{MLP} con cuatro capas ocultas de 128 unidades ReLU y cuatro salidas
+acotadas: $\epsilon_r$, $\sigma$, coeficiente de dispersión y discriminación por
+polarización cruzada. Como la dispersión difusa está desactivada en esta ejecución,
+las dos últimas salidas no contribuyen al canal analizado.
+
+Para B1 y B2 se utiliza Adam, tasa de aprendizaje $10^{-3}$, lotes de ocho consultas
+y 10,000 iteraciones sobre 5000 posiciones; 100 posiciones se reservan para
+validación y 4900 para prueba. La función objetivo no minimiza fase compleja. Es la
+suma de pérdidas SMAPE de potencia total y dispersión RMS de retardos,
+\begin{align}
+\mathcal L_b&=\mathcal L_{P,b}+\mathcal L_{\tau,b},\\
+\mathcal L_{P,b}
+&=\frac{1}{N}\sum_i
+\frac{|P_i^{(b)}-\alpha P_i^{\rm real}|}
+{P_i^{(b)}+\alpha P_i^{\rm real}},\qquad
+\mathcal L_{\tau,b}
+=\frac{1}{N}\sum_i
+\frac{|\tau_{{\rm rms},i}^{(b)}-\tau_{{\rm rms},i}^{\rm real}|}
+{\tau_{{\rm rms},i}^{(b)}+\tau_{{\rm rms},i}^{\rm real}},
+\label{eq:b12_training_loss}
+\end{align}
+donde $\alpha$ es el factor común de escala de potencia. Esta elección explica qué
+puede esperarse del entrenamiento: B1--B2 reciben supervisión explícita sobre
+energía y estructura gruesa de retardos, no sobre fase absoluta. Los detalles
+corresponden a la implementación de referencia reproducida
+\citep{Hoydis2024DiffRT,NVIDIA2023DiffRTCalibration}.
+
+B2 no es un campo RF implícito como NeRF$^2$ \citep{Zhao2023NeRF2}: conserva
+trayectorias geométricas y utiliza la red sólo para asignar propiedades efectivas
+en sus puntos de interacción. Tampoco existe B3 en la serie reportada; B2 es el
+tercer modelo porque la numeración comienza en cero.
 
 \begin{table}[htbp]
 \centering\small
@@ -132,6 +203,22 @@ y $k$ la subportadora. $\Delta\tau_{\rm eff}$ es un retardo relativo, $\psi$ una
 dirección común al arreglo y $r^{\rm rel}$ la estructura espacial/espectral restante.
 La expresión clasifica funciones inferenciales; no identifica causas físicas
 independientes.
+
+\subsection{Significado del CPO en esta evaluación}
+
+Antes de comparar correcciones conviene precisar la etiqueta CPO. Aquí no denota
+una cuarta calibración ni una red neuronal. Para cada CFR de un enlace se permite
+una sola rotación compleja, constante sobre sus subportadoras, estimada mediante la
+\cref{eq:cpo_posthoc_alignment}. Es el grado de libertad de orden cero del error de
+fase; el retardo efectivo, en cambio, introduce el término de primer orden
+$-2\pi\nu_k\Delta\tau_{\rm eff}$.
+
+El ángulo se calcula con la medición del mismo enlace evaluado. En consecuencia,
+``sólo CPO'' es un alineamiento \emph{post hoc} que responde cuánto error puede
+eliminar una rotación escalar, no un método autónomo para predecir fase en una
+posición nueva. Además, este CPO por enlace y por CFR debe distinguirse de la fase
+común al arreglo de la \cref{sec:common_array_phase}: esta última impone una
+dirección compartida entre antenas y se somete después a pruebas de predictibilidad.
 
 La pendiente $-2\pi\nu_k\Delta\tau_{\rm eff}$ puede condensar error de distancia,
 posición o centro de fase, trayectorias ausentes, respuesta de cadena, STO, SFO o
@@ -238,6 +325,7 @@ un coeficiente independiente por camino: distintos mecanismos y errores pueden
 producir la misma curvatura residual.
 
 \section{Fase común al arreglo}
+\label{sec:common_array_phase}
 
 S4.6 analiza 640,000 fases residuales en 10,000 capturas. La resultante global cercana a $0.0011$ y las resultantes marginales pequeñas no respaldan una fase absoluta fija y concentrada. Dentro de cada captura, la dirección común estimada reduce descriptivamente el error mediano de aproximadamente $89.0^\circ$ a $46.0^\circ$, pero se obtiene de las mismas antenas evaluadas.
 

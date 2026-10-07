@@ -88,6 +88,45 @@ correspondencia macroscópica, generalización estática y, para esta tesis, res
 diferencial ante una intervención. Que $H_{\rm model}$ sea preciso en los puntos de
 calibración no implica que su derivada respecto de $q$ sea correcta.
 
+\subsection{Escalera de capacidad B0--B2}
+
+La evidencia experimental utilizará tres configuraciones anidadas inspiradas en
+la calibración de Hoydis y colaboradores y en su implementación reproducible
+\citep{Hoydis2024DiffRT,NVIDIA2023DiffRTCalibration}. Conviene introducirlas antes
+de presentar sus resultados. Las tres conservan la escena, posiciones, soporte de
+trayectorias, frecuencia y operador de síntesis. La diferencia reside en la
+representación electromagnética evaluada en los puntos de interacción.
+
+En B0, las superficies conservan propiedades nominales de la recomendación ITU;
+no existe una red neuronal ni se aprende variación espacial de materiales. Un
+factor escalar global iguala la escala de potencia entre medición y simulación,
+pero no altera retardos, fases relativas ni materiales. B0 es, por tanto, la
+referencia determinista nominal.
+
+En B1, cada objeto de la escena recibe un vector constante de parámetros
+electromagnéticos. En la configuración empleada, las variables físicamente activas
+son permitividad relativa real $\epsilon_r$ y conductividad $\sigma$; permanecen
+constantes sobre todos los puntos de un mismo objeto y se optimizan por gradiente a
+través del trazador diferenciable. B1 es una calibración paramétrica por objeto,
+no una red que consulte coordenadas.
+
+En B2, la parametrización constante se sustituye por un campo aprendido
+\begin{equation}
+(\epsilon_r(\vect x),\sigma(\vect x),s(\vect x),\chi(\vect x))
+=g_{\vect\psi}\!\left(\gamma(\vect x)\right),
+\label{eq:neural_material_field}
+\end{equation}
+donde $\vect x$ es el punto de interacción, $\gamma$ es una codificación posicional
+senoidal y $g_{\vect\psi}$ es un \ac{MLP}. B2 sigue usando trayectorias explícitas:
+la red parametriza materiales locales, no reemplaza el trazador por un campo
+neuronal de canal. La arquitectura, las salidas activas y el protocolo de
+optimización se especifican junto con los resultados en el \cref{ch:avances}.
+
+La numeración comienza en cero: B2 es la tercera configuración. No existe una B3
+en la serie experimental documentada. Esta aclaración impide confundir B2 con
+NeRF$^2$, Learnable WDT u otras arquitecturas que se discuten después como
+comparaciones pendientes.
+
 \section{Gemelos aprendidos y alcance de la comparación}
 
 Los campos implícitos, gemelos aprendibles y representaciones centradas en objetos

@@ -149,9 +149,48 @@ Una parametrización local de la medición es
 \end{equation}
 $g_n[k]$ contiene respuesta de cadena y ganancia; $\varphi_{0,n}$ es una fase
 común; el \ac{CFO} rota entre instantes; el \ac{STO} induce una pendiente espectral;
-y el \ac{SFO} hace evolucionar esa pendiente. La CPO puede reagruparse en
+y el \ac{SFO} hace evolucionar esa pendiente. El \ac{CPO} es la rotación
+aproximadamente constante que resulta de la referencia de fase de portadora de
+transmisor y receptor al comenzar una captura; puede reagruparse en
 $\varphi_{0,n}$. Ruido de fase, control automático de ganancia, reinicios y
 saltos de reloj requieren términos adicionales según la plataforma.
+
+La palabra \emph{constante} en CPO se refiere a su acción dentro de la unidad de
+observación elegida, no a que conserve el mismo valor durante toda una campaña.
+En una CFR de un enlace, el CPO rota todas las subportadoras por un mismo ángulo,
+mientras el STO produce una pendiente con $\nu_k$. Entre paquetes, una diferencia
+de frecuencia de osciladores hace evolucionar la fase; por ello CFO y CPO no son
+sinónimos. Tampoco toda rotación común observada es necesariamente instrumental:
+una discrepancia física o del modelo que afecte por igual al vector considerado
+puede quedar absorbida por el mismo parámetro.
+
+Cuando una predicción $H^{\rm mod}_{i,u,a,k}$ se alinea con una medición compleja
+mediante una única rotación por enlace $(i,u,a)$, el estimador de mínimos cuadrados
+ponderados es
+\begin{equation}
+\widehat\phi_{{\rm CPO},i,u,a}
+=\arg\!\left(
+\sum_{k\in\mathcal K}w_k
+H^{\rm real}_{i,u,a,k}H^{{\rm mod}*}_{i,u,a,k}
+\right),
+\qquad
+H^{{\rm mod,CPO}}_{i,u,a,k}
+=e^{j\widehat\phi_{{\rm CPO},i,u,a}}H^{\rm mod}_{i,u,a,k}.
+\label{eq:cpo_posthoc_alignment}
+\end{equation}
+Aquí $i$ denota la captura o posición, $u$ el transmisor o arreglo, $a$ la antena
+y $\mathcal K$ el conjunto de frecuencias. Si la suma utiliza el mismo canal real
+sobre el que se reporta el error, $\widehat\phi_{\rm CPO}$ es un ajuste \emph{post
+hoc}: cuantifica cuánto error puede retirarse con un grado de libertad, pero no es
+una predicción desplegable. La estimación independiente exige una referencia,
+pilotos o un predictor ajustado sólo con entrenamiento.
+
+Esta distinción también anticipa el comportamiento de las métricas. Una rotación
+común puede disminuir el error angular punto a punto, pero no modifica la forma
+del vector multicarrier. Por tanto, la coherencia definida mediante el módulo del
+producto interno normalizado es invariante a la corrección de la
+\cref{eq:cpo_posthoc_alignment}. Una reducción angular por CPO y una mejora de
+coherencia expresan afirmaciones diferentes.
 
 Esta taxonomía es funcional, no una identificación automática. Una discrepancia
 geométrica común y un STO producen la misma dependencia lineal en frecuencia;
