@@ -31,6 +31,23 @@ no implica
 Esta separación es el criterio central para juzgar si un gemelo calibrado para canal
 estático resulta adecuado para sensado.
 
+La \cref{fig:differential_fidelity_schematic} ilustra una ambigüedad importante.
+Dos respuestas pueden compartir una fase normalizada casi idéntica y, al mismo
+tiempo, diferir en la magnitud del incremento complejo. Dependiendo de la tarea,
+normalizar puede revelar la dirección de respuesta o esconder un error de ganancia
+diferencial. Por ello se reportarán dirección, norma y error complejo, no una sola
+medida angular.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figuras/dc01/raw11_differential_fidelity.pdf}
+\caption{Ejemplo analítico, no resultado experimental, de dos gemelos con respuesta
+angular normalizada coincidente y amplitud diferencial distinta. La comparación
+completa del Jacobiano requiere preservar dirección y escala, o declarar cuál de
+ellas es irrelevante para el estimando.}
+\label{fig:differential_fidelity_schematic}
+\end{figure}
+
 \subsection{Invariancia instrumental y costo diferencial}
 
 Para un grupo de transformaciones perturbadoras $T_g$, una representación puede
@@ -147,6 +164,38 @@ el rango puede favorecer una configuración que pierde una variable.
 El rango identifica el subespacio localmente visible; un valor propio pequeño indica una dirección mal condicionada, no necesariamente una variable individual invisible. Estos criterios provienen del diseño óptimo de experimentos y se reutilizarán para determinar la ubicación de los nodos \citep{Pukelsheim2006}.
 
 \section{Información física a escala de tarea y red}
+
+\subsection{Jerarquía de métricas}
+
+Ninguna métrica aislada recorre la cadena completa desde recepción hasta fisiología.
+La evaluación se organiza en seis niveles:
+\begin{table}[htbp]
+\centering\small
+\caption{Jerarquía de métricas y afirmación que permite sostener cada nivel.}
+\label{tab:metric_hierarchy}
+\begin{tabularx}{\textwidth}{P{2.4cm}P{4.1cm}L}
+\toprule
+Nivel & Métricas representativas & Pregunta respondida\\
+\midrule
+Comunicación & RSSI, SNR, PER, BER & ¿La transmisión es utilizable?\\
+Perturbación & SSNR, SCR, fracción dinámica & ¿El objetivo modifica el canal por
+encima del ruido?\\
+Coherencia & coherencia compleja, error relativo de fase & ¿El gemelo reproduce
+la estructura compleja observada?\\
+Sensibilidad & $\|J_q\|$, $\mat F_q^{\rm eq}$, CRLB & ¿La geometría contiene
+información local sobre $q$?\\
+Cobertura temporal & muestras por ciclo, huecos, estabilidad de SampEn & ¿La
+dinámica se muestrea con soporte suficiente?\\
+Tarea & correlación, NRMSE, retardo, morfología, cobertura & ¿Se recuperó el patrón
+respecto de la referencia?\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Cada nivel es condición o diagnóstico del siguiente, no su sustituto. Una SNR alta
+no garantiza perturbación humana; una SSNR alta no garantiza identificabilidad
+frente a \(\vect\zeta\); una FIM favorable bajo el gemelo no acredita su calibración;
+y una frecuencia respiratoria correcta no demuestra fidelidad de forma de onda.
 
 \subsection{Respiración como ejemplo conductor}
 

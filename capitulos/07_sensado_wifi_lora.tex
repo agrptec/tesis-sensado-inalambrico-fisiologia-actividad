@@ -146,6 +146,64 @@ cobertura efectiva de sensing \citep{Xue2025LargeScaleLoRa}. Estas obras respald
 alcance y factibilidad, pero no garantizan que una pasarela particular preserve
 fase ni que su cadencia baste para respiración.
 
+\subsection{Calidad de comunicación y calidad para sensado}
+
+Para $Y(t)=H_s+H_d(t)+n(t)$, sean
+$P_d=\E|H_d|^2$ y $P_n=\E|n|^2$. La SNR empleada para comunicación,
+\begin{equation}
+\mathrm{SNR}_{\rm comm}
+=\frac{\E|H_s+H_d|^2}{P_n},
+\end{equation}
+responde si la señal total puede detectarse o demodularse. En cambio,
+\begin{equation}
+\mathrm{SSNR}=\frac{P_d}{P_n},\qquad
+\eta_d=\frac{P_d}{\E|H_s+H_d|^2},
+\label{eq:ssnr_dynamic_fraction}
+\end{equation}
+describen la componente dinámica sobre ruido y su fracción respecto del canal.
+Un LOS estático intenso puede producir $\mathrm{SNR}_{\rm comm}$ elevada y
+$\eta_d$ pequeña; el enlace comunica con fiabilidad y, sin embargo, apenas cambia
+con la persona.
+
+Bajo una suma \emph{incoherente} de potencias,
+$\eta_d\mathrm{SNR}_{\rm comm}\approx\mathrm{SSNR}$. La aproximación no es general,
+pues el término $2\Re\{H_sH_d^*\}$ depende de fase. SenLoRa utiliza además una
+relación de contraste de sensing de la forma
+\begin{equation}
+\mathrm{SCR}=
+\frac{\E\left|H_d/(H_s+H_d)\right|^2}{\sigma_n^2},
+\label{eq:senlora_scr}
+\end{equation}
+bajo la normalización de ruido adoptada en su procesamiento \citep{SenLoRa2025}.
+La normalización debe declararse para que la escala sea interpretable. El cociente
+puede crecer cerca de $H_s+H_d\simeq0$, precisamente donde la fase, el control de
+ganancia y la demodulación son menos estables. También requiere estimar una
+descomposición $H_s/H_d$ que no se observa directamente. Por estas razones, SSNR,
+$\eta_d$ y SCR son métricas intermedias y no pruebas de recuperación respiratoria.
+
+\subsection{Suficiencia temporal y entropía de muestra}
+
+SenLoRa emplea entropía de muestra para evaluar la estabilización de un descriptor
+temporal. Para patrones de longitud $m$ y tolerancia $r$,
+\begin{equation}
+\operatorname{SampEn}(m,r)=
+-\log\frac{A_{m+1}(r)}{B_m(r)},
+\label{eq:sample_entropy}
+\end{equation}
+donde $B_m$ cuenta coincidencias de longitud $m$ y $A_{m+1}$ las que permanecen
+coincidentes al añadir una muestra. La convergencia reportada alrededor de 600
+chirps pertenece a su configuración; no constituye un umbral universal. Depende
+de factor de ensanchamiento, ancho de banda, duración y número de chirps, tráfico,
+$m$, $r$, ruido y dinámica objetivo.
+
+Además, alta entropía puede provenir de ruido y baja entropía de una señal constante
+o de respiración periódica limpia. La tesis utilizará la entropía de muestra como
+diagnóstico de regularidad y suficiencia de ventana, distinguiéndola de entropía de
+Shannon o información de Fisher. Para forma de onda se reportarán duración
+$T_{\rm obs}$, ciclos observados, cadencia efectiva y distribución de huecos; cumplir
+Nyquist para la frecuencia fundamental no garantiza resolución de inspiración,
+espiración y pausas.
+
 OpenLoRa ofrece un banco para recepción PHY e interferencia
 \citep{Mishra2023OpenLoRa}. En esta tesis se utiliza para auditar el operador y
 las perturbaciones, no como evidencia de sensado humano. La cadena de conservación

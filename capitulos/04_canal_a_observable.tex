@@ -116,6 +116,28 @@ la descomposición sea física ni única. Entonces
 \[
 |H|^2=|H_s|^2+|H_d|^2+2\Re\{H_s^*H_d\}.
 \]
+En el modelo local $H(x)=H_s+a e^{-j\kappa x}$, donde $\kappa$ incorpora longitud
+de onda y proyección biestática, se obtiene
+\begin{equation}
+J_x=\frac{\partial H}{\partial x}
+=-j\kappa a e^{-j\kappa x}.
+\label{eq:single_dynamic_path_jacobian}
+\end{equation}
+Para $H\neq0$, las sensibilidades de magnitud y fase son, respectivamente,
+\begin{align}
+\frac{\partial |H|}{\partial x}
+&=\frac{\Re\{H^*J_x\}}{|H|},
+\label{eq:magnitude_sensitivity}\\
+\frac{\partial \angle H}{\partial x}
+&=\frac{\Im\{H^*J_x\}}{|H|^2}.
+\label{eq:phase_sensitivity}
+\end{align}
+Las expresiones muestran que magnitud y fase son proyecciones diferentes del mismo
+incremento complejo. Según la fase relativa entre $H_s$ y $H_d$, una puede ser
+sensible mientras la otra se aproxima a cero. Cerca de un nulo profundo, el
+denominador de la \cref{eq:phase_sensitivity} amplifica ruido y discrepancia; una
+gran variación angular no equivale entonces a alta información útil.
+
 La variación de magnitud depende de la fase relativa: un mismo movimiento puede
 atravesar regiones de gran pendiente, máximos o nulos. Las zonas de Fresnel
 ofrecen una interpretación geométrica de estas alternancias. Interrumpir o

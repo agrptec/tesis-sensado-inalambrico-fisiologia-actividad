@@ -161,6 +161,35 @@ correcciones locales de fase estudiadas en la literatura deben juzgarse por las
 perturbaciones que eliminan y por la sensibilidad física que preservan
 \citep{Ruah2024Phase}.
 
+\subsection{Tres objetivos distintos al tratar la fase}
+
+Conviene separar tres problemas que a menudo se denominan, de manera ambigua,
+\emph{corrección de fase}. El primero es recuperar una referencia electromagnética
+absoluta, de modo que la fase predicha y la medida coincidan bajo un origen común.
+Este objetivo exige controlar osciladores, disparos, cadenas RF, cables y centros
+de fase, y resulta especialmente restrictivo al comparar sesiones o dispositivos.
+No es una condición necesaria para toda inferencia diferencial dentro de una
+secuencia.
+
+El segundo problema es estimar o marginalizar las perturbaciones instrumentales de
+la \cref{eq:hardware_model}. Si $\varphi_{0,n}$ o $\Delta\tau_n$ varían entre
+paquetes, una escena inmóvil puede producir una señal aparente en la banda
+respiratoria. El tercero es preservar la fase física diferencial, por ejemplo
+\begin{equation}
+\Delta\phi_k(t;t_0)=
+\arg\!\left\{H_k(t)H_k^*(t_0)\right\},
+\label{eq:differential_physical_phase}
+\end{equation}
+o una relación equivalente entre antenas, frecuencias o enlaces. Esta cantidad
+puede seguir el movimiento aun cuando exista una fase absoluta desconocida.
+
+Los objetivos segundo y tercero entran en tensión: una transformación que elimina
+toda rotación común también elimina cualquier movimiento que se manifieste en esa
+dirección. Por tanto, una corrección no se valida por reducir el error angular
+estático. Debe demostrar que disminuye variabilidad instrumental y conserva
+$\partial V(H)/\partial q$. Esta condición conecta la taxonomía de adquisición con
+la fidelidad diferencial del \cref{ch:fidelity_observability}.
+
 \section{Convención espectral y retardo efectivo}
 \label{sec:phase_conventions}
 \label{sec:delay_gauge}

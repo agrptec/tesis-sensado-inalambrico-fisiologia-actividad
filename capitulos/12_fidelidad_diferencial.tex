@@ -54,7 +54,46 @@ Para cada alternativa se medirán repetibilidad basal y respuesta física. La di
 
 \section{E2: fantoma respiratorio}
 
-El fantoma ejecutará movimientos de amplitud, frecuencia, orientación y forma de onda conocidas, incluidos cambios de frecuencia y pausas mecánicas. El estimando inicial será la forma de onda $x(t)$; la tasa respiratoria se derivará sólo en intervalos donde una frecuencia instantánea resulte significativa. Se evaluarán error temporal sin reajuste del test, correlación, amplitud cuando esté calibrada, detección de eventos y cobertura de intervalos.
+El fantoma ejecutará movimientos de amplitud, frecuencia, orientación y forma de
+onda conocidas. No se limitará a una sinusoide, porque ésta permite estimar una
+frecuencia aun cuando el sistema distorsione la morfología. El conjunto de excitaciones
+incluirá: ciclo sinusoidal; inspiración rápida con espiración lenta; el caso inverso;
+amplitud modulada; pausas; dos frecuencias próximas en bloques separados; y movimiento
+grueso superpuesto. Cada perfil se almacena como referencia continua $x_{\rm ref}(t)$,
+junto con incertidumbre de desplazamiento y tiempo.
+
+El estimando primario será la forma de onda $\widehat x(t)$. Para una alineación
+temporal estimada exclusivamente con validación, se reportarán
+\begin{align}
+\operatorname{NRMSE}
+&=\frac{\|\widehat{\vect x}-\vect x_{\rm ref}\|_2}
+{\|\vect x_{\rm ref}-\bar x_{\rm ref}\vect 1\|_2},\\
+\rho_{\max}
+&=\max_{\ell\in\mathcal L_{\rm val}}
+\operatorname{corr}\{\widehat x(t-\ell),x_{\rm ref}(t)\}.
+\end{align}
+El retardo seleccionado, el error de amplitud por ciclo, las duraciones de
+inspiración y espiración, la detección de pausas, la coherencia espectral y una
+distancia de deformación temporal se informarán por separado. La frecuencia
+respiratoria se derivará sólo en intervalos donde una frecuencia instantánea resulte
+significativa; no será sustituto de la forma de onda.
+
+\subsection{Contrastes de fase y selección de enlaces}
+
+Sobre la misma adquisición se compararán: magnitud; fase cruda; fase con CPO
+retirada; retardo predicho más fase diferencial; retardo oráculo como techo de
+alineabilidad; productos entre antenas; productos entre frecuencias; y canal
+complejo coherentemente referenciado. El caso oráculo se etiqueta como límite
+superior y no participa en la comparación de despliegue. Cada alternativa utilizará
+idénticas ventanas y particiones.
+
+La selección mediante SNR de comunicación se contrastará con SSNR/SCR y con
+información equivalente \(F_{x\mid\zeta}\). El análisis probará tres afirmaciones
+operacionales: si el retardo efectivo mejora la combinación coherente y la forma
+de onda; si eliminar fase común reduce el piso sin proyectar \(J_x\); y si la
+fidelidad del Jacobiano predice el error respiratorio mejor que potencia o fidelidad
+estática. Estas afirmaciones son contrastes pendientes, no conclusiones del banco
+dc01.
 
 Una forma de onda mecánica recuperada no valida respiración humana ni apnea clínica. E2 determina si la cadena observa un micromovimiento conocido y si el gemelo predice condiciones favorables. La transición a E3 añadirá deformación no rígida, postura, ropa y movimiento espontáneo.
 
