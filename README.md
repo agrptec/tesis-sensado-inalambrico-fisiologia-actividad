@@ -12,6 +12,7 @@ El gemelo inalámbrico se emplea para separar propagación, instrumentación y p
 main.tex                     Documento maestro y cinco partes
 capitulos/                   Quince capítulos científicos
 preliminares/                Portada, resúmenes y notación global
+presentacion_avances_rf/     Presentación Beamer de avances y validación propuesta
 docs/                        Mapa editorial y pendientes científicos
 references.bib               Bibliografía
 ```
@@ -31,3 +32,10 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 El manuscrito compilado se encuentra en [main.pdf](main.pdf).
+
+La presentación de avances se compila de forma independiente:
+
+```sh
+cd presentacion_avances_rf
+./compile.sh
+```
