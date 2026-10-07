@@ -80,6 +80,31 @@ y retardos gruesos sean razonables. La ventaja tiene un costo de identificabilid
 Una corrección flexible puede reunir desplazamiento de interacción, error de reloj
 y mecanismos ausentes; debe probarse fuera de las observaciones que la estimaron.
 
+La diferencia entre las tres estrategias consideradas en ese marco se entiende al
+introducir un error circular $\varepsilon_p$ en cada contribución simulada,
+\begin{equation}
+H^{\rm mod}(f)=\sum_p \alpha_p(f)
+\exp\{-j2\pi f\tau_p+j\varepsilon_p\}.
+\label{eq:path_phase_error_model}
+\end{equation}
+La calibración que ignora el error de fase (PEOC) fija
+$\varepsilon_p=0$ y obliga a los materiales a explicar también cualquier error
+geométrico. UPEC marginaliza fases sin estructura mediante una distribución
+uniforme. PEAC conserva información parcial con una distribución de von Mises,
+\begin{equation}
+p(\varepsilon_p\mid\mu_p,\kappa_p)=
+\frac{\exp\{\kappa_p\cos(\varepsilon_p-\mu_p)\}}
+{2\pi I_0(\kappa_p)},
+\label{eq:von_mises_path_error}
+\end{equation}
+donde $\kappa_p=0$ recupera el caso uniforme y una concentración grande expresa
+confianza alrededor de $\mu_p$. Esta jerarquía aclara el compromiso: PEOC puede
+sesgar materiales cuando la fase RT es incorrecta; UPEC evita esa confianza, pero
+descarta estructura; PEAC puede aprovecharla, aunque introduce variables latentes,
+dependencia de inicialización y posibles óptimos locales. Sin información adicional,
+una fase por trayectoria puede ser numéricamente estimable y aun carecer de una
+interpretación física única.
+
 Estas obras motivan una calibración escalonada. Primero se fijan convención,
 registro y respuesta de cadena; después se ajustan parámetros globales o compartidos
 de materiales y antenas; finalmente se estudia discrepancia local con priors y

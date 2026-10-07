@@ -11,6 +11,19 @@ convertir el programa experimental en conclusiones.
 
 La evidencia disponible permite separar tres niveles que antes aparecían mezclados. Primero, la calibración B0--B2 mejora propiedades macroscópicas del canal: potencia, magnitud y dispersión de retardos. Segundo, la discrepancia compleja contiene una pendiente espectral de baja dimensión que puede predecirse parcialmente desde posición y descriptores de trazado. Tercero, las representaciones relativas eliminan grados de libertad no disponibles y mejoran la discriminabilidad espacial estática.
 
+Esta separación no depende sólo del orden de las métricas. B0 ajusta una escala
+global sin modificar materiales; B1 aprende propiedades efectivas constantes por
+objeto; y B2 emplea un campo neuronal de 57,860 parámetros para permitir variación
+espacial continua. El progreso B0--B2 en potencia y RMS-DS es compatible con la
+función objetivo utilizada, que supervisa esas cantidades y no la fase compleja.
+Que B2 alcance la mejor fidelidad macroscópica mientras su coherencia bruta no
+mejora constituye evidencia de desacoplamiento entre capacidad para aproximar
+estadísticos estáticos y capacidad para conservar estructura coherente. La
+factorización posterior de la discrepancia no fue una hipótesis añadida para
+explicar ese fallo: se construyó mediante una secuencia de cancelaciones, techos
+oráculo y pruebas de transferencia que separaron pendiente espectral, fase común
+y residuo relativo.
+
 La comparación de representaciones confirma este tercer nivel dentro de dc01: la
 mejora se concentra en separación regional y no aparece una ganancia local
 concluyente. Las cifras, particiones e intervalos se conservan en el
