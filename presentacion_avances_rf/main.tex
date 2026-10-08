@@ -12,37 +12,36 @@
 \usepackage{siunitx}
 \graphicspath{{figures/}}
 
-% Formato sobrio para presentación doctoral.
-\usetheme{default}
-\definecolor{navy}{RGB}{18,52,86}
+% Identidad visual institucional, conservada con composición sobria.
+\usetheme{Madrid}
+\usecolortheme{default}
+\definecolor{tecblue}{RGB}{0,63,115}
+\definecolor{teccyan}{RGB}{0,142,170}
+\definecolor{deepgray}{RGB}{55,65,75}
+\definecolor{softgray}{RGB}{245,247,250}
+\definecolor{navy}{RGB}{0,63,115}
 \definecolor{slate}{RGB}{76,86,96}
 \definecolor{rulegray}{RGB}{190,196,202}
-\definecolor{lightgray}{RGB}{246,247,248}
 \definecolor{textgray}{RGB}{35,39,43}
 \setbeamercolor{normal text}{fg=textgray,bg=white}
-\setbeamercolor{structure}{fg=navy}
-\setbeamercolor{frametitle}{fg=navy,bg=white}
-\setbeamercolor{title}{fg=navy,bg=white}
-\setbeamercolor{subtitle}{fg=slate,bg=white}
-\setbeamercolor{caption name}{fg=navy}
-\setbeamercolor{footline}{fg=slate,bg=white}
+\setbeamercolor{structure}{fg=tecblue}
+\setbeamercolor{frametitle}{fg=white,bg=tecblue}
+\setbeamercolor{title}{fg=white,bg=tecblue}
+\setbeamercolor{subtitle}{fg=deepgray,bg=white}
+\setbeamercolor{caption name}{fg=tecblue}
+\setbeamercolor{palette primary}{fg=white,bg=tecblue}
+\setbeamercolor{palette secondary}{fg=white,bg=tecblue!88!black}
+\setbeamercolor{palette tertiary}{fg=white,bg=tecblue!76!black}
+\setbeamercolor{footline}{fg=deepgray,bg=white}
 \setbeamerfont{frametitle}{size=\large,series=\bfseries}
 \setbeamerfont{caption}{size=\scriptsize}
 \setbeamerfont{footline}{size=\tiny}
 \setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{itemize item}{\raise0.2ex\hbox{\scriptsize$\blacksquare$}}
-\setbeamertemplate{itemize subitem}{\raise0.2ex\hbox{\tiny$\blacktriangleright$}}
 \setbeamertemplate{caption}[numbered]
-\setbeamertemplate{frametitle}{%
-  \vspace{0.18cm}\insertframetitle\par
-  \vspace{0.06cm}{\color{rulegray}\rule{0.96\textwidth}{0.45pt}}
-}
 \setbeamertemplate{footline}{%
-  \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.0ex,leftskip=0.75cm,rightskip=0.75cm]{footline}%
-  A. G. Romero-Pacheco \hspace{0.7em}|\hspace{0.7em} Avances de tesis doctoral
-  \hfill\insertframenumber/\inserttotalframenumber
-  \end{beamercolorbox}
-}
+  \hfill\usebeamerfont{footline}%
+  A. G. Romero-Pacheco\hspace{0.7em}|\hspace{0.7em}%
+  \insertframenumber/\inserttotalframenumber\hspace{3mm}\vspace{1.5mm}}
 \setbeamersize{text margin left=0.75cm,text margin right=0.75cm}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
@@ -52,9 +51,6 @@
 \newcommand{\Hrt}{H^{\mathrm{RT}}}
 \newcommand{\dtau}{\Delta\tau_{\mathrm{eff}}}
 \newcommand{\smallsource}[1]{\par\vspace{0.05cm}{\tiny\color{slate}#1}}
-\newcommand{\conclusion}[1]{%
-  \vspace{0.12cm}\par\noindent{\color{navy}\rule{\textwidth}{0.4pt}}\par
-  \vspace{0.08cm}\noindent{\scriptsize\textbf{Conclusión.} #1}}
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 
@@ -73,7 +69,7 @@
 \includegraphics[width=0.34\linewidth]{eic-tec-de-monterrey.png}
 \vspace{0.5cm}
 
-{\LARGE\bfseries\color{navy} De la fidelidad estática a la fidelidad diferencial}\par
+{\LARGE\bfseries\color{tecblue} De la fidelidad estática a la fidelidad diferencial}\par
 \vspace{0.18cm}
 {\large Calibración de un gemelo digital inalámbrico y validación para sensado fisiológico}\par
 \vspace{0.55cm}
@@ -86,48 +82,39 @@
 
 % 2
 \begin{frame}{Planteamiento de la investigación}
-\scriptsize
-El objetivo no es corregir la fase como una tarea aislada. Se busca determinar qué
-componentes del canal complejo deben calibrarse, predecirse o marginalizarse para
-preservar la sensibilidad a una perturbación física de interés.
-\vspace{0.25cm}
+\small
+Sea $q(t)$ el estado físico, $\Gamma(q)$ la configuración electromagnética de la
+escena, $H(f,t)$ el canal y $Y(f,t)$ la observación proporcionada por el receptor:
 \begin{equation*}
-q(t)\longrightarrow \Gamma(q)
-\longrightarrow H(f,t)
+q(t)\longrightarrow \Gamma(q)\longrightarrow H(f,t)
 \xrightarrow{\,\mathcal O,\,\mathcal C\,}Y(f,t)
-\longrightarrow \widehat q(t),
+\longrightarrow \widehat q(t).
 \end{equation*}
-donde $\Gamma$ describe la escena, $H$ el canal físico, $\mathcal O$ el operador de
-observación y $\mathcal C$ la instrumentación.
-\vspace{0.25cm}
-\begin{tabularx}{\textwidth}{p{3.2cm}Y}
+\begin{tabularx}{\textwidth}{p{3.3cm}Y}
 \toprule
-Pregunta & Criterio científico\\
+Nivel de evaluación & Cantidad caracterizada\\
 \midrule
-Fidelidad estática & Correspondencia de $H$ en una configuración fija.\\
-Fidelidad diferencial & Correspondencia de $\partial H/\partial q$ ante una perturbación controlada.\\
-Observabilidad & Información sobre $q$ después de descontar ruido y variables nuisance.\\
+Fidelidad estática & Correspondencia de $H(f,q_0)$ para una configuración fija.\\
+Fidelidad diferencial & Correspondencia de $\partial H(f,q)/\partial q$ alrededor de $q_0$.\\
+Observabilidad & Información sobre $q$ después de considerar ruido y parámetros instrumentales.\\
 \bottomrule
 \end{tabularx}
-\conclusion{La concordancia estática es necesaria para diagnosticar el gemelo, pero no basta para validar sensado.}
+\vspace{0.2cm}
+La metodología separa la calibración del modelo directo, la estimación de términos
+instrumentales y la validación de la respuesta inducida por movimiento.
 \end{frame}
 
 % 3
 \begin{frame}{Estructura de la exposición}
 \small
 \begin{enumerate}
-\setlength\itemsep{0.34cm}
-\item \textbf{Banco y modelo directo.} DICHASUS dc01, soporte geométrico y síntesis del canal.
-\item \textbf{Calibración B0--B2.} Escala global, materiales por objeto y campo neuronal de materiales.
-\item \textbf{Discrepancia compleja.} Construcción del residuo, retardo efectivo, fase común y estructura relativa.
-\item \textbf{Predicción y generalización.} Etiqueta oráculo, Random Forest y evaluación espacial bloqueada.
-\item \textbf{Siguiente validación.} Fidelidad diferencial mediante movimiento mecánico conocido.
+\setlength\itemsep{0.42cm}
+\item Banco DICHASUS dc01 y operador de síntesis del canal.
+\item Calibración B0--B2: escala global, materiales por objeto y campo neuronal.
+\item Descomposición de la discrepancia compleja en frecuencia y antena.
+\item Predicción espacial del retardo efectivo y evaluación bloqueada.
+\item Validación diferencial mediante movimiento mecánico conocido.
 \end{enumerate}
-\vspace{0.25cm}
-{\color{rulegray}\rule{\textwidth}{0.45pt}}
-\vspace{0.15cm}
-La exposición distingue explícitamente entre cantidades estimadas con el canal objetivo,
-predicciones fuera de muestra y experimentos todavía pendientes.
 \end{frame}
 
 % 4
@@ -180,7 +167,6 @@ H_{i,u,a}(f_k)=
 con \texttt{scattering=False}. La comparación activa utiliza contribuciones
 especulares y difractadas; la dispersión difusa almacenada no interviene.
 \end{columns}
-\conclusion{Las líneas son componentes del modelo directo; no implican que cada camino sea identificable desde la CFR medida.}
 \end{frame}
 
 % 6
@@ -373,7 +359,6 @@ Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
 \caption{Evaluación sobre las 4900 posiciones de prueba.}
 \end{table}
 \vspace{0.1cm}
-\conclusion{El aumento de capacidad mejora potencia, magnitud y RMS-DS, pero no induce una mejora de la concordancia compleja.}
 \end{frame}
 
 % 15
@@ -381,7 +366,7 @@ Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
 \begin{figure}
 \centering
 \includegraphics[width=0.94\textwidth,height=0.57\textheight,keepaspectratio]{raw05_spatial_power_maps.pdf}
-\caption{Potencia medida y predicha por B0--B2 sobre la región de prueba. B2 reproduce con mayor fidelidad la estructura espacial macroscópica.}
+\caption{Mapas de potencia medida y predicha por B0--B2 sobre la región de prueba.}
 \end{figure}
 \end{frame}
 
@@ -390,9 +375,8 @@ Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
 \begin{figure}
 \centering
 \includegraphics[width=0.92\textwidth,height=0.50\textheight,keepaspectratio]{raw06_cfr_measured_vs_b0.pdf}
-\caption{Ejemplo de CFR medida y B0. La envolvente puede ser plausible mientras la interferencia fina y la fase permanecen desalineadas.}
+\caption{CFR medida y sintetizada por B0 para una posición de prueba.}
 \end{figure}
-\conclusion{Una aproximación macroscópica de la envolvente no determina la orientación del vector complejo multifrecuencia.}
 \end{frame}
 
 % 17
@@ -400,32 +384,29 @@ Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
 \begin{figure}
 \centering
 \includegraphics[width=0.88\textwidth,height=0.56\textheight,keepaspectratio]{raw07_b0_b1_b2_metrics.pdf}
-\caption{Comparación normalizada de métricas estáticas. La mejora de B2 se concentra en potencia, magnitud y dispersión de retardos.}
+\caption{Comparación normalizada de las métricas estáticas de B0--B2.}
 \end{figure}
 \end{frame}
 
 % 18
 \begin{frame}{Construcción progresiva del modelo de discrepancia}
 \small
-La factorización final se obtuvo mediante una secuencia de contrastes, no mediante
-una hipótesis causal fijada de antemano:
+La discrepancia compleja se estudia mediante modelos anidados:
 \begin{equation*}
 \begin{aligned}
 \text{B0}&\rightarrow\text{B1--B2}\rightarrow
-\text{fallo de fase bruta}\rightarrow\text{residuo complejo}\\
-&\rightarrow\text{pendiente espectral}\rightarrow\text{transferencia}
-\rightarrow\text{fase común}\rightarrow\text{residuo estructurado}.
+\text{residuo complejo}\rightarrow\text{pendiente espectral}\\
+&\rightarrow\text{fase común al arreglo}\rightarrow\text{residuo relativo}.
 \end{aligned}
 \end{equation*}
-\vspace{0.25cm}
 \begin{tabularx}{\textwidth}{p{2.2cm}Y}
 \toprule
-Etapa & Pregunta sometida a contraste\\
+Etapa & Componente analizada\\
 \midrule
-S4.1 & ¿Conviene introducir errores circulares independientes por trayectoria?\\
-S4.2--S4.3 & ¿Existe estructura agregada de baja dimensión en la discrepancia?\\
-S4.4--S4.5 & ¿Puede predecirse sin consultar el canal objetivo en prueba?\\
-S4.6 & ¿El intercepto contiene una componente común transferible?\\
+S4.1 & Perturbación circular asociada a cada trayectoria.\\
+S4.2--S4.3 & Estructura agregada de baja dimensión en la discrepancia.\\
+S4.4--S4.5 & Predicción sin acceso al canal objetivo de prueba.\\
+S4.6 & Componente de fase compartida por las antenas de una captura.\\
 \bottomrule
 \end{tabularx}
 \end{frame}
@@ -536,64 +517,52 @@ $r_k$ & Discrepancia no afín que permanece después de ambos términos.\\
 
 % 23
 \begin{frame}{Detección de la pendiente y techo oráculo}
-\tiny
-\renewcommand{\arraystretch}{0.98}
-Los incrementos adyacentes eliminan el intercepto:
+\small
+Los incrementos adyacentes eliminan el intercepto de fase:
 \begin{equation*}
-\arg(R_{k+1}R_k^*)\simeq-2\pi\Delta f\Delta\tau_{\rm eff}.
+\arg(R_{k+1}R_k^*)\simeq-2\pi\Delta f\,\Delta\tau_{\rm eff}.
 \end{equation*}
-\begin{table}
-\centering
-\begin{tabular}{lrr}
-\toprule
-Modelo & Sólo CPO [$^\circ$] & Pendiente adyacente + CPO [$^\circ$]\\
-\midrule
-B0 & 81.42 & 66.05\\
-B1 & 81.39 & 66.48\\
-B2 & 81.58 & 54.99\\
-\bottomrule
-\end{tabular}
-\end{table}
-El techo global se obtiene mediante
+El alineamiento global se define por
 \begin{equation*}
 \widehat\tau^{\rm oracle}_{i,u}=
-\arg\max_{\tau\in[-500,500]\,{\rm ns}}
+\arg\max_{\tau\in[-500,500],{\rm ns}}
 \left|\sum_a\sum_k R_{i,u,a,k}e^{j2\pi\nu_k\tau}\right|.
 \end{equation*}
 \begin{table}
 \centering
 \begin{tabular}{lrrrr}
 \toprule
-& \multicolumn{2}{c}{Error angular [$^\circ$]} & \multicolumn{2}{c}{Coherencia}\\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Modelo & CPO & Retardo + CPO & Bruta & Retardo + CPO\\
+& \multicolumn{3}{c}{Error angular [$^\circ$]} & Coherencia\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-5}
+Modelo & CPO & Adyacente+CPO & Oráculo+CPO & Oráculo+CPO\\
 \midrule
-B0 & 81.42 & 31.63 & 0.156 & 0.745\\
-B1 & 81.39 & 37.15 & 0.155 & 0.696\\
-B2 & 81.58 & 38.17 & 0.145 & 0.683\\
+B0 & 81.42 & 66.05 & 31.63 & 0.745\\
+B1 & 81.39 & 66.48 & 37.15 & 0.696\\
+B2 & 81.58 & 54.99 & 38.17 & 0.683\\
 \bottomrule
 \end{tabular}
 \end{table}
+\scriptsize Ambos estimadores se calculan a partir del residuo medido. El valor oráculo
+establece una cota experimental y no constituye una predicción fuera de muestra.
 \end{frame}
 
 % 24
 \begin{frame}{Controles de transferencia del retardo efectivo}
-\scriptsize
-\begin{tabularx}{\textwidth}{p{3.2cm}p{4.2cm}Y}
+\small
+\begin{tabularx}{\textwidth}{P{3.0cm}P{4.3cm}Y}
 \toprule
-Control & Resultado & Inferencia permitida\\
+Control & Resultado & Alcance\\
 \midrule
-Entre modelos & $r=0.886$ B0--B1; $0.834$ B0--B2; $0.819$ B1--B2 & La pendiente no depende exclusivamente de una parametrización material.\\
-Antenas retenidas & $35.52^\circ$ al transferir; $30.49^\circ$ en antenas usadas & Existe una componente compartida dentro del arreglo.\\
-Pares a impares & $31.65^\circ$ & Interpolación intercalada casi conserva el techo.\\
-Media banda a media banda & $\approx45^\circ$ & La extrapolación espectral es más difícil.\\
+Entre modelos & $r=0.886$ B0--B1; $0.834$ B0--B2; $0.819$ B1--B2 & Componente común a las parametrizaciones.\\
+Antenas retenidas & $35.52^\circ$ al transferir; $30.49^\circ$ en antenas usadas & Componente compartida dentro del arreglo.\\
+Pares a impares & $31.65^\circ$ & Interpolación espectral intercalada.\\
+Media banda a media banda & $\approx45^\circ$ & Extrapolación entre intervalos espectrales.\\
 \bottomrule
 \end{tabularx}
 \vspace{0.3cm}
-El retardo efectivo puede reunir error geométrico, centros de fase, trayectorias
-ausentes, STO/SFO, cables y respuesta de cadena. El nombre designa la pendiente que
-mejor alinea el canal agregado; no identifica una causa física única.
-\conclusion{Los controles respaldan una estructura compartida y transferible, pero no una fase absoluta autónoma.}
+El parámetro $\Delta\tau_{\rm eff}$ describe la pendiente que alinea el canal
+agregado. Puede contener error geométrico, centros de fase, trayectorias ausentes,
+STO/SFO, cables y respuesta de la cadena de RF.
 \end{frame}
 
 % 25
@@ -650,8 +619,6 @@ El bosque promedia los regresores construidos sobre muestras bootstrap:
 \begin{equation*}
 \widehat\tau^{\rm pred}(\vect x)=\frac1T\sum_{b=1}^{T}h_b(\vect x).
 \end{equation*}
-No se asignan valores de hiperparámetros que no estén documentados en los artefactos
-proporcionados.
 \end{frame}
 
 % 27
@@ -684,10 +651,8 @@ Posición + RT & \textbf{18.69}\\
 \bottomrule
 \end{tabular}
 \end{table}
-Los descriptores RT aportan información regional más allá de copiar coordenadas
-próximas.
+La incorporación de descriptores RT reduce la MAE bloqueada de 27.56 a 18.69 ns.
 \end{columns}
-\conclusion{La evidencia es intraescena y la variable objetivo conserva el significado operativo del oráculo.}
 \end{frame}
 
 % 28
@@ -715,7 +680,7 @@ Bloques, CPO & 81.49 & 0.157\\
 Bloques, pred. & 64.08 & 0.448\\
 \bottomrule
 \end{tabular}
-\vspace{0.15cm}
+\par\vspace{0.15cm}
 La coherencia
 \begin{equation*}
 \rho=\frac{|\vect h^H\widehat{\vect h}|}
@@ -727,37 +692,25 @@ es invariante a CPO. Su mejora proviene de la corrección dependiente de frecuen
 
 % 29
 \begin{frame}{Fase común al arreglo y factorización final}
-\scriptsize
-El intercepto por enlace se descompone descriptivamente como
+\small
+El intercepto de cada enlace se representa como
 \begin{equation*}
-\phi_{0,i,u,a}\simeq\beta_{u,a}+\psi_{i,u}+\epsilon_{i,u,a}\pmod{2\pi}.
+\phi_{0,i,u,a}\simeq\beta_{u,a}+\psi_{i,u}+\epsilon_{i,u,a}\pmod{2\pi},
 \end{equation*}
-Las resultantes por antena son pequeñas (0.01024 en Tx0 y 0.00630 en Tx1). Dentro
-de una captura, la resultante mediana es 0.4216; retirar $\psi$ reduce
-$88.99^\circ$ a $45.97^\circ$, pero usa las mismas antenas evaluadas. Vecinos
-espaciales y temporales no muestran predictibilidad transferible.
-\vspace{0.1cm}
-La organización resultante es
+donde $\beta_{u,a}$ es específico de antena, $\psi_{i,u}$ es común a la captura y
+$\epsilon_{i,u,a}$ reúne la variación restante. Las resultantes por antena son
+0.01024 en Tx0 y 0.00630 en Tx1. La resultante mediana dentro de captura es 0.4216.
 \begin{equation*}
 \boxed{\begin{aligned}
-\Delta\phi_{i,u,a,k}\simeq{}&
--2\pi\nu_k\Delta\tau_{{\rm eff},i,u}\\
-&+\psi_{i,u}+r^{\rm rel}_{i,u,a,k}\pmod{2\pi}
+\Delta\phi_{i,u,a,k}\simeq{}&-2\pi\nu_k\Delta\tau_{{\rm eff},i,u}
++\psi_{i,u}\\
+&+\beta_{u,a}+\epsilon_{i,u,a}+r_{\phi,i,u,a,k}
+\pmod{2\pi}.
 \end{aligned}}
 \end{equation*}
-con $r^{\rm rel}=\beta+\epsilon+r_\phi$.
-\begin{table}
-\centering
-\begin{tabularx}{\textwidth}{p{2.0cm}p{5.0cm}Y}
-\toprule
-Componente & Evidencia & Papel metodológico\\
-\midrule
-$\Delta\tau_{\rm eff}$ & Transferencia parcial espacial, espectral y entre antenas & Predecir y validar fuera de muestra.\\
-$\psi$ & Dirección común a posteriori, sin regla local predictiva & Referenciar, medir o marginalizar.\\
-$r^{\rm rel}$ & Suavidad espectral y relación con distribución energética & Modelar con estructura y abstención.\\
-\bottomrule
-\end{tabularx}
-\end{table}
+La estimación a posteriori de $\psi_{i,u}$ reduce el error de $88.99^\circ$ a
+$45.97^\circ$. No se observó una regla espacial o temporal transferible para
+predecir esta componente con las covariables disponibles.
 \end{frame}
 
 % 30
@@ -798,31 +751,24 @@ Tx1 & $1.45\times10^6$ & 0.999974\\
 El rango algebraico completo coexiste con columnas casi indistinguibles. Las
 ecuaciones normales agravan la condición y ridge introduce sesgo.
 \end{columns}
-\conclusion{La representación relativa mejora discriminabilidad regional estática; no demuestra todavía sensibilidad a movimiento.}
 \end{frame}
 
 % 31
 \begin{frame}{Dominio de validez de la evidencia}
-\scriptsize
-\begin{tabularx}{\textwidth}{p{4.0cm}Y}
+\small
+\begin{tabularx}{\textwidth}{P{4.5cm}Y}
 \toprule
-Condición & Consecuencia inferencial\\
+Condición experimental & Alcance\\
 \midrule
-Una escena dc01 & No demuestra transferencia entre edificios.\\
-\SI{3.438}{GHz} y $\approx\SI{50}{MHz}$ & No se extrapola automáticamente a Wi-Fi, LoRa o mmWave.\\
-10,000 posiciones estáticas & No contiene movimiento fisiológico ni mecánico.\\
-64 antenas y 1024 subportadoras & Un dispositivo COTS puede perder apertura o soporte espectral.\\
-Dispersión difusa desactivada & El residuo puede contener mecanismos de propagación omitidos.\\
-Retardo oráculo como etiqueta & La variable aprendida no identifica una causa física única.\\
-CPO ajustado con el objetivo & El error angular completo sigue siendo condicional.\\
-$\psi$ estimada con las mismas antenas & La reducción de fase común es descriptiva.\\
-Sin reinicios estacionarios & No se separan PLL, reloj y estado de cadena RF.\\
-Sin ground truth dinámico & No puede afirmarse recuperación de forma de onda.\\
+Una escena DICHASUS dc01 & Evaluación intraescena; no se establece transferencia entre edificios.\\
+\SI{3.438}{GHz} y $\approx\SI{50}{MHz}$ & La extrapolación a otras bandas requiere medición específica.\\
+10,000 posiciones estáticas & No se observa movimiento fisiológico ni mecánico.\\
+64 antenas y 1024 subportadoras & La apertura excede la de varios dispositivos comerciales.\\
+Dispersión difusa desactivada & El residuo incluye mecanismos de propagación no modelados.\\
+Retardo oráculo y CPO post hoc & Las métricas correspondientes son condicionales al canal medido.\\
+Sin referencia dinámica & No se evalúa todavía la reconstrucción de $q(t)$.\\
 \bottomrule
 \end{tabularx}
-\vspace{0.2cm}
-La hipótesis que permanece abierta es si una representación con mejor correspondencia
-compleja estática conserva también la perturbación inducida por movimiento.
 \end{frame}
 
 % 32
@@ -852,25 +798,25 @@ la dirección y amplitud de la perturbación están bien representadas.
 \end{frame}
 
 % 33
-\begin{frame}{Sensibilidad, nuisance y métrica final}
+\begin{frame}{Sensibilidad y parámetros instrumentales}
 \small
 Para una observación compleja gaussiana con media $\vect\mu(q)$ y covarianza
 $\Sigma$, la información local es
 \begin{equation*}
-F_q=2\operatorname{Re}\left\{J_q^H\Sigma^{-1}J_q\right\}.
+F_q=2\operatorname{Re}\!\left\{J_q^H\Sigma^{-1}J_q\right\}.
 \end{equation*}
-Si $\zeta$ reúne ganancia, CPO o retardo instrumental, la información equivalente es
+Si $\zeta$ contiene ganancia, CPO y retardo instrumental,
 \begin{equation*}
 F_{q|\zeta}=F_{qq}-F_{q\zeta}F_{\zeta\zeta}^{\dagger}F_{\zeta q}.
 \end{equation*}
-\begin{tabularx}{\textwidth}{P{2.9cm}P{4.0cm}Y}
+\begin{tabularx}{\textwidth}{P{2.8cm}P{4.0cm}Y}
 \toprule
-Nivel & Métricas & Pregunta\\
+Nivel & Métricas & Magnitud caracterizada\\
 \midrule
-Comunicación & RSSI, SNR, PER/BER & ¿El enlace transporta información?\\
-Perturbación & SSNR, SCR, fracción dinámica & ¿El movimiento supera ruido y fondo estático?\\
-Sensibilidad & $\|J_q\|$, $F_{q|\zeta}$, CRLB & ¿El estado es observable después de nuisance?\\
-Tarea & correlación, NRMSE, lag, morfología & ¿Se recuperó $q(t)$ contra ground truth?\\
+Comunicación & RSSI, SNR, PER/BER & Calidad del enlace digital.\\
+Perturbación & SSNR, SCR, fracción dinámica & Separación respecto del fondo estático.\\
+Sensibilidad & $\|J_q\|$, $F_{q|\zeta}$, CRLB & Información local sobre el estado.\\
+Tarea & correlación, NRMSE, retardo, morfología & Concordancia con la referencia temporal.\\
 \bottomrule
 \end{tabularx}
 \end{frame}
@@ -878,28 +824,27 @@ Tarea & correlación, NRMSE, lag, morfología & ¿Se recuperó $q(t)$ contra gro
 % 34
 \begin{frame}{Patrón fisiológico objetivo y criterio de tarea}
 \begin{columns}[T]
-\column{0.67\textwidth}
+\column{0.69\textwidth}
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth,height=0.54\textheight,keepaspectratio]{osa_waveforms.png}
-\caption{Referencia de cinturón y reconstrucciones conservadas del análisis OSA.}
+\includegraphics[width=\linewidth,height=0.59\textheight,keepaspectratio]{osa_waveforms.png}
+\caption{Referencia de cinturón y reconstrucciones del análisis OSA.}
 \end{figure}
-\column{0.30\textwidth}
+\column{0.28\textwidth}
 \scriptsize
-La forma de onda de referencia define una evaluación de tarea que exige conservar
-morfología, sincronía y eventos. En el artefacto mostrado, el componente ICA
-seleccionado reporta
+El componente ICA seleccionado presenta
 \begin{align*}
-r&=0.880, & r_{\rm env}&=0.832,\\
-F_1&=0.714.&&
+r&=0.880,\\
+r_{\rm env}&=0.832,\\
+F_1&=0.714.
 \end{align*}
-mientras que la alternativa wavelet no supervisada alcanza $r=0.802$ y
-$F_1=0.686$.
-
-Estos valores pertenecen al análisis fisiológico mostrado y no constituyen evidencia
-de validación del gemelo digital RF.
+La alternativa wavelet no supervisada presenta
+\begin{equation*}
+r=0.802,\qquad F_1=0.686.
+\end{equation*}
+Estas métricas corresponden al análisis fisiológico de la figura. No proceden de la
+validación del gemelo digital RF.
 \end{columns}
-\conclusion{La validación RF debe culminar en métricas contra ground truth temporal, después de demostrar fidelidad diferencial con movimiento controlado.}
 \end{frame}
 
 % 35
@@ -936,66 +881,58 @@ alta sensibilidad y otra próxima a nulo como control geométrico.
 
 % 36
 \begin{frame}{Instrumentación y metrología}
-\scriptsize
+\small
 \begin{columns}[T]
 \column{0.49\textwidth}
-\textbf{Infraestructura disponible}
+\textbf{Instrumentación disponible}
 \begin{itemize}
 \item Jetson Orin Nano para adquisición y marcas temporales.
-\item Cámara binocular calibrada y LiDAR MS200.
-\item Medidor láser y estructura rígida de aluminio.
+\item Cámara binocular calibrada, LiDAR y medidor láser.
 \item IWRL6432BOOST como referencia independiente.
 \item PlutoSDR y NUCLEO-WL55 para LoRa.
-\item Router/ESP32 para CSI Wi-Fi, sujeto a extracción compleja estable.
-\item Sensores de temperatura y humedad, cuando estén disponibles.
+\item Router o ESP32 para CSI Wi-Fi complejo.
 \end{itemize}
 \column{0.49\textwidth}
-\textbf{Elementos por incorporar}
+\textbf{Banco mecánico requerido}
 \begin{itemize}
 \item Etapa lineal micrométrica con 25--50 mm de recorrido.
-\item Actuador guiado o NEMA 17 con husillo T8.
-\item ESP32/Arduino y controlador TMC2209.
+\item Actuador guiado y controlador de micropasos.
 \item Comparador digital con salida de datos.
-\item Placa de aluminio de $20\times20$ cm y reflectores intercambiables.
-\item Soportes rígidos y marcas ChArUco/AprilTag.
+\item Reflector metálico y soportes rígidos.
+\item Referencias ChArUco o AprilTag para la geometría.
 \end{itemize}
 \end{columns}
-\vspace{0.18cm}
-{\color{rulegray}\rule{\textwidth}{0.45pt}}
-\vspace{0.1cm}
-Un canal LoRa de 125 kHz no reproduce el análisis de pendiente de dc01 sobre 50 MHz.
-En LoRa se evaluará principalmente la evolución temporal de amplitud y fase/IQ.
+\vspace{0.2cm}
+El canal LoRa de 125 kHz no reproduce la resolución espectral del banco dc01. Su
+evaluación se restringe a la evolución temporal de amplitud y fase IQ.
 \end{frame}
 
 % 37
 \begin{frame}{Protocolo de excitación y adquisición}
-\scriptsize
+\small
 \begin{columns}[T]
 \column{0.48\textwidth}
-\textbf{Secuencia de movimiento}
+\textbf{Excitación mecánica}
 \begin{enumerate}
-\item reposo durante cinco minutos;
-\item posiciones estáticas: 0, 1, 2, 5 y 10 mm;
+\item reposo y posiciones estáticas entre 0 y 10 mm;
 \item sinusoides de 2, 5 y 10 mm;
 \item frecuencias de 0.1, 0.2, 0.3 y 0.5 Hz;
-\item inspiración rápida, espiración lenta y pausas;
-\item amplitud variable y movimiento grueso superpuesto;
-\item repetición después de reiniciar Tx y Rx;
-\item dos o tres posiciones y dos orientaciones geométricas.
+\item perfiles respiratorios artificiales y movimiento grueso;
+\item reinicios controlados de transmisor y receptor;
+\item repetición en distintas posiciones y orientaciones.
 \end{enumerate}
 Cada condición se repite al menos cinco veces.
 \column{0.49\textwidth}
 \textbf{Variables sincronizadas}
 \begin{itemize}
 \item CSI complejo Wi-Fi o IQ LoRa;
-\item posición ordenada y posición medida del actuador;
+\item posición ordenada y posición medida;
 \item radar, cámara y comparador;
-\item timestamps y eventos de reinicio;
-\item CFO, RSSI, SNR y configuración del receptor;
-\item temperatura, humedad y poses de Tx/Rx/reflector.
+\item CFO, RSSI, SNR y estado del receptor;
+\item marcas temporales, reinicios y geometría del banco.
 \end{itemize}
-Las particiones se realizan por repetición y posición. Ventanas del mismo ensayo no
-se distribuyen entre entrenamiento y prueba como réplicas independientes.
+Las particiones se definen por repetición y posición. Las ventanas de un mismo ensayo
+permanecen en una sola partición.
 \end{columns}
 \end{frame}
 
@@ -1019,29 +956,23 @@ Robustez & degradación tras reinicio, cambio de posición y cambio de orientaci
 \bottomrule
 \end{tabularx}
 \vspace{0.2cm}
-El criterio para avanzar a sujetos es recuperar consistentemente movimientos de
-1--5 mm y patrones respiratorios artificiales, con incertidumbre y tasa de fallas
-declaradas. La reducción de error angular estático no constituye por sí sola un
-criterio de éxito.
+El avance a sujetos requiere recuperar movimientos de 1--5 mm y patrones
+respiratorios artificiales, con incertidumbre y tasa de fallas declaradas.
 \end{frame}
 
 % 39
-\begin{frame}{Conclusiones}
+\begin{frame}{Estado actual y siguiente etapa}
 \small
 \begin{enumerate}
-\setlength\itemsep{0.22cm}
-\item B1 y B2 mejoran potencia, magnitud y RMS-DS porque esas cantidades intervienen
-en la función objetivo; la coherencia compleja bruta no mejora.
-\item La discrepancia de fase contiene una pendiente espectral unidimensional que se
-transfiere parcialmente entre modelos, antenas, frecuencias y regiones.
-\item Un Random Forest predice parte de ese retardo desde posición y descriptores RT;
-la evaluación bloqueada reduce la mejora respecto de la partición densa.
-\item La fase común presenta estructura dentro de captura, pero no predictibilidad
-local demostrada con las covariables evaluadas.
-\item El residuo conserva suavidad espectral y no debe modelarse como ruido angular
-independiente ni como una fase libre por trayectoria sin análisis de resolubilidad.
-\item La siguiente contribución debe establecer si estas representaciones preservan
-$\partial H/\partial q$ y mejoran la reconstrucción de movimiento conocido.
+\setlength\itemsep{0.34cm}
+\item B0--B2 mejoran sucesivamente potencia, magnitud y RMS delay spread; la
+coherencia compleja bruta permanece aproximadamente constante.
+\item La discrepancia de fase contiene una pendiente espectral transferible de forma
+parcial entre modelos, antenas, frecuencias y regiones espaciales.
+\item El retardo efectivo puede predecirse a partir de posición y descriptores RT,
+con una degradación apreciable bajo partición espacial bloqueada.
+\item La siguiente etapa estima $\partial H/\partial q$ mediante movimiento mecánico
+conocido y compara la reconstrucción con una referencia temporal independiente.
 \end{enumerate}
 \end{frame}
 
