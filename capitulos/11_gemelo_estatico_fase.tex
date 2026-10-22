@@ -1,0 +1,1000 @@
+\chapter{Gemelo estático, discrepancia de fase e identificabilidad}
+\label{ch:avances}
+
+Este capítulo concentra la evidencia propia ya obtenida. Las cifras se reportan una
+sola vez, junto con particiones, observables y límites de inferencia. Su propósito es
+determinar qué se aprendió del canal estático y qué incertidumbre debe resolver la
+experimentación física; no se presentan como resultados de sensado humano.
+
+\section{Banco dc01 y condiciones de evaluación}
+
+DICHASUS dc01 proporciona CFR MIMO-OFDM, posiciones y una escena compatible con trazado de rayos a \SI{3.438}{GHz} \citep{Euchner2023DICHASUSdcxx,DICHASUSdcxxWeb}. El banco contiene 10,000 posiciones; la partición original utiliza 5000 para entrenamiento, 100 para validación y 4900 para prueba. Los análisis posteriores añaden bloques espaciales con guarda para distinguir interpolación densa de generalización regional.
+
+En cada posición se dispone de dos arreglos de 32 antenas y 1024 subportadoras
+sobre aproximadamente \SI{50}{MHz}; por tanto,
+\begin{equation}
+H_i^{\rm real}\in\mathbb C^{2\times32\times1024},
+\qquad i=1,\ldots,10{,}000.
+\label{eq:dc01_channel_tensor}
+\end{equation}
+Los $10{,}000\times2\times32=640{,}000$ vectores antena--posición no constituyen
+capturas físicas independientes: comparten posición, escena, tiempo y referencia de
+arreglo. Para el contraste regional se forman cinco bloques de 2000 posiciones y se
+retira del entrenamiento todo punto situado a menos de \SI{0.5}{m} del bloque
+evaluado.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/dc01/raw01_dc01_positions_xy.pdf}\\[0.5em]
+\includegraphics[width=0.58\textwidth]{figuras/dc01/raw02_dc01_positions_3d.pdf}
+\caption{Soporte espacial de las 10,000 posiciones de dc01. Arriba se muestra la
+proyección en planta; abajo, la elevación registrada. La distribución combina
+trayectos longitudinales extensos con una región central densamente recorrida, lo
+que motiva separar interpolación local y generalización por bloques.}
+\label{fig:dc01_positions}
+\end{figure}
+
+El canal medido y el simulado se comparan sobre soporte común. Potencia, RMS-DS, magnitud, coherencia y error angular responden preguntas distintas. Las correcciones que consultan el canal objetivo se etiquetan como oráculo o ajuste a posteriori; sólo un predictor entrenado fuera del test se considera transferible.
+
+La unidad experimental es la posición o consulta. Antenas y subportadoras comparten geometría y no se tratan como réplicas independientes. Las cifras de este capítulo son evidencia dentro de dc01 y no validación entre edificios, dispositivos o sesiones.
+
+El banco conserva el soporte geométrico de las trayectorias, no sólo el canal
+sintetizado. La \cref{fig:dc01_paths} muestra un ejemplo para Tx0 y una antena:
+varias interacciones producen longitudes y firmas que después se suman
+coherentemente. La visualización no implica que cada camino sea estimable a partir
+de la CFR. En esta ejecución se usan las contribuciones especulares y difractadas
+almacenadas, con dispersión difusa desactivada; cualquier parámetro aprendido puede
+compensar, por tanto, energía o fase de mecanismos omitidos.
+
+Los tensores de trayectorias reservan hasta 198 contribuciones especulares, seis
+difractadas y 445 difusas por consulta. Estos números son capacidades máximas del
+registro, no conteos efectivos idénticos en todos los enlaces. La llamada a
+\texttt{paths.cir} con \texttt{scattering=False} excluye el tercer grupo en
+B0--B2 y S4. La
+cadena congelada coloca los receptores, reconstruye los caminos almacenados,
+calcula campos, obtiene la CIR sin dispersión difusa, transforma a 1024 tonos y
+normaliza la CFR por $\sqrt{1024}$ antes de aplicar la escala global. Así se evita
+que una diferencia posterior provenga de volver a trazar geometrías distintas para
+cada modelo.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/dc01/raw03_sionna_paths_xy.pdf}\\[0.5em]
+\includegraphics[width=0.60\textwidth]{figuras/dc01/raw04_sionna_paths_3d.pdf}
+\caption{Ejemplo del soporte de trayectorias almacenado para Tx0 y la antena 2,
+en proyección horizontal y vista tridimensional. Las líneas representan
+interacciones del modelo directo; no constituyen componentes identificadas de la
+medición.}
+\label{fig:dc01_paths}
+\end{figure}
+
+\section{Fidelidad estática B0--B2}
+
+La comparación incrementa capacidad de forma controlada sobre un mismo modelo
+directo. Para una consulta $i$, las tres variantes pueden escribirse como
+\begin{equation}
+H_i^{(b)}=\mathcal S\!\left(
+\mathcal P_i^{\rm RT},\Theta_b;f_k
+\right),\qquad b\in\{0,1,2\},
+\label{eq:b012_common_synthesis}
+\end{equation}
+donde $\mathcal P_i^{\rm RT}$ contiene las trayectorias trazadas y $\mathcal S$
+suma sus campos sobre las subportadoras. La geometría, las posiciones, los caminos
+almacenados y el operador de síntesis permanecen fijos; cambia $\Theta_b$, es decir,
+la forma de asignar propiedades electromagnéticas en cada interacción. Así, las
+diferencias no deben interpretarse como tres simuladores inconmensurables.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Definición operacional de las configuraciones B0--B2.}
+\label{tab:b012_models}
+\begin{tabularx}{\textwidth}{P{1.4cm}P{3.0cm}P{3.8cm}L}
+\toprule
+Modelo & Representación & Componentes ajustados & Papel experimental\\
+\midrule
+B0 & Materiales ITU nominales, constantes por superficie & Sólo una escala global
+de potencia; sin red neuronal & Referencia determinista del error antes de calibrar
+el entorno.\\
+B1 & Material aprendido, constante dentro de cada objeto & $\epsilon_r$ y $\sigma$
+por objeto mediante trazado diferenciable; sin MLP espacial & Determina cuánto
+explica una calibración paramétrica compartida.\\
+B2 & Material neuronal continuo en coordenadas globales & Codificación posicional
+y MLP para $\epsilon_r(\vect x)$ y $\sigma(\vect x)$ & Evalúa si mayor capacidad
+espacial mejora la correspondencia estática.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{B0: referencia nominal y escala de potencia}
+
+B0 conserva geometría, trayectorias y materiales ITU. No actualiza parámetros
+electromagnéticos por gradiente. Su único ajuste es una escala de potencia que
+reconcilia las unidades de medición y simulación. Para un minibatch $\mathcal B$,
+se calculan
+\begin{equation}
+P_i^{\rm RT}=\sum_k|H_{i,k}^{\rm RT}|^2,\qquad
+P_i^{\rm real}=\sum_k|H_{i,k}^{\rm real}|^2,\qquad
+\widehat\alpha_{\mathcal B}=
+\frac{\sum_{i\in\mathcal B}P_i^{\rm RT}P_i^{\rm real}}
+{\sum_{i\in\mathcal B}(P_i^{\rm real})^2}.
+\label{eq:b0_power_scale_batch}
+\end{equation}
+El último cociente es la solución cerrada de
+$\min_\alpha\sum_i(P_i^{\rm RT}-\alpha P_i^{\rm real})^2$. Para reducir la
+variación entre lotes se aplica
+\begin{equation}
+\alpha_t=\delta\alpha_{t-1}+(1-\delta)\widehat\alpha_{\mathcal B_t},
+\qquad \delta=0.999,\qquad
+H^{\rm real}\leftarrow\sqrt{\alpha_t}H^{\rm real}.
+\label{eq:b0_power_scale_ema}
+\end{equation}
+Después de 10,000 actualizaciones con lotes de ocho, la ejecución conservada da
+$\alpha=5.762855\times10^{-10}$, equivalente a $-92.39$ dB como factor de
+potencia, y $\sqrt\alpha=2.400595\times10^{-5}$ como factor de amplitud. La escala
+no modifica la fase, los retardos ni la forma espectral normalizada; por ello B0
+sigue siendo un control nominal y no una calibración material.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b0_01_pipeline.pdf}
+\caption{Pipeline B0. El soporte geométrico, los caminos y los materiales ITU
+permanecen fijos; la única cantidad estimada es la escala global $\alpha$. La
+pérdida de fase no interviene en el procedimiento.}
+\label{fig:b0_pipeline}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b0_02_power_scaling.pdf}
+\caption{Estimación de la escala de potencia de B0. El óptimo cerrado se calcula
+por minibatch y se suaviza mediante un promedio móvil exponencial; las métricas de
+potencia y RMS-DS se monitorizan, pero no actualizan materiales en B0.}
+\label{fig:b0_power_scaling}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{B1: calibración diferenciable constante por objeto}
+
+B1 mantiene los mismos caminos y sustituye cada material nominal por parámetros
+constantes para piso, techo y paredes. La implementación no es un MLP espacial:
+emplea una factorización bilineal
+\begin{equation}
+\vect z=\vect v\mat W\in\real^{4N_o},\qquad
+\vect v\in\real^{1\times30},\quad
+\mat W\in\real^{30\times4N_o},\quad N_o=3,
+\label{eq:b1_bilinear_materials}
+\end{equation}
+que se divide en cuatro bloques, cada uno con un valor por objeto, para producir
+valores crudos de $\epsilon_r$, $\sigma$, dispersión $s$ y discriminación por
+polarización cruzada.
+Hay $30+30(12)=390$ parámetros entrenables, aunque sólo existen 12 salidas
+efectivas. Como $\vect v\mat W=(c\vect v)(\mat W/c)$, los factores internos no son
+identificables por separado; el objeto interpretable es el vector de propiedades
+resultante.
+
+Las restricciones de dominio se implementan como
+\begin{align}
+\epsilon_r&=1+\exp\{\operatorname{clip}(z_\epsilon,\log 10^{-3},\log 200)\},\\
+\sigma&=\exp\{\operatorname{clip}(z_\sigma,\log 10^{-3},\log 10^6)\},\\
+s&=\operatorname{clip}(\operatorname{sigmoid}(z_s),10^{-3},1-10^{-3}),
+\end{align}
+y de manera análoga para XPD. Sin embargo, la ejecución fija $s={\rm XPD}=0$;
+por ello sólo seis cantidades ---$\epsilon_r$ y $\sigma$ para tres objetos---
+afectan el canal. El identificador del objeto selecciona el par correspondiente y
+forma la permitividad relativa compleja
+\begin{equation}
+\eta_o(f)=\epsilon_{r,o}-j\frac{\sigma_o}{2\pi f\epsilon_0},
+\label{eq:b1_complex_permittivity}
+\end{equation}
+de la que se derivan los coeficientes de interacción. Los valores finales son
+efectivos: aproximadamente $(1.001,0.001)$ para piso, $(70.4,8.09)$ para techo y
+$(7.33,1.95)$ para paredes, con conductividad en S/m. La saturación del piso en el
+límite inferior y la libertad bilineal desaconsejan interpretarlos como mediciones
+independientes de materiales.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b1_01_pipeline.pdf}
+\caption{Pipeline B1. La pérdida de potencia y RMS-DS retropropaga gradientes a
+propiedades constantes por objeto a través del trazador diferenciable; la escala
+$\alpha$ se actualiza por separado y no se supervisa fase.}
+\label{fig:b1_pipeline}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b1_02_parameterization.pdf}
+\caption{Parametrización interna de B1. La factorización produce cuatro bloques
+de tres salidas y el identificador de objeto selecciona las propiedades para cada
+interacción. Dispersión y XPD permanecen anuladas en el experimento.}
+\label{fig:b1_parameterization}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{B2: campo neuronal de materiales}
+
+B2 elimina la constancia por objeto y evalúa un campo continuo en la coordenada
+global $\vect x$ de cada interacción. Primero se normaliza con el centro
+$\vect c$ y la mayor semiextensión $s_{\rm box}$ de la escena,
+$\bar{\vect x}=(\vect x-\vect c)/s_{\rm box}$. Después se aplica la codificación
+\begin{equation}
+\gamma(\bar{\vect x})=
+\left[
+\cos(2^\ell\pi\bar x_d),
+\sin(2^\ell\pi\bar x_d)
+\right]_{d=1,2,3;\,\ell=0,\ldots,9}
+\in\real^{60}.
+\label{eq:b2_positional_encoding}
+\end{equation}
+Esta representación alimenta cuatro capas densas de 128 unidades ReLU y una capa
+lineal de cuatro salidas. Su número de parámetros queda auditado por
+\begin{equation}
+(60\cdot128+128)
++3(128\cdot128+128)
++(128\cdot4+4)=57{,}860.
+\label{eq:b2_parameter_count}
+\end{equation}
+Las cuatro salidas atraviesan las mismas transformaciones físicas de B1. Con
+dispersión desactivada, sólo $\epsilon_r(\vect x)$ y $\sigma(\vect x)$ participan
+en la síntesis. El identificador de objeto no se usa: la continuidad proviene de
+las coordenadas globales, no de una etiqueta semántica. Esta decisión aumenta la
+capacidad para absorber heterogeneidad espacial, pero dificulta trasladar un objeto
+sin volver a registrar o aprender el campo. Además, los caminos y retardos se
+mantienen fijos; B2 cambia coeficientes de interacción, no crea trayectorias
+ausentes ni corrige por sí solo la geometría.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b2_01_pipeline.pdf}
+\caption{Pipeline B2. El campo NeuralMaterials asigna propiedades locales a los
+puntos de interacción dentro del cálculo DRT; la geometría y los caminos permanecen
+fijos, y la función objetivo no contiene un término de fase.}
+\label{fig:b2_pipeline}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/metodologia_b012/b2_02_mlp_architecture.pdf}
+\caption{Arquitectura auditada de B2. La figura muestra dimensiones, parámetros y
+transformaciones de las cuatro salidas después de comprobar los diez tensores del
+archivo de pesos; sólo permitividad y conductividad están activas en esta ejecución.}
+\label{fig:b2_architecture}
+\end{figure}
+
+\FloatBarrier
+
+B2 no es un campo RF implícito como NeRF$^2$ \citep{Zhao2023NeRF2}: conserva
+trayectorias geométricas y utiliza la red sólo para asignar propiedades efectivas
+en sus puntos de interacción. Tampoco existe B3 en la serie reportada; B2 es el
+tercer modelo porque la numeración comienza en cero.
+
+\subsection{Objetivo y protocolo común de aprendizaje}
+
+Para B1 y B2 se utiliza Adam, tasa de aprendizaje $10^{-3}$, lotes de ocho consultas
+y 10,000 iteraciones sobre 5000 posiciones; 100 posiciones se reservan para
+validación y 4900 para prueba. La escala $\alpha$ se actualiza mediante la
+\cref{eq:b0_power_scale_ema}, fuera de Adam. La función objetivo no minimiza fase
+compleja: es la suma de pérdidas SMAPE de potencia total y dispersión RMS de
+retardos,
+\begin{align}
+\mathcal L_b&=\mathcal L_{P,b}+\mathcal L_{\tau,b},\\
+\mathcal L_{P,b}
+&=\frac{1}{N}\sum_i
+\frac{|P_i^{(b)}-\alpha P_i^{\rm real}|}
+{P_i^{(b)}+\alpha P_i^{\rm real}},\qquad
+\mathcal L_{\tau,b}
+=\frac{1}{N}\sum_i
+\frac{|\tau_{{\rm rms},i}^{(b)}-\tau_{{\rm rms},i}^{\rm real}|}
+{\tau_{{\rm rms},i}^{(b)}+\tau_{{\rm rms},i}^{\rm real}},
+\label{eq:b12_training_loss}
+\end{align}
+donde $\alpha$ es el factor común de escala de potencia. Esta elección explica qué
+puede esperarse del entrenamiento: B1--B2 reciben supervisión explícita sobre
+energía y estructura gruesa de retardos, no sobre fase absoluta. Los detalles
+corresponden a la implementación de referencia reproducida
+\citep{Hoydis2024DiffRT,NVIDIA2023DiffRTCalibration}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Resultados de prueba de la calibración estática B0--B2.}
+\label{tab:b012_consolidated}
+\begin{tabular}{lrrr}
+\toprule
+Métrica & B0 & B1 & B2\\
+\midrule
+Correlación de potencia $\uparrow$ & 0.699 & 0.736 & \textbf{0.871}\\
+MAE de potencia [dB] $\downarrow$ & 6.29 & 3.82 & \textbf{2.22}\\
+Correlación RMS-DS $\uparrow$ & 0.173 & 0.278 & \textbf{0.647}\\
+MAE RMS-DS [ns] $\downarrow$ & 43.21 & 27.32 & \textbf{16.50}\\
+NMSE mediana de magnitud [dB] $\downarrow$ & $-3.17$ & $-3.92$ & \textbf{$-4.46$}\\
+Coherencia compleja bruta $\uparrow$ & 0.156 & 0.155 & 0.145\\
+Error angular bruto [$^\circ$] $\downarrow$ & 89.93 & 89.95 & 89.96\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figuras/dc01/raw07_b0_b1_b2_metrics.pdf}
+\caption{Tres métricas que exhiben la separación entre fidelidad macroscópica y
+fase bruta. B1 y B2 mejoran correlación de potencia y dispersión RMS de retardos,
+mientras el MAE angular permanece próximo al valor correspondiente a una diferencia
+circular ampliamente dispersa.}
+\label{fig:b012_metric_contrast}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figuras/dc01/raw05_spatial_power_maps.pdf}
+\caption{Mapas espaciales de potencia medida y predicha por B0--B2. Las correlaciones
+anotadas pertenecen al mapa representado y no sustituyen la estadística agregada
+de la \cref{tab:b012_consolidated}. La mejora progresiva confirma que la calibración
+recupera estructura espacial de gran escala.}
+\label{fig:b012_spatial_power}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=0.88\textwidth]{figuras/dc01/raw06_cfr_measured_vs_b0.pdf}
+\caption{Ejemplo de CFR medida y B0 para Tx0 y la antena 2. La magnitud simulada
+reproduce una envolvente gruesa, pero no todos los nulos; la fase desenvuelta exhibe
+una discrepancia aproximadamente afín en frecuencia. Es un caso ilustrativo y no
+una estimación poblacional.}
+\label{fig:cfr_measured_b0_example}
+\end{figure}
+
+B2 mejora de forma clara potencia, magnitud y estructura de retardos, pero no la
+concordancia angular bruta (\cref{fig:b012_metric_contrast,fig:b012_spatial_power}).
+La \cref{fig:cfr_measured_b0_example} permite interpretar por qué ambas conclusiones
+coexisten: una calibración puede aproximar la envolvente de potencia y desplazar
+energía hacia retardos plausibles sin reproducir la interferencia fina que determina
+nulos y fase.
+
+Los parámetros aprendidos se interpretan como efectivos: pueden compensar materiales,
+geometría, antenas o mecanismos ausentes. El orden B0--B2 según potencia no induce
+un orden favorable según fase; de hecho, la coherencia compleja bruta no mejora.
+Éste es el primer hallazgo estructural: aumentar fidelidad macroscópica no garantiza
+preservar la estructura coherente que un sensor de micromovimiento necesita.
+
+\section{Estructura de la discrepancia y componente transferible}
+
+La factorización empleada al final del capítulo no se postuló antes de observar los
+datos ni fue aprendida de extremo a extremo. Surgió al recorrer la cadena
+\begin{equation}
+\begin{aligned}
+\text{B0}&\longrightarrow\text{B1--B2}
+\longrightarrow\text{fallo de fase bruta}\\
+&\longrightarrow\text{residuo complejo}
+\longrightarrow\text{pendiente espectral}
+\longrightarrow\text{transferencia}
+\\
+&\longrightarrow\text{fase común}
+\longrightarrow\text{residuo estructurado}.
+\end{aligned}
+\label{eq:phase_factorization_history}
+\end{equation}
+Cada transición respondió una pregunta falsable y restringió la siguiente. Esta
+sección reconstruye esa secuencia para evitar presentar el modelo final como una
+descomposición causal ya identificada.
+
+\subsection{S4.1: por qué no ajustar de inmediato una fase por trayectoria}
+
+La reproducción de las estrategias PEOC, UPEC y PEAC de la
+\cref{eq:path_phase_error_model} mostró el compromiso anticipado por la literatura
+\citep{Ruah2024Phase}. Ignorar el error local podía transferir discrepancia de fase
+a los materiales; marginalizarla uniformemente estabilizaba la permitividad, pero
+descartaba información; y el modelo von Mises podía alcanzar soluciones precisas,
+a costa de mayor sensibilidad a inicialización y mínimos locales. La conductividad
+resultó menos identificable que la permitividad.
+
+No se concluyó que PEAC fuera inadecuado. La decisión metodológica fue anterior:
+determinar si el error agregado contenía primero una estructura de dimensión mucho
+menor. Introducir centenares de variables circulares sin conocer la resolubilidad
+de sus firmas podía producir una excelente reconstrucción con parámetros inestables.
+La auditoría posterior de la \cref{sec:pathwise_resolvability} confirmó esta cautela:
+rango algebraico completo coexistió con coherencias casi unitarias y condición de
+hasta $1.45\times10^6$.
+
+\subsection{Residuo conjugado e hipótesis afín mínima}
+
+Para comparar medición y modelo se definió
+\begin{equation}
+R_{i,u,a,k}=
+H^{\rm real}_{i,u,a,k}H^{{\rm RT}*}_{i,u,a,k},
+\qquad
+\Delta\phi_{i,u,a,k}=\arg R_{i,u,a,k},
+\label{eq:complex_phase_residual}
+\end{equation}
+donde $i$ identifica posición, $u$ el arreglo, $a$ la antena y $k$ la
+subportadora. El cociente $H^{\rm real}/H^{\rm RT}$ tendría la misma diferencia
+angular, pero es inestable cerca de un nulo del gemelo. El producto conjugado evita
+esa división y posee magnitud
+$|R|=|H^{\rm real}||H^{\rm RT}|$; en consecuencia, da mayor influencia a tonos con
+energía simultánea en ambos canales. Esta ponderación implícita debe recordarse:
+el descriptor no trata por igual los nulos y las regiones de alta potencia.
+
+La hipótesis más simple compatible con una discrepancia de retardo es
+\begin{equation}
+H^{\rm real}_{i,u,a,k}
+\simeq c_{i,u,a}
+e^{-j2\pi\nu_k\Delta\tau_{{\rm eff},i,u}}
+H^{\rm RT}_{i,u,a,k}+e_{i,u,a,k}.
+\label{eq:aggregate_delay_hypothesis}
+\end{equation}
+Al multiplicar por $H^{{\rm RT}*}$ y omitir momentáneamente $e$,
+\begin{equation}
+R_{i,u,a,k}\simeq
+c_{i,u,a}e^{-j2\pi\nu_k\Delta\tau_{{\rm eff},i,u}}
+|H^{\rm RT}_{i,u,a,k}|^2,
+\end{equation}
+de donde
+\begin{equation}
+\Delta\phi_{i,u,a,k}\simeq
+\phi_{0,i,u,a}-2\pi\nu_k\Delta\tau_{{\rm eff},i,u}+r_{i,u,a,k}
+\pmod{2\pi}.
+\label{eq:first_affine_phase_model}
+\end{equation}
+El término $r$ recoge todo lo que la aproximación afín no explica. Se usa
+$\nu_k=f_k-f_{\rm ref}$ porque
+$-2\pi f_k\Delta\tau=-2\pi f_{\rm ref}\Delta\tau
+-2\pi\nu_k\Delta\tau$: el primer sumando es constante en frecuencia y se absorbe
+en $\phi_0$. Esto fija un calibre conveniente, pero no separa físicamente error de
+reloj, longitud, centro de fase o respuesta de cadena.
+
+\subsection{Significado del CPO en esta evaluación}
+
+Antes de comparar correcciones conviene precisar la etiqueta CPO. Aquí no denota
+una cuarta calibración ni una red neuronal. Para cada CFR de un enlace se permite
+una sola rotación compleja, constante sobre sus subportadoras, estimada mediante la
+\cref{eq:cpo_posthoc_alignment}. Es el grado de libertad de orden cero del error de
+fase; el retardo efectivo, en cambio, introduce el término de primer orden
+$-2\pi\nu_k\Delta\tau_{\rm eff}$.
+
+El ángulo se calcula con la medición del mismo enlace evaluado. En consecuencia,
+``sólo CPO'' es un alineamiento \emph{post hoc} que responde cuánto error puede
+eliminar una rotación escalar, no un método autónomo para predecir fase en una
+posición nueva. Además, este CPO por enlace y por CFR debe distinguirse de la fase
+común al arreglo de la \cref{sec:common_array_phase}: esta última impone una
+dirección compartida entre antenas y se somete después a pruebas de predictibilidad.
+
+\subsection{S4.2: detección, techo oráculo y controles de transferencia}
+
+El primer estimador eliminó el intercepto mediante incrementos adyacentes. Bajo la
+\cref{eq:first_affine_phase_model},
+\begin{equation}
+R_{k+1}R_k^*\simeq
+B_{k+1}B_k e^{-j2\pi(\nu_{k+1}-\nu_k)\Delta\tau_{\rm eff}},
+\qquad
+\arg(R_{k+1}R_k^*)\simeq-2\pi\Delta f\Delta\tau_{\rm eff}.
+\label{eq:adjacent_phase_slope}
+\end{equation}
+La cancelación de $\phi_0$ mostró una primera reducción, aunque el procedimiento es
+sensible a ruido, wrapping y nulos espectrales.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Resultado inicial al retirar una pendiente común estimada con incrementos
+adyacentes. El CPO se ajusta con el mismo enlace evaluado.}
+\label{tab:adjacent_slope_results}
+\begin{tabular}{lrr}
+\toprule
+Modelo & Sólo CPO [$^\circ$] & Pendiente adyacente + CPO [$^\circ$]\\
+\midrule
+B0 & 81.42 & 66.05\\
+B1 & 81.39 & 66.48\\
+B2 & 81.58 & 54.99\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Después se definió un techo de alineabilidad que consulta el canal objetivo,
+\begin{equation}
+\widehat\tau^{\rm oracle}_{i,u}=
+\arg\max_{\tau\in[-500,500],\mathrm{ns}}
+\left|
+\sum_a\sum_k R_{i,u,a,k}e^{j2\pi\nu_k\tau}
+\right|.
+\label{eq:oracle_effective_delay}
+\end{equation}
+Para cada candidato, la rotación compensa una pendiente; si es adecuada, los
+términos dejan de cancelarse y aumenta la concentración compleja. La búsqueda usó
+una FFT/rejilla de 8192 puntos y espaciamiento computacional de \SI{2.5}{ns}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Techo oráculo de retardo en la partición densa.}
+\label{tab:oracle_delay_b012}
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Error angular [$^\circ$]} &
+\multicolumn{2}{c}{Coherencia}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Modelo & CPO & Retardo + CPO & Bruta & Retardo + CPO\\
+\midrule
+B0 & 81.42 & 31.63 & 0.156 & 0.745\\
+B1 & 81.39 & 37.15 & 0.155 & 0.696\\
+B2 & 81.58 & 38.17 & 0.145 & 0.683\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La ganancia no prueba que $\Delta\tau_{\rm eff}$ sea un STO físico; demuestra que
+una transformación espectral unidimensional explica una fracción sustancial del
+error agregado. Tres controles reducen la posibilidad de un mero sobreajuste. Los
+retardos oráculo correlacionan 0.886 entre B0--B1, 0.834 entre B0--B2 y 0.819 entre
+B1--B2. Estimar con 16 antenas y aplicar a las otras 16 deja a B0 en
+$35.52^\circ$, frente a $30.49^\circ$ con retardo oráculo en las antenas retenidas.
+Finalmente, ajustar en subportadoras pares y evaluar en impares produce
+$31.65^\circ$, mientras extrapolar de una media banda a la otra degrada el error a
+aproximadamente $45^\circ$. Se transfiere, por tanto, una pendiente compartida;
+no se transfiere todavía la fase absoluta, porque el CPO vuelve a ajustarse.
+
+La pendiente $-2\pi\nu_k\Delta\tau_{\rm eff}$ puede condensar error de distancia,
+posición o centro de fase, trayectorias ausentes, respuesta de cadena, STO, SFO o
+retardo de cables. Denominarla \emph{retardo efectivo} evita atribuir a un reloj lo
+que también puede provenir del modelo electromagnético. Su relevancia es operacional:
+subportadoras desalineadas pueden cancelarse al combinarse, desplazar el perfil de
+retardo y degradar cualquier separación coherente.
+
+El alineamiento oráculo muestra que una pendiente espectral común explica una
+fracción importante del error. Un error de \SI{2.5}{ns} ya produce
+$22.5^\circ$ a \SI{25}{MHz} de separación, como ilustra la
+\cref{fig:delay_phase_sensitivity}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.86\textwidth]{figuras/dc01/raw10_phase_sensitivity.pdf}
+\caption{Error de fase calculado como
+$|\Delta\phi|=360^\circ|\nu\Delta\tau|$ para varios desajustes temporales. El punto
+marca \SI{2.5}{ns} y \SI{25}{MHz}. La figura es analítica y no una medición.}
+\label{fig:delay_phase_sensitivity}
+\end{figure}
+
+Esta sensibilidad no contradice la resolución nominal $1/B\simeq\SI{20}{ns}$.
+La escala $1/B$ caracteriza la separación de dos componentes en retardo; estimar
+la posición de un máximo bajo un modelo paramétrico y SNR suficiente es otro
+problema. El zero-padding interpola la función objetivo y permite una malla de
+\SI{2.5}{ns}, pero no crea ancho de banda ni garantiza resolver dos trayectorias
+separadas por esa cantidad. La cifra se interpreta como espaciamiento de búsqueda
+y como escala de error relevante para combinación coherente.
+
+\subsection{S4.3: estructura después de pendiente e intercepto}
+
+Tras retirar el retardo oráculo y el CPO por enlace se definió
+\begin{equation}
+r_{i,u,a,k}=\operatorname{wrap}\!\left(
+\Delta\phi_{i,u,a,k}
++2\pi\nu_k\widehat\tau^{\rm oracle}_{i,u}
+-\widehat\phi_{0,i,u,a}
+\right).
+\label{eq:phase_residual_after_delay}
+\end{equation}
+El residuo conserva un error angular mediano de $31.63^\circ$ y una resultante
+circular mediana de 0.786. Sin embargo, el incremento adyacente tiene magnitud
+mediana $2.41^\circ$ y concentración
+\begin{equation}
+C_1=\left|
+\frac{1}{K-1}\sum_{k=1}^{K-1}
+e^{j\operatorname{wrap}(r_{k+1}-r_k)}
+\right|=0.9974.
+\label{eq:adjacent_residual_concentration}
+\end{equation}
+Una concentración próxima a uno no significa que $r_k$ sea pequeño; significa que
+su cambio local es muy regular. Una curva desplazada decenas de grados puede ser
+espectralmente suave. La concentración decrece al aumentar la separación y presenta mayor
+heterogeneidad entre enlaces, por lo que la regularidad es local.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\textwidth]{figuras/dc01/raw09_phase_residual_structure.pdf}
+\caption{Concentración circular del residuo relativo frente a separación entre
+subportadoras. La línea muestra la mediana y la banda el rango intercuartílico entre
+enlaces. La alta concentración a separaciones pequeñas demuestra suavidad espectral, no
+identidad causal de trayectorias.}
+\label{fig:phase_residual_structure}
+\end{figure}
+
+Los conteos de caminos, la extensión de retardos y el RMS-DS se contrastaron con
+energía dominante, energía top-3/top-5, entropía energética y número efectivo de
+trayectorias. Los conteos brutos explicaron poco; los descriptores que representan
+cómo se reparte la energía resultaron más informativos. Estas asociaciones son
+observacionales: no establecen que modificar la entropía de caminos cause un error
+angular determinado. Sí justifican estudiar bases suaves o modelos circulares
+jerárquicos antes de asignar un coeficiente libre a cada camino.
+
+\subsection{S4.4: del techo oráculo a una predicción fuera de muestra}
+
+El retardo oráculo se convirtió en etiqueta de aprendizaje. Cada fila contiene
+\begin{equation}
+\left(\vect p_i,\vect z_i^{\rm RT},
+\widehat\tau^{\rm oracle}_{i,u}\right),
+\qquad \vect z_i^{\rm RT}\in\real^{48},
+\label{eq:delay_prediction_dataset}
+\end{equation}
+con posición y 48 descriptores obtenidos exclusivamente del trazado. Se compararon
+predictor constante, modelos lineales, posición, descriptores RT, su combinación y
+bosque aleatorio. En la partición densa, el bosque con posición y RT logra MAE de
+\SI{10.89}{ns}, mediana de \SI{4.74}{ns}, $R^2=0.867$ y correlación de Pearson
+0.931. La distancia mediana al vecino de entrenamiento, \SI{4.83}{cm}, impide
+interpretarlo como extrapolación regional.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Predicción de $\Delta\tau_{\rm eff}$ bajo bloques espaciales con guarda de
+\SI{0.5}{m}.}
+\label{tab:blocked_delay_prediction}
+\begin{tabular}{lr}
+\toprule
+Entrada del predictor & MAE [ns]\\
+\midrule
+Posición & 27.56\\
+Descriptores RT & 19.29\\
+Posición + descriptores RT & \textbf{18.69}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La ventaja de los descriptores RT muestra información regional que no se reduce a
+copiar una coordenada próxima. Continúa siendo transferencia dentro de dc01, con
+una etiqueta derivada del oráculo; no identifica una causa física única ni acredita
+generalización entre edificios.
+
+\subsection{S4.5: efecto de la corrección predicha sobre el canal}
+
+La salida del predictor se aplica como
+\begin{equation}
+H^{{\rm RT,corr}}_{i,u,a,k}=
+H^{\rm RT}_{i,u,a,k}
+e^{-j2\pi\nu_k\widehat\tau^{\rm pred}_{i,u}},
+\label{eq:predicted_delay_correction}
+\end{equation}
+bajo la convención de signo adoptada. Después se ajusta CPO con la medición del
+enlace evaluado; por ello la pendiente es predictiva, pero la corrección compleja
+completa sigue siendo condicional.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Efecto del retardo predicho sobre el canal. El desfase constante por enlace se ajusta con la medición evaluada en todas las filas.}
+\label{tab:phase_contribution_summary}
+\begin{tabular}{llrr}
+\toprule
+Protocolo & Corrección & Error [$^\circ$] & Coherencia\\
+\midrule
+Denso & sólo CPO & 81.42 & 0.156\\
+Denso & retardo predicho + CPO & \textbf{45.59} & \textbf{0.634}\\
+Denso & retardo oráculo + CPO & 31.63 & 0.745\\
+Por bloques & sólo CPO & 81.49 & 0.157\\
+Por bloques & retardo predicho + CPO & \textbf{64.08} & \textbf{0.448}\\
+Por bloques & retardo oráculo + CPO & 31.46 & 0.746\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figuras/dc01/raw08_phase_correction.pdf}
+\caption{MAE angular mediano de B0 bajo evaluación densa y por bloques. El retardo
+predicho es transferible respecto de la partición indicada; CPO se ajusta con el
+canal evaluado. El retardo oráculo define un techo de alineabilidad, no un método
+desplegable.}
+\label{fig:phase_correction_effect}
+\end{figure}
+
+Para vectores complejos, la coherencia empleada es
+\begin{equation}
+\rho(\vect h,\widehat{\vect h})=
+\frac{|\vect h^H\widehat{\vect h}|}
+{\|\vect h\|_2\|\widehat{\vect h}\|_2}.
+\label{eq:static_complex_coherence}
+\end{equation}
+Multiplicar cualquiera de los argumentos por $e^{j\psi}$ no cambia $\rho$. Por
+eso CPO puede reducir el error angular de $89.93^\circ$ a $81.42^\circ$ sin
+modificar la coherencia 0.156: cambia la referencia global, no la forma del vector.
+La corrección de retardo actúa de manera distinta en cada frecuencia y eleva
+$\rho$ a 0.634 en la partición densa; sí reorienta la estructura multifrecuencia.
+
+El descenso bajo bloques, visible en la \cref{fig:phase_correction_effect}, separa
+interpolación cercana de transferencia regional. Aun así, el canal corregido usa
+la medición evaluada para ajustar CPO. El retardo predicho es no oráculo, la fase
+común permanece condicional y el retardo oráculo sólo cuantifica cuánto podría
+alinearse la observación si se consultara el objetivo. La contribución demostrada
+es una alineación compleja estática parcialmente transferible, no una predicción
+autónoma de fase absoluta ni una mejora de respiración.
+
+\section{Fase común al arreglo}
+\label{sec:common_array_phase}
+
+Hasta S4.5, el intercepto de la \cref{eq:first_affine_phase_model} se estimaba por
+enlace, lo que produce $10{,}000\times2\times32=640{,}000$ ángulos a partir de
+10,000 capturas físicas. S4.6 preguntó si esa colección admitía la estructura
+\begin{equation}
+\phi_{0,i,u,a}\simeq
+\beta_{u,a}+\psi_{i,u}+\epsilon_{i,u,a}\pmod{2\pi},
+\label{eq:common_phase_decomposition}
+\end{equation}
+donde $\beta_{u,a}$ sería un sesgo fijo de antena, $\psi_{i,u}$ una dirección
+compartida dentro de la posición y el arreglo, y $\epsilon_{i,u,a}$ un residual.
+Ésta fue una hipótesis descriptiva sometida a controles, no una asignación previa
+de causas instrumentales.
+
+La resultante mediana de $\phi_0$ por antena fue 0.01024 en Tx0 y 0.00630 en Tx1;
+ninguna superó 0.023. Retirar la dirección fija $\widehat\beta_{u,a}$ dejó el error
+angular en $88.99^\circ$. Por tanto, una tabla estacionaria de offsets por antena
+no explica la fase observada durante la campaña.
+
+Después se estimó, dentro de cada captura,
+\begin{equation}
+\widehat\psi_{i,u}=\arg\!\left[
+\frac{1}{32}\sum_{a=1}^{32}
+e^{j(\phi_{0,i,u,a}-\widehat\beta_{u,a})}
+\right].
+\label{eq:common_array_phase_estimator}
+\end{equation}
+La resultante dentro de posición tuvo mediana 0.4216, cuartiles 0.3013 y 0.5499,
+y percentil 90 de 0.6897. Aunque la distribución marginal era casi uniforme, las
+32 antenas de una misma captura compartían parcialmente una dirección. Centrar con
+$\widehat\psi_{i,u}$ redujo el error de $88.99^\circ$ a $45.97^\circ$.
+
+Esta reducción es descriptiva: las mismas antenas determinan la dirección y se usan
+para medir el residual. No constituye predicción fuera de muestra. Copiar $\psi$
+desde el vecino espacial, situado a \SI{4.83}{cm} en mediana, produjo error cercano
+a $90^\circ$; aun con separaciones de alrededor de \SI{7.8}{mm} no apareció una
+ventaja. El vecino temporal mediano estaba a \SI{0.624}{s} y tampoco superó el
+control; intervalos próximos a \SI{47.9}{ms} mantuvieron aproximadamente
+$88^\circ$. No se observó una tendencia monótona con distancia o tiempo.
+
+El resultado excluye las reglas locales ensayadas bajo esta referencia. No prueba
+que $\psi$ sea fundamentalmente aleatoria: podría depender de inicio del PLL,
+disparo, estado de reloj, cadena RF, orden de adquisición, CFO/SFO residual o
+metadatos que dc01 no conserva.
+
+\subsection{Factorización obtenida y significado inferencial}
+
+La secuencia S4.2--S4.6 conduce finalmente a
+\begin{equation}
+\Delta\phi_{i,u,a,k}\simeq
+-2\pi\nu_k\Delta\tau_{{\rm eff},i,u}
++\psi_{i,u}+r^{\rm rel}_{i,u,a,k}\pmod{2\pi},
+\label{eq:phase_contribution_factorization}
+\end{equation}
+con
+\begin{equation}
+r^{\rm rel}_{i,u,a,k}=
+\beta_{u,a}+\epsilon_{i,u,a}+r_{\phi,i,u,a,k}.
+\label{eq:relative_residual_composition}
+\end{equation}
+La igualdad es una organización operacional de grados de libertad. No afirma que
+retardo, fase común y residual sean tres causas físicas independientes. El retardo
+efectivo mezcla discrepancias geométricas, electromagnéticas e instrumentales;
+$\psi$ se define por una dirección circular común; y $r^{\rm rel}$ reúne sesgos y
+curvatura no afín aún no identificados.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Evidencia que asigna un papel inferencial a cada término de la
+\cref{eq:phase_contribution_factorization}.}
+\label{tab:phase_factor_roles}
+\begin{tabularx}{\textwidth}{P{3.0cm}P{5.0cm}L}
+\toprule
+Componente & Evidencia observada & Decisión metodológica\\
+\midrule
+$\Delta\tau_{\rm eff}$ & Transferencia parcial entre modelos, antenas, frecuencias
+y regiones & Predecir con covariables disponibles y validar fuera de muestra.\\
+$\psi$ & Dirección común dentro de captura, sin predictibilidad local demostrada &
+Referenciar, medir o marginalizar como nuisance bajo el protocolo actual.\\
+$r^{\rm rel}$ & Suavidad espectral local y asociación con distribución energética &
+Modelar con estructura y abstención; no asignar una fase libre a cada trayectoria.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La consecuencia para sensado depende de la escala temporal. Una $\psi$ constante
+durante toda la secuencia puede eliminarse sin alterar la morfología diferencial.
+Si cambia paquete a paquete, ocupa la misma banda que el micromovimiento y debe
+estimarse, referenciarse o marginalizarse. Si el movimiento físico produce una
+rotación aproximadamente común del vector de canal, imponer invariancia completa
+a $\psi$ también elimina señal. Por ello, clasificarla como nuisance bajo dc01 no
+autoriza proyectar toda fase común en E1--E3 sin medir el Jacobiano posterior a la
+transformación.
+
+La clasificación conceptual se expresa como
+\begin{equation}
+Z_\phi=\{Z_\phi^{\rm pred},Z_\phi^{\rm nuisance},Z_\phi^{\rm residual}\},
+\label{eq:phase_latent_roles}
+\end{equation}
+donde el retardo efectivo ocupa parcialmente el primer bloque, la fase común se
+asigna operacionalmente al segundo bajo el protocolo actual y la estructura
+relativa permanece en el tercero.
+
+\section{S4.7-R: representaciones relativas e información espacial}
+\label{sec:s47r_results}
+
+S4.7-R evalúa si retirar grados de libertad de fase mejora la correspondencia espacial sin usar fase absoluta. El régimen es estático: no hay movimiento mecánico, referencia temporal independiente ni variable humana. La evaluación usa 500 consultas estratificadas y negativos locales, del mismo bloque y de otros bloques.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Discriminabilidad de $U(1)$ por arreglo antes y después del retardo predicho.}
+\label{tab:s47_discriminability}
+\begin{tabular}{lrrr}
+\toprule
+Métrica & RT bruto & RT con $\widehat\tau$ & Cambio\\
+\midrule
+Victoria global & 0.591333 & 0.795733 & 0.204400\\
+Victoria local & 0.5200 & 0.5560 & 0.0360\\
+Mismo bloque, no local & 0.5888 & 0.8872 & 0.2984\\
+Entre bloques & 0.6652 & 0.9440 & 0.2788\\
+Exactitud \emph{top-1} & 0.048 & 0.156 & 0.108\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los intervalos pareados son
+\[
+\mathrm{IC95\%}_{\rm global}=[0.1801,0.2281],\qquad
+\mathrm{IC95\%}_{\rm local}=[-0.0016,0.0732].
+\]
+La mejora local no es concluyente. El producto espectral con separación 64 ofrece información regional complementaria. La resolución conjunta sostenida aparece entre $1$ y $2\lambda$ (aproximadamente \SIrange{0.087}{0.174}{m}); es un umbral empírico de discriminabilidad, no un límite físico universal.
+
+La fusión convexa se ajusta sin usar test y asigna peso $0.551$ a $U(1)$ y $0.449$ al producto espectral; magnitud y el control R4 reciben peso nulo o despreciable.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Evaluación congelada de la fusión de S4.7-R.}
+\label{tab:s47_frozen_fusion}
+\begin{tabular}{lrrr}
+\toprule
+Métrica & $U(1)$ & Fusión & Cambio\\
+\midrule
+Victoria global & 0.795733 & 0.807333 & 0.011600\\
+Victoria local & 0.5560 & 0.5560 & 0.0000\\
+Mismo bloque, no local & 0.8872 & 0.8928 & 0.0056\\
+Entre bloques & 0.9440 & 0.9732 & 0.0292\\
+Exactitud \emph{top-1} & 0.156 & 0.148 & $-0.008$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La mejora global tiene IC95\% $[0.0031,0.0207]$; entre bloques, el intervalo es
+$[0.0192,0.0408]$. No se demuestra mejora local, \emph{top-1} o MRR. La representación relativa mejora discriminabilidad espacial estática, pero no demuestra fidelidad diferencial ni sensing.
+
+\section{S4.7-Ua: predictibilidad circular de la fase común}
+
+S4.7-Ua compara $p(\psi\mid x_{\rm RT})$ con baselines circulares incondicionales mediante NLL y particiones fuera de muestra. La dirección condicionada no muestra una mejora robusta; retirar el término $\beta$ no cambia la conclusión; el efecto local restringido a $\kappa>0$ permanece alrededor de cero; y una escala oráculo RT no produce una ganancia material. El mínimo observado, $\Delta\mathrm{NLL}\approx-2\times10^{-6}$, es despreciable.
+
+\begin{quote}
+No se encontró evidencia de predictibilidad circular transferible de la fase común a partir de los descriptores evaluados.
+\end{quote}
+
+En consecuencia, $\psi\in Z_\phi^{\rm nuisance}$ bajo dc01/B0, las covariables y particiones evaluadas. El cierre es operacional. No autoriza afirmar que $\psi$ sea universalmente aleatoria o que ninguna referencia futura pueda volverla predecible.
+
+\section{S4.7-Ub.0: resolubilidad del modelo por trayectorias}
+\label{sec:pathwise_resolvability}
+
+La reconstrucción de la suma de caminos alcanza error aproximado de $2.93\times10^{-7}$, lo que verifica la implementación de síntesis. La inversión de coeficientes revela, sin embargo, una diferencia severa:
+\begin{table}[htbp]
+\centering\small
+\caption{Diagnóstico inicial de la matriz pathwise.}
+\label{tab:pathwise_smoke}
+\begin{tabular}{lrrr}
+\toprule
+Caso & Rango & $\kappa(G)$ & Coherencia máxima\\
+\midrule
+Tx0 & 189/189 & $2.79\times10^2$ & 0.997073\\
+Tx1 & 178/178 & $1.45\times10^6$ & 0.999974\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las ecuaciones normales deterioran notablemente Tx1 porque cuadran la condición. Un ridge exploratorio reduce varianza a costa de un sesgo demasiado alto y no constituye una solución. Con $B\approx\SI{50}{MHz}$, la escala $1/B\approx\SI{20}{ns}$ ayuda a explicar firmas de caminos casi indistinguibles. El hallazgo metodológico es preciso: rango algebraico completo no implica identificabilidad robusta de coeficientes pathwise.
+
+El siguiente análisis estudiará valores singulares, rango efectivo, coherencias, separación de retardos y agrupación de modos no resolubles. No se presenta todavía un posterior independiente por trayectoria como resultado científico.
+
+\section{Dominio de validez y restricciones inferenciales}
+
+Los hallazgos anteriores deben leerse junto con las condiciones de la
+\cref{tab:dc01_validity}. La tabla no reduce su valor: identifica exactamente qué
+hipótesis ha sido sometida a prueba y qué evidencia falta para conectar el gemelo
+con fisiología.
+
+\begin{table}[p]
+\centering
+\caption{Restricciones principales de la evidencia estática y consecuencia para la inferencia.}
+\label{tab:dc01_validity}
+\small
+\begin{tabularx}{\textwidth}{P{4.0cm}X}
+\toprule
+Condición & Consecuencia\\
+\midrule
+Una escena dc01 & No demuestra transferencia entre edificios ni redistribución de
+objetos.\\
+\SI{3.438}{GHz} y aproximadamente \SI{50}{MHz} & No se extrapola automáticamente
+a LoRa, Wi-Fi de 2.4/5 GHz o mmWave.\\
+10,000 posiciones estáticas & No contiene respiración ni movimiento humano
+controlado.\\
+64 antenas y 1024 subportadoras & Un dispositivo COTS con menor apertura o soporte
+espectral puede perder discriminabilidad.\\
+Dispersión difusa desactivada & El canal evaluado omite contribuciones almacenadas
+que podrían alterar potencia, fase y sensibilidad.\\
+Geometría y materiales imperfectos & $\Delta\tau_{\rm eff}$ mezcla discrepancias
+electromagnéticas e instrumentales.\\
+CPO ajustada con el objetivo & La corrección compleja completa no es todavía
+autónoma en prueba.\\
+Partición densa con vecino mediano a \SI{4.83}{cm} & Puede sobreestimar
+generalización regional.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[p]
+\centering
+\caption{Restricciones adicionales de la evidencia estática y consecuencia para la inferencia.}
+\label{tab:dc01_validity_cont}
+\small
+\begin{tabularx}{\textwidth}{P{4.0cm}X}
+\toprule
+Condición & Consecuencia\\
+\midrule
+Partición por bloques dentro de dc01 & Es un contraste más fuerte, pero continúa
+siendo intraescena.\\
+Malla temporal de \SI{2.5}{ns} por zero-padding & Interpola el máximo; no aumenta
+$B$ ni garantiza resolución física a \SI{2.5}{ns}.\\
+$\psi$ estimada con las mismas 32 antenas del arreglo & La reducción angular es
+descriptiva y no una predicción fuera de muestra.\\
+640,000 fases agrupadas en 10,000 capturas & Antenas y subportadoras no son
+640,000 réplicas experimentales independientes.\\
+Vecinos espaciales y temporales evaluados & El resultado negativo excluye esas
+reglas concretas, no toda covariable posible.\\
+Sin repeticiones estacionarias tras ciclos de energía & No se identifica por
+separado la contribución de PLL, reinicio o temperatura.\\
+Sin referencia respiratoria & No puede afirmarse recuperación de forma de onda ni
+de eventos fisiológicos.\\
+Asociación con descriptores de trayectorias & Las asociaciones son predictivas; no
+establecen causalidad material o geométrica.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Evidencia dinámica complementaria de d010}
+
+DICHASUS d010 aporta una trayectoria temporal del transmisor observada por infraestructura distribuida \citep{DICHASUSd010Web}. Su variación confirma que la sensibilidad depende de geometría y enlaces, y resulta útil para auditar continuidad y particiones temporales. No constituye sensing humano con terminales fijos:
+\begin{equation}
+\frac{\partial H}{\partial p_{\rm Tx}}
+\ne
+\frac{\partial H}{\partial q_{\rm humano}}.
+\label{eq:d010_derivative_distinction}
+\end{equation}
+En el segundo caso coexisten caminos estáticos y dinámicos, cambios de dispersión y oclusiones corporales. d010 se conserva como evidencia externa complementaria, no como sustituto de E1--E3.
+
+\section{Síntesis científica y consecuencias}
+\label{sec:synthesis}
+
+La evidencia establece una jerarquía de tres resultados. Primero, B1--B2 mejoran
+propiedades macroscópicas y espaciales del canal sin mejorar fase bruta. Segundo,
+la discrepancia compleja no es completamente aleatoria: contiene una pendiente
+espectral de baja dimensión, parcialmente transferible, y un residuo suave en
+frecuencia. Tercero, la fase común no mostró predictibilidad útil con las
+covariables evaluadas y la inversión por trayectorias puede ser numéricamente
+frágil aun con rango completo.
+
+La corrección de fase no constituye el objetivo final. Su valor dependerá de que
+permita combinar frecuencias y antenas sin cancelar la perturbación corporal,
+predecir enlaces sensibles y reconstruir $x(t)$. Un sesgo absoluto constante puede
+ser irrelevante si el gemelo reproduce $\partial H/\partial x$; de manera inversa,
+una potencia estática precisa puede coexistir con un Jacobiano erróneo. Los datos
+dc01 sólo prueban el primer término de esta cadena: alineación compleja estática
+condicionada.
+
+Por tanto, el siguiente avance no depende de añadir capacidad neuronal a dc01.
+E0 debe medir si $\psi(t)$, ganancia y pendiente instrumental permanecen estables
+en la escala respiratoria. E1 debe determinar si las representaciones reducen ese
+piso sin destruir $\Delta H$ y si el gemelo reproduce dirección y norma de $J_x$.
+E2 deberá comprobar que cualquier mejora de coherencia produce menor error de forma
+de onda frente a una referencia mecánica. Sólo entonces podrá afirmarse que la
+estructura de fase encontrada aporta valor fisiológico.
+
+\section{Trazabilidad histórica}
+\label{sec:trazabilidad_avances}
+
+La nomenclatura S4.2--S4.7 se conserva para enlazar registros de experimentación. B0--B2 corresponde a calibración estática; S4.2--S4.5 a estructura y transferencia del retardo; S4.6 a fase común; S4.7-R a representaciones relativas; S4.7-Ua a predictibilidad circular; S4.7-Ub.0 a resolubilidad pathwise. Los nombres de programas, hashes, parámetros completos y estructura de artefactos se mantienen en la documentación reproducible del repositorio, fuera de la narrativa científica principal.

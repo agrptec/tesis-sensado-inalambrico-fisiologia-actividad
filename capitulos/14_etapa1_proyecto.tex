@@ -1,0 +1,164 @@
+\chapter{Etapa 1 del proyecto financiado}
+\label{ch:stage1}
+\label{ch:wbs_stage1}
+
+La metodología doctoral requiere una transición controlada desde evidencia
+computacional hacia mediciones físicas y, después, hacia un sitio real. La Etapa 1
+del proyecto financiado proporciona esa infraestructura. Este capítulo conserva
+en la monografía sólo las dependencias científicas, los productos verificables y
+los criterios que habilitan la etapa siguiente; cronogramas semanales, compras,
+movilidad y logística se mantienen en la documentación operativa del repositorio.
+
+\section{Finalidad y relación con la tesis}
+
+Durante los primeros diez meses, la etapa integra modelado, diseño experimental,
+plataforma multimodal y preparación del sitio comunitario. Su éxito no se mide por
+volumen de datos ni número de participantes, sino por reducción demostrable de
+incertidumbre: un modelo reproducible, un observable caracterizado, una plataforma
+estable, un protocolo trazable y condiciones justificadas para avanzar.
+
+La evidencia estática disponible se presenta en el \cref{ch:avances}. Su consecuencia
+para el proyecto es concreta: la siguiente incertidumbre central concierne a la
+sensibilidad física. E0 mide el piso instrumental y E1 compara el Jacobiano simulado
+con el producido por un movimiento conocido. Las auditorías computacionales y la
+comparación de representaciones pueden continuar en paralelo, pero no sustituyen
+esas intervenciones. Del mismo modo, un banco estable no acredita todavía sensado
+humano ni habilita por sí solo un despliegue comunitario.
+
+\section{Líneas de trabajo y productos científicos}
+
+Las seis líneas de trabajo se conectan por dependencia, no sólo por calendario.
+LT1 formula las predicciones; LT2 establece qué información debe conservarse; LT3
+materializa la medición; LT4 somete el sistema a perturbaciones controladas; LT5
+caracteriza el dominio de despliegue; y LT6 integra la evidencia para decidir si
+procede la Etapa 2.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Líneas de trabajo, función metodológica y evidencia de cierre.}
+\label{tab:wbs_stage1_summary}
+\begin{tabularx}{\textwidth}{P{1.0cm}P{3.0cm}L L}
+\toprule
+Línea & Función & Producto principal & Condición de cierre\\
+\midrule
+LT1 & Modelo físico y gemelo inicial & Modelo directo y discrepancia cuantificada &
+Reproducción y evaluación fuera de calibración.\\
+LT2 & Datos, protocolo y referencias & Protocolo, metadatos y control de calidad &
+Trazabilidad y reglas fijadas antes de la campaña.\\
+LT3 & Plataforma multimodal & Banco E0--E1 y sincronización & Piso, deriva,
+referencia y geometría caracterizados.\\
+LT4 & Estudio controlado & Evidencia acumulativa E0--E3 & Cada régimen satisface
+su criterio antes de aumentar complejidad.\\
+LT5 & Sitio y vinculación & Ficha técnica y caso de uso & Contraparte,
+restricciones y RF del sitio documentados.\\
+LT6 & Integración & Paquete de transición & Riesgos y supuestos pendientes
+explícitos.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+LT1 y LT2 preservan la distinción entre modelo, observable y tarea. La simulación
+debe producir $H$ bajo convenciones reproducibles; el protocolo debe especificar
+cómo se obtiene $Y$ y qué referencias quedan disponibles en inferencia. Los productos
+incluyen el modelo directo, la comparación con datos públicos, el esquema multimodal,
+los procedimientos de inclusión y exclusión y los métodos de referencia sin selección
+oráculo.
+
+LT3 implementa la arquitectura funcional del \cref{ch:platform}. El banco mínimo
+combina radio, desplazamiento mecánico medido, geometría registrada y marcas
+temporales. Radar, RGB-D, fisiología e inerciales son modalidades auxiliares según
+la pregunta; su presencia en el inventario no implica que se utilicen en toda captura.
+La estabilidad se demuestra mediante E0 y no mediante especificaciones nominales.
+
+LT4 sigue la jerarquía E0--E3. La habitación vacía establece falsas perturbaciones;
+el reflector impone posición y movimiento; el fantoma introduce forma de onda
+respiratoria; y una persona añade deformación, postura y variabilidad biológica con
+la aprobación ética correspondiente. La comparación Wi-Fi/LoRa utiliza, cuando sea
+posible, la misma perturbación y referencia para separar diferencias del operador
+de diferencias de estado.
+
+LT5 no constituye validación clínica. Su función científica es describir un cambio
+de dominio antes de medirlo: geometría, materiales, energía, infraestructura, ruido
+RF, cobertura y restricciones de montaje. El taller de divulgación y el codiseño
+ambiental pertenecen a vinculación; no se cuentan como observaciones de sujetos.
+LT6 reúne estos productos y conserva tanto resultados favorables como condiciones
+que impidan avanzar.
+
+\section{Dependencia experimental y criterios de revisión}
+
+La secuencia de evidencia es
+\[
+\begin{aligned}
+\text{modelo y protocolo}&\rightarrow \text{E0: instrumento}
+\rightarrow \text{E1: movimiento}\\
+&\rightarrow \text{E2: fantoma}
+\rightarrow \text{E3: persona}
+\rightarrow \text{sitio}.
+\end{aligned}
+\]
+Un cumplimiento cronológico no reemplaza una condición de paso. Las revisiones
+se resumen en la \cref{tab:stage1_milestones}; sus umbrales cuantitativos se fijan
+después del piloto técnico y antes de la evaluación confirmatoria, tal como establece
+el \cref{ch:methodology}.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Revisiones de la Etapa 1 y decisión que sustentan.}
+\label{tab:stage1_milestones}
+\begin{tabularx}{\textwidth}{P{1.4cm}L L}
+\toprule
+Revisión & Evidencia requerida & Decisión\\
+\midrule
+R1 & Modelo estático reproducible; discrepancia y acceso a fase declarados. &
+Fijar el modelo físico de referencia.\\
+R2 & Protocolo, calidad, gobernanza y ética formalizados. &
+Autorizar adquisición humana cuando corresponda.\\
+R3 & E0--E1 con referencia, sincronización e incertidumbre caracterizadas. &
+Continuar hacia el fantoma.\\
+R4 & E0--E2 con repetibilidad, sensibilidad y recuperación de forma de onda. &
+Iniciar E3 y preparar transferencia.\\
+R5 & Sitio, contraparte, restricciones y caso de uso definidos. &
+Preparar instalación posterior.\\
+$R_{\rm E2}$ & Cumplimiento conjunto de todos los bloques. &
+Iniciar la campaña formal de Etapa 2.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La condición conjunta es
+\begin{equation}
+R_{\rm E2}=
+R_{\rm RF}\land
+R_{\rm sinc}\land
+R_{\rm protocolo}\land
+R_{\rm etica}\land
+R_{\rm sitio}\land
+R_{\rm datos}.
+\label{eq:stage2_gate}
+\end{equation}
+La conjunción impide compensar una referencia inestable con mayor volumen de datos
+o sustituir aprobación ética por madurez técnica. Si una condición falla, el
+producto de la etapa es la delimitación documentada de ese bloqueo y la revisión
+del diseño correspondiente.
+
+\section{Recursos como restricciones del diseño}
+
+La instrumentación y el presupuesto condicionan qué observable puede adquirirse,
+pero no constituyen aportes científicos. La prioridad técnica es resolver referencia
+RF, movimiento medido, geometría y sincronización antes de ampliar modalidades. Se
+reutilizan las plataformas disponibles y cada compra se justifica por una incertidumbre
+experimental: acceso a I/Q, coherencia, precisión mecánica, registro o cadencia.
+
+El detalle de inventario, bolsas autorizadas, cotizaciones por validar, movilidad,
+kits, cronograma semanal y actividades del taller se conserva en
+\path{docs/etapa1_detalle_operativo.md}. Separarlo del argumento principal evita
+que una decisión administrativa se lea como evidencia, sin borrar la trazabilidad
+necesaria para ejecutar el proyecto.
+
+\section{Transición}
+
+La Etapa 1 conecta la teoría con una campaña auditable. El gemelo predice qué cambio
+debería observarse; el banco establece qué cambio puede medirse; E1 y E2 contrastan
+si ambas respuestas concuerdan; y el sitio define el dominio al que se intentará
+transferir. El capítulo final sintetiza qué se conoce ya, qué permanece como hipótesis
+y qué evidencia tiene mayor valor para continuar la investigación.

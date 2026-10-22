@@ -1,0 +1,103 @@
+\chapter{Síntesis científica y perspectivas}
+\label{ch:conclusions}
+
+La tesis se encuentra en una transición metodológica: existe evidencia estática
+suficiente para descartar algunas interpretaciones de la fase y seleccionar
+observables candidatos, pero la fidelidad ante perturbaciones físicas sigue abierta.
+Esta síntesis separa resultados establecidos, límites y trabajo pendiente sin
+convertir el programa experimental en conclusiones.
+
+\section{Resultados establecidos}
+
+La evidencia disponible permite separar tres niveles que antes aparecían mezclados. Primero, la calibración B0--B2 mejora propiedades macroscópicas del canal: potencia, magnitud y dispersión de retardos. Segundo, la discrepancia compleja contiene una pendiente espectral de baja dimensión que puede predecirse parcialmente desde posición y descriptores de trazado. Tercero, las representaciones relativas eliminan grados de libertad no disponibles y mejoran la discriminabilidad espacial estática.
+
+Esta separación no depende sólo del orden de las métricas. B0 ajusta una escala
+global sin modificar materiales; B1 aprende propiedades efectivas constantes por
+objeto; y B2 emplea un campo neuronal de 57,860 parámetros para permitir variación
+espacial continua. El progreso B0--B2 en potencia y RMS-DS es compatible con la
+función objetivo utilizada, que supervisa esas cantidades y no la fase compleja.
+Que B2 alcance la mejor fidelidad macroscópica mientras su coherencia bruta no
+mejora constituye evidencia de desacoplamiento entre capacidad para aproximar
+estadísticos estáticos y capacidad para conservar estructura coherente. La
+factorización posterior de la discrepancia no fue una hipótesis añadida para
+explicar ese fallo: se construyó mediante una secuencia de cancelaciones, techos
+oráculo y pruebas de transferencia que separaron pendiente espectral, fase común
+y residuo relativo.
+
+La comparación de representaciones confirma este tercer nivel dentro de dc01: la
+mejora se concentra en separación regional y no aparece una ganancia local
+concluyente. Las cifras, particiones e intervalos se conservan en el
+\cref{sec:s47r_results}; aquí interesa su alcance: se ha demostrado discriminabilidad
+estática bajo el protocolo, no resolución física universal ni sensibilidad humana.
+
+\section{Resultados negativos y límites identificados}
+
+La fase común al arreglo se estima a posteriori, pero el análisis condicionado no
+encuentra una mejora robusta frente a distribuciones circulares incondicionales.
+Los controles descritos en el \cref{ch:avances} no cambian materialmente la
+conclusión.
+
+Por tanto, bajo dc01/B0, las covariables y particiones evaluadas, $\psi$ se trata como componente de $Z_\phi^{\rm nuisance}$. Esta decisión no afirma que la fase común sea universalmente aleatoria o impredecible. Una referencia estable o metadatos distintos podrían modificar su identificabilidad.
+
+La auditoría por trayectorias verifica la síntesis, pero revela condicionamientos muy
+distintos entre transmisores. Las ecuaciones normales agravan el caso mal condicionado
+y la regularización exploratoria introduce sesgo. El resultado estable es conceptual:
+el rango algebraico completo no implica identificabilidad robusta de coeficientes
+individuales.
+
+\section{Hipótesis revisadas por la evidencia}
+
+La hipótesis de una fase absoluta directamente predecible desde geometría se ha debilitado. La evidencia favorece una estructura operacional: componente espectral parcialmente transferible, fase común tratada como perturbación bajo el protocolo actual y estructura relativa aprovechable. La factorización latente se conserva como guía conceptual, sin prometer identificación separada de todos sus bloques.
+
+Esto redefine el papel de la fase. La tesis no necesita prometer una referencia
+absoluta perfecta para recuperar respiración dentro de una secuencia. Sí necesita
+una referencia suficientemente coherente para distinguir la variación inducida por
+el cuerpo de la inducida por el radio. Corregir fase sólo constituye progreso si
+preserva el Jacobiano físico y mejora la forma de onda recuperada; reducir un error
+angular estático es insuficiente.
+
+La distinción entre fidelidad estática y diferencial adquiere prioridad. S4.7-R demuestra información espacial estática, pero no respuesta a movimiento. La evidencia d010 confirma que la sensibilidad depende de geometría e infraestructura distribuida; sin embargo,
+\begin{equation}
+\frac{\partial H}{\partial p_{\rm Tx}}
+\ne
+\frac{\partial H}{\partial q_{\rm humano}},
+\end{equation}
+por lo que no sustituye una intervención humana o mecánica con terminales fijos.
+
+La selección de enlaces también se separa de la calidad de comunicación. RSSI o
+SNR responden si el enlace transporta paquetes; SSNR, SCR y fracción dinámica
+cuantifican si existe perturbación corporal; $F_q^{\rm eq}$ descuenta direcciones
+confundidas con nuisance; y las métricas de forma de onda determinan finalmente si
+se recuperaron inspiración, espiración y pausas. Esta jerarquía evita convertir una
+condición necesaria en evidencia de la tarea completa.
+
+\section{Experimentos con mayor valor informativo}
+
+La siguiente evidencia decisiva procede de E0 y E1. E0 medirá el piso instrumental,
+reinicios y referencia. E1 impondrá desplazamientos conocidos y comparará canal
+complejo, magnitud, representación relativa, descriptor espectral y rama coherente
+mediante $\Delta H$, $J_{\rm real}$ y $J_{\rm sim}$. E2 utilizará un fantoma sólo
+después de cerrar ese régimen y contrastará morfologías asimétricas, amplitud
+variable, pausas y movimiento superpuesto. El criterio de éxito será disminuir
+error de forma de onda en condiciones reservadas, con tasa respiratoria como
+resultado secundario.
+
+En paralelo, la auditoría por trayectorias debe estudiar espectros singulares, rango
+efectivo, coherencia, separaciones de retardo y agrupación de modos no resolubles.
+La escala $1/B$ explica por qué varias firmas pueden ser casi indistinguibles. No
+se presentará un posterior independiente por trayectoria hasta definir un estimando
+resoluble. La comparación de gemelos aprendidos y la auditoría OpenLoRa pueden avanzar
+sin bloquear la física controlada.
+
+\section{Agenda doctoral y proyecto}
+
+La tesis busca establecer qué representación preserva sensibilidad, cuándo un gemelo reproduce esa sensibilidad y cómo la observabilidad apoya transferencia. El proyecto financiado aporta plataforma, metrología, referencias, extensión multirradio y sitio piloto. Su transición sigue
+\[
+\begin{aligned}
+\text{instrumentación estable}&\rightarrow
+\text{movimiento controlado detectable}\\
+&\rightarrow\text{respiración controlada recuperable}
+\rightarrow\text{persona}\rightarrow\text{piloto}.
+\end{aligned}
+\]
+El manuscrito permanece abierto en los puntos que requieren medición. Su contribución actual es delimitar con precisión qué parte del canal estático se ha modelado, qué grados de libertad no mostraron predictibilidad y por qué la fidelidad diferencial debe gobernar la siguiente etapa.

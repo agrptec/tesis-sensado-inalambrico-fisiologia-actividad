@@ -1,0 +1,160 @@
+\chapter{Metodología, conjuntos de datos y diseño experimental}
+\label{ch:methodology}
+
+La metodología se diseña para distinguir tres fuentes de éxito aparente: ajuste a
+una escena, rechazo de perturbaciones instrumentales y sensibilidad al estado físico.
+Cada experimento declara su intervención, unidad experimental, información disponible
+y afirmación admisible antes de seleccionar modelos.
+
+\section{Incorporación gradual de complejidad}
+
+La metodología avanza desde condiciones identificables hacia escenarios realistas. Cada etapa añade un solo grupo dominante de incertidumbres y conserva controles de la etapa anterior:
+\[
+\begin{aligned}
+\text{implementación}&\rightarrow\text{canal estático}
+\rightarrow\text{piso instrumental}\\
+&\rightarrow\text{movimiento conocido}
+\rightarrow\text{respiración mecánica}\\
+&\rightarrow\text{persona}\rightarrow\text{transferencia}.
+\end{aligned}
+\]
+El avance depende de evidencia, no únicamente de calendario. Si un contraste falla, el resultado determina qué referencia, geometría o modelo debe revisarse antes de aumentar complejidad.
+
+\section{Cadena de evidencia}
+
+Para cada experimento se documentan: estado físico $q$, intervención, operador de observación, representación $V$, unidad experimental, partición, métrica primaria y criterio de decisión. Se distinguen tres niveles:
+\begin{enumerate}
+\item \emph{verificación}: consistencia algebraica, dimensional y de software;
+\item \emph{validación del modelo directo}: correspondencia entre $H_{\rm model}$ y $H_{\rm real}$;
+\item \emph{validación para sensing}: correspondencia de $\Delta H$, $J_q$ o información equivalente y desempeño del problema inverso.
+\end{enumerate}
+Una verificación de suma de trayectorias no valida sus coeficientes individuales; una mejora estática no valida sensibilidad; una tarea downstream no identifica por sí sola la causa física de la mejora.
+
+\section{Conjuntos de datos y función metodológica}
+
+Los conjuntos no forman un catálogo. Cada uno resuelve una pregunta específica y posee una limitación explícita.
+
+RadioRange se incorpora como generador de perturbaciones y condiciones de ranging
+para UWB, Wi-Fi y 5G, útil para someter observables a fallas controladas
+\citep{Lyu2026RadioRange}. Al ser un simulador basado en gemelo, sus salidas sirven
+para verificación y análisis de vulnerabilidad; no sustituyen la distribución de
+errores ni la sensibilidad medidas en la plataforma propia.
+
+\begin{table}[htbp]
+\centering\scriptsize
+\caption{Conjuntos de datos y función dentro de la cadena de evidencia.}
+\label{tab:datasets_roles}
+\begin{tabularx}{\textwidth}{P{2.25cm}P{2.45cm}P{2.3cm}L L}
+\toprule
+Conjunto & Observable & Geo./referencia & Función & Limitación principal\\
+\midrule
+DICHASUS dc01 \citep{Euchner2023DICHASUSdcxx,DICHASUSdcxxWeb} & CFR MIMO-OFDM y RT & posiciones y escena & calibración estática, fase y representaciones & transmisor móvil; no hay perturbación humana\\
+DICHASUS d010 \citep{DICHASUSd010Web} & CSI distribuida temporal & trayectoria Tx & sensibilidad geométrica externa & $\partial H/\partial p_{\rm Tx}\ne\partial H/\partial q_{\rm humano}$\\
+OpenLoRa \citep{Mishra2023OpenLoRa} & I/Q y recepción PHY & condiciones de enlace & auditar operador LoRa e interferencia & no es sensing humano\\
+BreatheSmart \citep{Mosleh2022BreatheSmart} & CSI y respiración controlada & maniquí y ref. & contrastar micromovimiento y fallas & protocolo y hardware específicos\\
+WiMANS/MM-Fi \citep{Huang2024WiMANS,Yang2023MMFi} & CSI y referencias multimodales & video/actividad & representación y multiusuario & no sustituyen metrología de fase propia\\
+Datos propios & Wi-Fi/LoRa, referencia y geometría & E0--E5 & fidelidad diferencial y transferencia & pendientes de adquisición por etapas\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Evaluación sin oráculo y particiones}
+
+Un método se considera desplegable sólo si sus entradas en prueba están disponibles sin consultar el canal objetivo ni la referencia humana. Los alineamientos estimados con el objetivo se conservan como límites oráculo y se etiquetan como tales. Los hiperparámetros, máscaras, normalizaciones y pesos de fusión se ajustan con entrenamiento/validación; el test permanece congelado.
+
+Las particiones respetan la unidad de generalización. Para dc01 se comparan interpolación densa y bloques espaciales con guardas. Para secuencias, las ventanas correlacionadas permanecen en una misma partición; para sesiones y dispositivos se reserva el dominio completo cuando ésa sea la afirmación. Predicciones \emph{out-of-fold} se utilizan cuando una salida de primera etapa alimenta una segunda, evitando que el predictor vea su propio objetivo.
+
+La unidad experimental será posición, sesión o sujeto según la pregunta. Antenas, subportadoras y candidatos comparten condiciones y no se tratarán como réplicas independientes. La incertidumbre se estimará mediante bootstrap agrupado o modelos jerárquicos compatibles con esa unidad. Se informarán distribución, tamaño de efecto e intervalo, no sólo una media.
+
+\section{Jerarquía primaria de escenarios E0--E5}
+\label{sec:e0e5_hierarchy}
+
+\begin{description}
+\item[E0 --- Piso instrumental.] Estado físico fijo. Se cuantifican deriva intra-sesión, variación intersesión, reinicios, reconexiones, referencia coherente y falsas perturbaciones.
+\item[E1 --- Perturbación mecánica conocida.] Un reflector ejecuta desplazamientos medidos, estáticos y dinámicos. Se contrastan $\Delta H$, Jacobianos y geometrías de sensibilidad baja.
+\item[E2 --- Respiración mecánica.] Un fantoma reproduce formas de onda conocidas, amplitud, frecuencia, orientación y pausas. El objetivo es observabilidad y recuperación de forma de onda, sin afirmación clínica.
+\item[E3 --- Una persona.] Se incorporan deformación no rígida, postura, ropa, movimiento espontáneo y referencias fisiológicas. Sólo procede cuando E0--E2 establecen un piso interpretable.
+\item[E4 --- Varias personas.] Se evalúan asociación, separabilidad y abstención. Se activa si E3 demuestra información suficiente y no se presupone como resultado obligatorio.
+\item[E5 --- Transferencia.] Se reservan posiciones, sesiones, dispositivos, escenas o sitio piloto. Se miden curvas de error frente a datos de adaptación y detección fuera de distribución.
+\end{description}
+
+Los identificadores S1--S4.7 se mantienen únicamente como trazabilidad histórica de estudios computacionales. Los experimentos futuros se organizan por E0--E5 para evitar taxonomías paralelas.
+
+\section{Variables, representaciones y comparaciones}
+
+En E0--E2 se conservarán, como mínimo: canal complejo, magnitud, representación relativa primaria de S4.7-R, descriptor espectral auxiliar y rama coherentemente referenciada cuando exista. Todas se calculan sobre la misma adquisición y con soporte fijado. Para cada $V$ se evalúan
+\begin{align}
+D_{\rm rep}(V)&=D(V(Y_{q,1}),V(Y_{q,2})),\\
+D_{\rm fis}(V)&=D(V(Y_{q+\Delta q}),V(Y_q)),\\
+Q(V)&=\frac{D_{\rm fis}(V)}{D_{\rm rep}(V)+\epsilon},
+\end{align}
+acompañadas de $\Delta H$, dirección/norma de $J_q$ y, cuando proceda, $F_q$. $Q$ es descriptivo: no reemplaza un contraste de identificabilidad ni permite comparar métricas con escalas incompatibles.
+
+La evaluación compleja conserva, además, una jerarquía explícita de información.
+La fase bruta constituye el punto de partida; CPO estima una rotación con el mismo
+canal evaluado y sólo diagnostica el grado de libertad constante; el retardo
+oráculo consulta el objetivo para establecer un techo de alineabilidad; el retardo
+predicho utiliza exclusivamente covariables disponibles fuera de muestra; y la
+fase común al arreglo se clasifica como nuisance mientras no exista una regla de
+transferencia validada. Estas etapas están anidadas para responder preguntas
+distintas y no se comparan como si todas fueran métodos desplegables. En particular,
+la factorización de fase del \cref{ch:avances} se obtuvo progresivamente a partir
+de residuos y controles de transferencia; E0--E1 deberán volver a contrastarla
+bajo referencia instrumental y perturbaciones conocidas.
+
+El manifiesto de SNR de dc01 permite un análisis puente sin atribuir todavía
+fisiología al conjunto estático. Las consultas se estratificarán por quintiles de
+SNR y, dentro de cada estrato, se evaluarán MAE angular, coherencia, error de
+$\Delta\tau_{\rm eff}$ y concentración del residuo. Energía dominante, entropía
+de trayectorias, RMS-DS, arreglo y posición se incorporarán como covariables o
+estratos, evitando atribuir a SNR una diferencia geométrica. Una relación no
+monótona mostraría que calidad de comunicación y fidelidad compleja son dimensiones
+distintas; no constituiría evidencia de respiración.
+
+El gemelo se calibra en el estado basal y después se perturba sin reajustarlo con el objetivo. Recalibrar cada estado podría absorber la señal que se desea medir. Las diferencias finitas se calcularán con pasos positivos y negativos, repeticiones y varios tamaños de paso para separar ruido, histéresis y error de truncamiento.
+
+\section{Aprendizaje, optimización e inferencia estadística}
+
+Los modelos aprendidos se compararán con referencias de capacidad creciente: predictor
+constante, vecino, regresión regularizada, bosque aleatorio y red neuronal. Esta jerarquía
+se apoya en principios estándar de reconocimiento de patrones y aprendizaje profundo
+\citep{Bishop2006PRML,Breiman2001RandomForests,Goodfellow2016DL}; la arquitectura se
+seleccionará con validación y no por inspección del test.
+
+La comparación responde a la afirmación de cada etapa. En E0 se modela la distribución
+basal y la tasa de falsas perturbaciones; en E1, la salida principal es una respuesta
+diferencial y no una etiqueta; en E2, se evalúa la forma de onda completa; en E3--E5,
+los predictores downstream se comparan con igual información, partición y presupuesto
+de adaptación. Una red con menor error medio no se considera mejor explicación física
+si falla en geometrías previstas como ciegas o si su ventaja desaparece al reservar la
+sesión, el sujeto o la escena.
+
+Las comparaciones entre representaciones serán pareadas sobre las mismas unidades.
+La selección incluye la métrica primaria y el régimen de generalización; métricas
+secundarias diagnostican mecanismo y fallas. Cuando se prueben varias arquitecturas,
+subportadoras o enlaces, esa búsqueda pertenece al procedimiento de selección y no
+genera réplicas adicionales. El conjunto de prueba se consulta una vez para la
+comparación confirmatoria.
+
+La calibración y las pérdidas multiobjetivo se formularán con restricciones y
+regularización explícitas \citep{Boyd2004Convex}. Cuando existan gradientes en conflicto,
+GradNorm y PCGrad serán referencias algorítmicas, no garantías de identificabilidad
+\citep{Chen2018GradNorm,Yu2020PCGrad}. Los intervalos se obtendrán mediante remuestreo
+agrupado en la unidad experimental \citep{Efron1993Bootstrap}. Los errores de fase se
+analizarán con estadística circular y distribuciones apropiadas, evitando medias lineales
+sobre ángulos envueltos \citep{Mardia2000Directional}.
+
+\section{Criterios de avance y evidencia negativa}
+
+E0 se cierra cuando la variabilidad basal y las discontinuidades por reinicio pueden medirse y el protocolo detecta falsas perturbaciones. E1 exige una respuesta al movimiento distinguible del piso y una comparación del Jacobiano real con el simulado. E2 exige recuperar la forma de onda mecánica con incertidumbre calibrada en condiciones reservadas. Los umbrales numéricos se fijarán tras el piloto técnico y antes de la evaluación confirmatoria.
+
+Un resultado negativo es informativo cuando excluye una hipótesis bajo covariables, particiones y resolución declaradas. S4.7-Ua constituye este tipo de cierre para la fase común. La mala condición pathwise restringe el estimando a modos o grupos resolubles antes de introducir un posterior independiente por trayectoria. Se evita ampliar la arquitectura para ocultar ausencia de información.
+
+\section{Trazabilidad y reproducibilidad}
+
+El cuerpo científico registra definición del experimento, particiones, métricas y procedencia. Nombres de scripts, hashes, parámetros completos y estructura de artefactos se documentarán en el repositorio o en un apéndice de reproducibilidad. No se utilizarán rutas locales dependientes de una computadora como parte de la argumentación científica.
+
+Con estas reglas, la evidencia existente puede leerse sin extrapolar más allá de su
+dominio. El \cref{ch:avances} presenta el corte estático y sus resultados negativos;
+los capítulos posteriores especifican las intervenciones necesarias para evaluar la
+fidelidad diferencial.

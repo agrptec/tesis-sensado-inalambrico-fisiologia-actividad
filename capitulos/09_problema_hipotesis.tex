@@ -1,0 +1,67 @@
+\chapter{Problema de investigación, hipótesis y alcance}
+\label{ch:problem}
+
+Los capítulos anteriores identificaron una brecha precisa: robustez instrumental,
+fidelidad estática y sensibilidad física son propiedades relacionadas, pero no
+equivalentes. Este capítulo transforma esa brecha en preguntas e hipótesis
+falsables y delimita qué afirmaciones pertenecen al núcleo doctoral.
+
+\section{Problema general}
+
+El canal inalámbrico depende de la geometría, los materiales, las antenas, la forma de onda, la instrumentación y el estado humano. Una medición útil para comunicación puede contener suficiente potencia y, al mismo tiempo, poca sensibilidad a la variable fisiológica. De forma dual, una transformación que estabiliza la CSI puede eliminar la variación de fase producida por un micromovimiento.
+
+El problema doctoral consiste en establecer qué representación del canal permite separar perturbaciones instrumentales de cambios físicos sin descartar la sensibilidad necesaria para sensado; cómo debe evaluarse un gemelo para determinar si reproduce esa sensibilidad; y en qué condiciones la estructura física reduce la cantidad de datos reales requerida para transferir la inferencia. El objeto científico no es reconstruir una fase absoluta perfecta ni prometer una factorización latente completamente identificable, sino caracterizar la información preservada y sus límites.
+
+\section{Preguntas doctorales}
+
+\begin{description}
+\item[PD1 --- Invariancia y sensibilidad.] ¿Qué transformaciones de la observación reducen variabilidad instrumental sin eliminar la respuesta diferencial asociada con la perturbación física de interés?
+\item[PD2 --- Fidelidad diferencial y observabilidad.] ¿La fidelidad de $\Delta H$, del Jacobiano o de información equivalente predice mejor la recuperabilidad para sensado que la fidelidad estática aislada?
+\item[PD3 --- Transferencia.] ¿El condicionamiento físico y la observabilidad reducen los datos reales necesarios para transferir modelos entre posiciones, sesiones, escenas y operadores de radio?
+\end{description}
+
+Las tres preguntas forman una cadena. PD1 define el observable; PD2 determina si el modelo preserva la respuesta del observable; PD3 evalúa si esa estructura produce una ventaja fuera de la condición de calibración.
+
+\section{Objetivo general}
+
+Desarrollar y validar un marco de gemelo digital inalámbrico que modele el canal y su respuesta a perturbaciones físicas, cuantifique observabilidad e incertidumbre y permita recuperar movimiento y patrones fisiológicos mediante infraestructura Wi-Fi y LoRa bajo cambios de geometría, sesión e instrumentación.
+
+\section{Objetivos específicos}
+
+\begin{enumerate}[label=\textbf{O\arabic*:},leftmargin=3em]
+\item Construir y calibrar un modelo directo condicionado por geometría, materiales y configuración de radio, distinguiendo discrepancia electromagnética de perturbaciones de adquisición.
+\item Diseñar y comparar representaciones complejas, de magnitud, relativas y coherentemente referenciadas, midiendo simultáneamente repetibilidad y sensibilidad ante perturbaciones controladas.
+\item Definir métricas de fidelidad estática y diferencial, resolubilidad e información de Fisher, y contrastar su relación con el error de recuperación.
+\item Validar de manera acumulativa el piso instrumental, el movimiento mecánico y la respiración antes de extender la inferencia a personas, múltiples sujetos y escenas reales.
+\item Evaluar transferencia y eficiencia de datos entre posiciones, sesiones, escenas y operadores Wi-Fi/LoRa, con incertidumbre y abstención cuando la información sea insuficiente.
+\end{enumerate}
+
+\section{Hipótesis falsables}
+\label{sec:updated_hypotheses}
+
+\begin{description}
+\item[H1 --- Invariancia con sensibilidad.] Existe al menos una representación $V$ que reduce de forma reproducible la variabilidad atribuible a un grupo instrumental especificado y conserva una fracción medible del Jacobiano respecto de la perturbación objetivo. La hipótesis falla si la ganancia de repetibilidad se obtiene a costa de una sensibilidad indistinguible del piso instrumental.
+
+\item[H2 --- Separación de fidelidades.] El orden de los modelos según error estático no determina su orden según $D_\Delta$ o error de Jacobiano. En consecuencia, incorporar fidelidad diferencial cambia la selección del modelo en al menos una condición controlada. La hipótesis se refuta si ambas jerarquías son equivalentes dentro de la incertidumbre en todas las condiciones evaluadas.
+
+\item[H3 --- Valor predictivo de observabilidad.] Las métricas basadas en $J_q$ o $F_q$ predicen mejor que RSSI/SNR aislados qué enlaces y geometrías permiten recuperar el estado. El contraste se realiza sobre datos reservados y considera direcciones mal condicionadas, falsas predicciones de observabilidad y cobertura de incertidumbre.
+
+\item[H4 --- Transferencia apoyada en física.] El condicionamiento por geometría, descriptores del modelo directo u observabilidad reduce la cantidad de datos reales necesaria para alcanzar un desempeño fijado en una condición nueva, frente a referencias con igual capacidad y supervisión que no reciben esa estructura.
+\end{description}
+
+S4.7-R aporta evidencia estática parcial para la primera mitad de H1: ciertas representaciones relativas mejoran la discriminabilidad espacial. No prueba preservación de sensibilidad. S4.7-Ua produce un resultado negativo útil sobre la fase común condicionada. H2--H4 requieren perturbaciones físicas y evaluación externa; no se consideran confirmadas por dc01.
+
+\section{Alcance, dominios y extensiones}
+
+Wi-Fi y LoRa son dominios de validación con operadores distintos. La prioridad inicial de Wi-Fi es microdinámica multicarrier; LoRa permite estudiar alcance, presencia, movimiento macroscópico e integración con tráfico. Los escenarios multiusuario y la optimización de red se condicionan a demostrar primero observabilidad con una fuente. La recuperación de forma de onda respiratoria precede cualquier interpretación clínica.
+
+La tesis distingue cuatro niveles de afirmación: teoría establecida, resultados de la literatura, evidencia propia observada y trabajo propuesto. Los umbrales de decisión se fijarán antes de la evaluación confirmatoria; un resultado negativo que delimite identificabilidad, referencia o resolubilidad constituye evidencia científica y no se ocultará mediante una arquitectura más flexible.
+
+\section{Núcleo doctoral y proyecto financiado}
+
+El núcleo doctoral comprende PD1--PD3, H1--H4 y la cadena E0--E3. El proyecto financiado habilita instrumentación, modalidades de referencia, extensión multirradio, vinculación y un sitio piloto. Las adquisiciones y actividades de gestión son medios para resolver incertidumbres experimentales; no se presentan como contribuciones científicas. La transición a múltiples usuarios, despliegue comunitario u optimización de red dependerá de los criterios de avance del \cref{ch:stage1}.
+
+Estas preguntas no prescriben una arquitectura particular. Exigen un diseño que
+compare observables bajo intervenciones y dominios reservados. El capítulo siguiente
+define esa cadena de evidencia y las reglas que impiden confundir ajuste, validación
+y transferencia.

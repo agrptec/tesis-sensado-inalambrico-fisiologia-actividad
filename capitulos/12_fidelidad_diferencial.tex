@@ -1,0 +1,108 @@
+\chapter{Fidelidad diferencial y experimentación controlada}
+\label{ch:differential_experiments}
+\label{ch:experimental_design}
+
+Este capítulo define los protocolos que producirán la evidencia dinámica. No se presentan como resultados mediciones aún no realizadas. Su función es convertir H1--H3 en intervenciones donde instrumentación, movimiento y referencia puedan separarse.
+
+\section{E0: caracterización del piso instrumental}
+
+Con el estado físico fijo se observa
+\begin{equation}
+\widetilde H(t)\mid q=q_0.
+\end{equation}
+Se realizarán bloques dentro de una sesión, entre sesiones, después de reinicios y después de reconexiones controladas. Cuando el hardware lo permita se registrarán temperatura, ganancia, CFO, estado de reloj y telemetría. El control de escena vacía se repetirá al inicio y al final; una perturbación simulada en procesamiento verificará que la cadena de análisis puede detectarla.
+
+La salida de E0 será una distribución de deriva y discontinuidades para cada observable. Se compararán canal complejo, magnitud, $U(1)$ por arreglo, producto espectral seleccionado y rama referenciada. Una representación se considerará más repetible sólo si el cambio excede la incertidumbre entre sesiones y no proviene de ajustar con los datos evaluados.
+
+\section{Referencia coherente y límites de cancelación}
+
+Para dos cadenas simultáneas con perturbación común $c(t,k)$,
+$Y_s=cg_sH_s+n_s$ y $Y_r=cg_rH_r+n_r$. Un cociente regularizado es
+\begin{equation}
+\widetilde H_s=H_{r,\rm cal}\frac{Y_sY_r^*}{|Y_r|^2+\epsilon_r}.
+\label{eq:cabled_reference_ratio}
+\end{equation}
+La cancelación es válida si la perturbación es común, la referencia no se anula y la relación de cadenas está calibrada. La regularización introduce sesgo y una referencia física puede contener temperatura, movimiento de cable o multitrayectoria propia. Compartir \SI{10}{MHz} o PPS facilita frecuencia/tiempo, pero no garantiza fase relativa después de un reinicio. Estas condiciones se comprobarán y no se asumirán por la hoja de datos.
+
+\section{E1: perturbación mecánica conocida}
+
+Un reflector se desplazará alrededor de un estado basal con posición y orientación medidas. Para cada paso $h$ se estimará
+\begin{equation}
+\widehat J_q^{(r)}=\frac{H(q+h\vect e_r)-H(q-h\vect e_r)}{2h},
+\label{eq:finite_difference_jacobian}
+\end{equation}
+y su equivalente después de $V$. Se ensayarán varios $h$ para identificar un régimen donde error de truncamiento y amplificación de ruido sean controlables. La secuencia alternará signos y repetirá estados para medir histéresis y deriva.
+
+El gemelo se calibra sólo en el basal. Sus predicciones principales son
+\begin{equation}
+\Delta H_{\rm sim},\qquad J_{\rm sim},
+\end{equation}
+comparadas con $\Delta H_{\rm real}$ y $J_{\rm real}$. Las métricas incluyen error complejo absoluto, correlación/dirección del Jacobiano, norma, valores singulares cuando $q$ es multidimensional y desempeño de una tarea de desplazamiento. Un denominador pequeño se reportará como baja sensibilidad y no como error relativo favorable.
+
+\section{Comparación de representaciones en E1}
+
+La comparación primaria incluye:
+\begin{enumerate}
+\item CSI/CFR complejo con referencia basal;
+\item magnitud;
+\item distancia $U(1)$ por arreglo seleccionada en S4.7-R;
+\item producto espectral auxiliar R3;
+\item rama coherentemente referenciada, si E0 demuestra estabilidad;
+\item fusiones definidas con entrenamiento/validación.
+\end{enumerate}
+Para cada alternativa se medirán repetibilidad basal y respuesta física. La discriminabilidad espacial estática de S4.7-R no se reutilizará como sustituto de sensibilidad. Se incluirán geometrías previstas por la \cref{eq:bistatic_sensitivity} como favorables y casi ciegas para probar el valor predictivo del gemelo.
+
+\section{E2: fantoma respiratorio}
+
+El fantoma ejecutará movimientos de amplitud, frecuencia, orientación y forma de
+onda conocidas. No se limitará a una sinusoide, porque ésta permite estimar una
+frecuencia aun cuando el sistema distorsione la morfología. El conjunto de excitaciones
+incluirá: ciclo sinusoidal; inspiración rápida con espiración lenta; el caso inverso;
+amplitud modulada; pausas; dos frecuencias próximas en bloques separados; y movimiento
+grueso superpuesto. Cada perfil se almacena como referencia continua $x_{\rm ref}(t)$,
+junto con incertidumbre de desplazamiento y tiempo.
+
+El estimando primario será la forma de onda $\widehat x(t)$. Para una alineación
+temporal estimada exclusivamente con validación, se reportarán
+\begin{align}
+\operatorname{NRMSE}
+&=\frac{\|\widehat{\vect x}-\vect x_{\rm ref}\|_2}
+{\|\vect x_{\rm ref}-\bar x_{\rm ref}\vect 1\|_2},\\
+\rho_{\max}
+&=\max_{\ell\in\mathcal L_{\rm val}}
+\operatorname{corr}\{\widehat x(t-\ell),x_{\rm ref}(t)\}.
+\end{align}
+El retardo seleccionado, el error de amplitud por ciclo, las duraciones de
+inspiración y espiración, la detección de pausas, la coherencia espectral y una
+distancia de deformación temporal se informarán por separado. La frecuencia
+respiratoria se derivará sólo en intervalos donde una frecuencia instantánea resulte
+significativa; no será sustituto de la forma de onda.
+
+\subsection{Contrastes de fase y selección de enlaces}
+
+Sobre la misma adquisición se compararán: magnitud; fase cruda; fase con CPO
+retirada; retardo predicho más fase diferencial; retardo oráculo como techo de
+alineabilidad; productos entre antenas; productos entre frecuencias; y canal
+complejo coherentemente referenciado. El caso oráculo se etiqueta como límite
+superior y no participa en la comparación de despliegue. Cada alternativa utilizará
+idénticas ventanas y particiones.
+
+La selección mediante SNR de comunicación se contrastará con SSNR/SCR y con
+información equivalente \(F_{x\mid\zeta}\). El análisis probará tres afirmaciones
+operacionales: si el retardo efectivo mejora la combinación coherente y la forma
+de onda; si eliminar fase común reduce el piso sin proyectar \(J_x\); y si la
+fidelidad del Jacobiano predice el error respiratorio mejor que potencia o fidelidad
+estática. Estas afirmaciones son contrastes pendientes, no conclusiones del banco
+dc01.
+
+Una forma de onda mecánica recuperada no valida respiración humana ni apnea clínica. E2 determina si la cadena observa un micromovimiento conocido y si el gemelo predice condiciones favorables. La transición a E3 añadirá deformación no rígida, postura, ropa y movimiento espontáneo.
+
+\section{Preflight simulado y criterio de paso}
+
+Antes de la adquisición se podrán simular perturbaciones conocidas en Sionna RT, WaveVerse u otra plataforma para detectar representaciones que anulan el movimiento por construcción \citep{Hoydis2023SionnaRT,Zheng2026WaveVerse}. Este preflight es un diagnóstico de diseño y no validación del mundo real.
+
+El paso E0$\rightarrow$E1 requiere instrumentación estable y trazabilidad; E1$\rightarrow$E2, detección reproducible de movimiento y un régimen de diferencias finitas interpretable; E2$\rightarrow$E3, recuperación de forma de onda y evaluación de incertidumbre en datos reservados. Los fallos se documentarán como límites de observabilidad, referencia o modelo.
+
+La validez de esta secuencia depende de que radio, actuador y referencias compartan
+una geometría y una escala temporal cuantificadas. El capítulo siguiente traduce
+esas condiciones en una arquitectura de medición y un protocolo de sesión.

@@ -1,0 +1,238 @@
+\chapter{Sensado humano mediante Wi-Fi y LoRa}
+\label{ch:sensado_wifi_lora}
+
+El sensado inalámbrico reutiliza infraestructura de comunicación como instrumento
+indirecto de la escena. La literatura demuestra viabilidad en presencia, actividad
+y respiración, pero también muestra que el desempeño depende del observable, la
+geometría y el dominio de evaluación. Este capítulo organiza esa evidencia según
+la variable física y el mecanismo de información que la hace recuperable.
+
+\section{Presencia, movimiento y actividad}
+
+La presencia es una decisión entre distribuciones del canal con y sin persona; la
+actividad añade una trayectoria temporal del cuerpo. Ambas tareas suelen producir
+cambios mayores que la respiración, pero involucran oclusiones, variación de soporte
+y múltiples segmentos. Por ello, un clasificador puede explotar regularidades de
+escena sin haber aprendido un mecanismo transferible. Las revisiones recientes
+identifican la variación entre habitaciones, sujetos, dispositivos y protocolos
+como una limitación central \citep{Zhu2024Survey,Armenta2024Survey}.
+
+La magnitud, diferencias de fase, Doppler y correlaciones espaciales ofrecen vistas
+complementarias. La magnitud es menos sensible a una referencia común, pero puede
+perder pequeños cambios rotacionales; la fase conserva micromovimiento si el reloj
+es estable; las ventanas Doppler separan escalas temporales a costa de asumir
+estacionariedad local. La elección debe justificarse por el estado $q$ y no sólo
+por exactitud de clasificación.
+
+Wi-Actigraph estudia actividad nocturna y eventos fisiológicos en un entorno
+realista, mientras el trabajo de Galdino y colaboradores sitúa Wi-Fi sensing dentro
+de salud ubicua \citep{Alzaabi2025WiActigraph,Galdino2023eHealth}. Estos antecedentes
+justifican infraestructura no invasiva. Sus etiquetas y protocolos no acreditan
+por sí mismos una forma de onda fisiológica ni transferencia a otra cadena de
+adquisición; establecen tareas downstream sobre observables específicos.
+
+\section{Respiración y signos vitales como problema físico}
+
+En primera aproximación, la respiración induce un desplazamiento torácico
+$x_{\rm chest}(t)$ que perturba longitudes y coeficientes de varias trayectorias.
+El objetivo más informativo es recuperar una forma de onda alineada con una
+referencia. La frecuencia respiratoria es una cantidad derivada y puede ocultar
+errores de amplitud, fase temporal, apneas o movimiento. Sólo después de validar
+esa cadena procede estudiar variables clínicas.
+
+BreatheSmart combina un maniquí respiratorio y experimentos humanos, y muestra
+que amplitud y fase de CSI contienen información dependiente de posición y
+configuración \citep{Mosleh2022BreatheSmart}. Su valor para esta tesis reside en
+el uso de una perturbación controlada y en documentar fallas geométricas, no en
+trasladar directamente su desempeño. FarSense forma una razón entre antenas para
+rechazar perturbaciones comunes y extender alcance \citep{Zeng2019FarSense}. La
+razón requiere un denominador con energía suficiente y puede eliminar un cambio
+físico común; será tratada como una hipótesis de invariancia que debe contrastarse.
+
+El movimiento concurrente no es ruido aditivo independiente. Puede cambiar el
+soporte de trayectorias y modular con mayor energía la misma medición que contiene
+respiración. MoVi-Fi, aunque utiliza radar IR-UWB/FMCW, ilustra la separación bajo
+movimiento \citep{Chen2022MoViFi}; ViMo aporta evidencia a \SI{60}{GHz}
+\citep{Wang2020ViMo}. Sus ventajas de ancho de banda y apertura no son transferibles
+sin más a CSI sub-7 GHz. La comparación debe declarar frecuencia, $B$, apertura,
+cadencia, referencia temporal y libertad de movimiento.
+
+\section{Múltiples usuarios como separabilidad física}
+
+Con dos personas, el canal depende de $\vect q=[\vect q_1^T,\vect q_2^T]^T$. Aun
+si cada sujeto es observable de manera aislada, los Jacobianos pueden ser casi
+colineales:
+\begin{equation}
+\mat J_q=[\mat J_{q_1}\ \mat J_{q_2}].
+\end{equation}
+La separación requiere que retardo, ángulo, enlace o evolución temporal aporten
+direcciones distintas. Dos tasas respiratorias bien separadas ayudan a un método
+espectral, pero no constituyen una condición general; frecuencias cercanas,
+armónicos, no estacionariedad y asociación persona--componente generan ambigüedad.
+
+WiMANS combina CSI y video sincronizado para actividades de cero a cinco personas
+y documenta el deterioro al aumentar ocupación \citep{Huang2024WiMANS}. WiMUSE
+formula respiración multiusuario como separación ciega y expone límites de métodos
+puramente espectrales \citep{Yi2025WiMUSE}. MURAL-Fi incorpora diversidad de AoA,
+ToF, AoD y Doppler para separar regiones torácicas y tolerar movimiento involuntario
+\citep{Li2026MURALFI}. La lección conjunta es física: el aprendizaje organiza la
+diversidad disponible, pero no crea una dimensión ausente.
+
+UWB-Fi amplía el ancho de banda efectivo mediante muestreo disperso en frecuencia
+y combina recuperación estructurada con conocimiento de trazado de rayos
+\citep{Li2024UWBFI}. Esta estrategia mejora resolución potencial a cambio de
+coherencia entre canales, tiempo de barrido y una cadena distinta de Wi-Fi
+convencional. HiSAC estudia la misma motivación general desde señales de
+comunicación multibanda y sirve como referencia para distinguir ancho de banda
+agregado de ancho de banda coherentemente utilizable \citep{Pegoraro2024HiSAC}.
+Ninguna de estas ventajas se atribuirá a una CSI monobanda sin reproducir su
+operador de adquisición. Por ello, la tesis evalúa primero una fuente y habilita el régimen
+multiusuario sólo si la información conjunta predice separabilidad y permite
+abstención en geometrías ambiguas.
+
+\section{Generalización y tipos de transferencia}
+
+La palabra transferencia reúne problemas diferentes. La transferencia espacial
+reserva posiciones; la temporal reserva sesiones; la instrumental cambia radio o
+firmware; la ambiental cambia escena; y la poblacional reserva sujetos. Una
+partición aleatoria de ventanas correlacionadas no prueba ninguno de estos casos.
+Las unidades completas del dominio objetivo deben quedar fuera del ajuste.
+
+MM-Fi proporciona radio y referencias multimodales sincronizadas para estudiar
+correspondencias \citep{Yang2023MMFi}. La visión puede aportar supervisión,
+geometría o desambiguación durante el desarrollo \citep{Hori2024Fusion}; debe
+declararse si está disponible en prueba. Una ganancia que requiere cámara no puede
+atribuirse exclusivamente a RF. De modo análogo, una posición exacta usada por el
+gemelo es una entrada adicional y debe compararse con alternativas que reciben
+información equivalente.
+
+WiFi-JEPA propone aprendizaje predictivo en espacio latente
+\citep{Kim2026WiFiJEPA}. El preentrenamiento puede reducir etiquetas si el objetivo
+obliga a conservar dinámica útil. También puede codificar identidad de escena o
+descartar cambios pequeños. Por ello se evaluará mediante curvas de error frente
+a cantidad de adaptación y pruebas de preservación del Jacobiano, además de una
+métrica downstream. La física funciona como condición y diagnóstico; no sustituye
+la evaluación fuera de dominio.
+
+\section{LoRa: de CSS al observable de sensado}
+
+LoRa usa \ac{CSS}: la frecuencia instantánea recorre un ancho de banda durante cada
+símbolo. Para una envolvente $x_{\rm CSS}$,
+\begin{equation}
+y_{\rm L}(t)=\sum_{\ell}\alpha_{{\rm L},\ell}(t)
+x_{\rm CSS}(t-\tau_{{\rm L},\ell}(t))+w_{\rm L}(t).
+\label{eq:lora_channel}
+\end{equation}
+El receptor multiplica por un chirp conjugado y aplica una DFT. Bajo el modelo
+ideal, el \emph{dechirp} convierte el símbolo en un tono cuya localización permite
+demodulación \citep{Ghanaatian2019LoRaRx,Maleki2023CSS}. El vector complejo antes
+de seleccionar el bin contiene más información que RSSI, SNR o el símbolo
+decodificado.
+
+CFO, STO y SFO no desaparecen con el dechirp. Desplazan o ensanchan picos, introducen
+rotaciones entre símbolos y pueden confundirse con dinámica lenta. La estimación
+para comunicación busca decodificar; el sensado requiere además estabilidad o una
+referencia para atribuir pequeñas variaciones al entorno. Una pasarela LoRaWAN
+convencional suele entregar paquetes y resúmenes, no necesariamente I/Q coherente.
+Por ello se distingue acceso de pasarela, recepción SDR y hardware con muestras
+intermedias.
+
+Zhang y colaboradores demuestran sensado de largo alcance y a través de paredes
+mediante una razón entre antenas \citep{Zhang2020LoRa}. SenLoRa aprovecha símbolos
+de alta confianza de tráfico ambiente y convierte la disponibilidad temporal en
+una restricción conjunta de comunicación y sensado \citep{SenLoRa2025}. El estudio
+de gran escala de Xue y colaboradores relaciona configuración del transceptor con
+cobertura efectiva de sensing \citep{Xue2025LargeScaleLoRa}. Estas obras respaldan
+alcance y factibilidad, pero no garantizan que una pasarela particular preserve
+fase ni que su cadencia baste para respiración.
+
+\subsection{Calidad de comunicación y calidad para sensado}
+
+Para $Y(t)=H_s+H_d(t)+n(t)$, sean
+$P_d=\E|H_d|^2$ y $P_n=\E|n|^2$. La SNR empleada para comunicación,
+\begin{equation}
+\mathrm{SNR}_{\rm comm}
+=\frac{\E|H_s+H_d|^2}{P_n},
+\end{equation}
+responde si la señal total puede detectarse o demodularse. En cambio,
+\begin{equation}
+\mathrm{SSNR}=\frac{P_d}{P_n},\qquad
+\eta_d=\frac{P_d}{\E|H_s+H_d|^2},
+\label{eq:ssnr_dynamic_fraction}
+\end{equation}
+describen la componente dinámica sobre ruido y su fracción respecto del canal.
+Un LOS estático intenso puede producir $\mathrm{SNR}_{\rm comm}$ elevada y
+$\eta_d$ pequeña; el enlace comunica con fiabilidad y, sin embargo, apenas cambia
+con la persona.
+
+Bajo una suma \emph{incoherente} de potencias,
+$\eta_d\mathrm{SNR}_{\rm comm}\approx\mathrm{SSNR}$. La aproximación no es general,
+pues el término $2\Re\{H_sH_d^*\}$ depende de fase. SenLoRa utiliza además una
+relación de contraste de sensing de la forma
+\begin{equation}
+\mathrm{SCR}=
+\frac{\E\left|H_d/(H_s+H_d)\right|^2}{\sigma_n^2},
+\label{eq:senlora_scr}
+\end{equation}
+bajo la normalización de ruido adoptada en su procesamiento \citep{SenLoRa2025}.
+La normalización debe declararse para que la escala sea interpretable. El cociente
+puede crecer cerca de $H_s+H_d\simeq0$, precisamente donde la fase, el control de
+ganancia y la demodulación son menos estables. También requiere estimar una
+descomposición $H_s/H_d$ que no se observa directamente. Por estas razones, SSNR,
+$\eta_d$ y SCR son métricas intermedias y no pruebas de recuperación respiratoria.
+
+\subsection{Suficiencia temporal y entropía de muestra}
+
+SenLoRa emplea entropía de muestra para evaluar la estabilización de un descriptor
+temporal. Para patrones de longitud $m$ y tolerancia $r$,
+\begin{equation}
+\operatorname{SampEn}(m,r)=
+-\log\frac{A_{m+1}(r)}{B_m(r)},
+\label{eq:sample_entropy}
+\end{equation}
+donde $B_m$ cuenta coincidencias de longitud $m$ y $A_{m+1}$ las que permanecen
+coincidentes al añadir una muestra. La convergencia reportada alrededor de 600
+chirps pertenece a su configuración; no constituye un umbral universal. Depende
+de factor de ensanchamiento, ancho de banda, duración y número de chirps, tráfico,
+$m$, $r$, ruido y dinámica objetivo.
+
+Además, alta entropía puede provenir de ruido y baja entropía de una señal constante
+o de respiración periódica limpia. La tesis utilizará la entropía de muestra como
+diagnóstico de regularidad y suficiencia de ventana, distinguiéndola de entropía de
+Shannon o información de Fisher. Para forma de onda se reportarán duración
+$T_{\rm obs}$, ciclos observados, cadencia efectiva y distribución de huecos; cumplir
+Nyquist para la frecuencia fundamental no garantiza resolución de inspiración,
+espiración y pausas.
+
+OpenLoRa ofrece un banco para recepción PHY e interferencia
+\citep{Mishra2023OpenLoRa}. En esta tesis se utiliza para auditar el operador y
+las perturbaciones, no como evidencia de sensado humano. La cadena de conservación
+se documentará como
+\[
+\text{I/Q}\rightarrow\text{I/Q tras dechirp}\rightarrow
+\text{DFT compleja}\rightarrow(A,\phi)\rightarrow
+(\mathrm{RSSI},\mathrm{SNR}).
+\]
+Interferencia, colisiones y tráfico esporádico afectan tanto calidad por muestra
+como disponibilidad. Un resumen puede regularizar un estimador con datos finitos,
+pero una transformación no invertible no incrementa la información del modelo
+original \citep{Kay1993,CoverThomas2006}.
+
+\section{Dos radios y una pregunta común}
+
+Wi-Fi y LoRa comparten el estado físico, pero implementan operadores distintos:
+\begin{equation}
+Y_{\rm WiFi}=\mathcal O_{\rm WiFi}(H_{\rm WiFi}),\qquad
+Y_{\rm LoRa}=\mathcal O_{\rm LoRa}(H_{\rm LoRa}).
+\end{equation}
+Wi-Fi ofrece inicialmente mayor diversidad multicarrier para microdinámica; LoRa
+ofrece presupuesto de enlace, cobertura y otra relación entre tráfico y muestreo.
+La comparación pertinente no pregunta cuál tecnología es universalmente superior,
+sino cuánta sensibilidad útil preserva cada operador bajo igual perturbación y
+qué costo instrumental requiere.
+
+La literatura deja tres brechas conectadas: separar robustez instrumental de
+sensibilidad física, evaluar un gemelo por su respuesta y no sólo por su campo
+estático, y declarar cuándo la recuperación deja de ser identificable. El capítulo
+siguiente formaliza estas brechas mediante invariancia, resolubilidad, Jacobianos
+e información de Fisher.
